@@ -2,3 +2,4 @@ __pycache__/
 *.pyc
 .env
 *.key
+kspo-report_backup_*.zip
