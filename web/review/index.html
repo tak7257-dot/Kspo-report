@@ -101,15 +101,14 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12.5px; max-width: 80
 
     <aside class="info">
       <div class="panel"><h3>출처와 파일</h3><dl id="d-file"></dl></div>
-      <div class="panel"><h3>방문 정보 (올림픽공원 홈페이지)</h3><dl id="d-visit"></dl></div>
-      <div class="panel"><h3>2025 공연일 주차 분석</h3><div id="d-data"></div></div>
       <div class="panel"><h3>점검할 것</h3><ul class="notes" id="d-notes"></ul></div>
     </aside>
   </div>
 
   <footer>
-    3D 모델 출처: 한국체육산업개발 「올림픽공원 공연장 실감형 콘텐츠」(공공데이터포털), 올림픽홀은 기관 홈페이지 공식 도면(평면도·단면도)으로 자체 제작한 간이 모델입니다.
-    웹용 파일은 재질 형식 변환과 압축을 거쳐 원본과 색감이 다를 수 있습니다. 주차 분석 수치는 같은 달·같은 요일유형·같은 시각의 공연 없는 날을 1배로 둔 값입니다.
+    3D 모델 출처: 한국체육산업개발주식회사 「올림픽공원 공연장 실감형 콘텐츠」, 공공데이터포털(www.data.go.kr), 이용허락범위 제한 없음.
+    웹용 파일은 재질 형식 변환과 압축을 거쳐 원본과 색감이 다를 수 있습니다.
+    올림픽공원 홈페이지 자료(공연장 도면, 공연 일정)는 공공누리 표시가 없어 기관과 사용을 협의하기 전까지 이 페이지에서 뺐습니다.
   </footer>
 </div>
 
@@ -123,38 +122,26 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12.5px; max-width: 80
 // 3D 파일(GLB)은 이 페이지 호스팅이 .glb 확장자를 내보내지 않아 '.glb.wasm' 이름으로 올렸다. 내용은 GLB 그대로이고, 뷰어는 파일 내용으로 형식을 판별한다.
 const VENUES = [
   { id: 'kspo-dome', name: 'KSPO DOME', alias: '올림픽체조경기장', status: 'pending', src: null, origin: 'org',
-    file: { 원본: 'DAE 475MB (압축 59MB)', 웹용: '변환 중', 수용: '15,000석' },
-    visit: { 가까운입구: '동2문, 북2문', 가까운주차장: 'P5 · 181대 · 06:00~22:00' },
-    data: [['주말·휴일 공연일', '58일'], ['평일 공연일', '17일'], ['주말 정점', '시작 1시간 후 평소의 2.7배'], ['평일 정점', '시작 2시간 후 2.3배']],
-    notes: ['원본이 475MB DAE라 웹용(GLB) 변환이 아직 진행 중입니다.', '분석상 가장 중요한 공연장(2025 공연일 75일)이라 변환이 실패하면 좌석배치도로 대체합니다.'] },
-  { id: 'olympic-hall', name: '올림픽홀', alias: '', status: 'ready', src: 'models/olympichall.glb.wasm', origin: 'own', cam: '0deg 60deg auto',
-    file: { 원본: '공식 도면(평면도·단면도) 기반 자체 제작', 좌석: '2,470석 (2층 평면도에서 하나씩 찾아 배치)', 웹용: '0.2MB' },
-    visit: { 가까운입구: '동2문', 가까운주차장: 'P2 · 380대 · 06:00~23:00' },
-    data: [['주말·휴일 공연일', '10일'], ['평일 공연일', '6일 (표본 적음)'], ['주말 정점', '시작 1시간 후 평소의 1.8배'], ['평일', '1.2배, 영향 거의 없음']],
-    notes: ['좌석 2,470석을 2층 평면도에서 하나씩 찾아 실제 위치와 방향(등받이 기준)대로 놓았습니다. 배치가 실제와 비슷한지 봐 주세요.', '외벽·로비 벽은 도면 벽선을 그대로 세웠고, 무대동(뒷벽·옆벽 23.4m, 무대 1.3m)은 단면도 치수로 만들었습니다.', '객석 단 높이(경사 약 23도), 외벽 높이(12m), 무대 입구 높이(11m)는 도면에 없어 추정했습니다.', '모서리 계단실은 원통으로 단순화했고, 지붕은 안이 보이도록 뺐습니다.'] },
+    file: { 원본: 'DAE 475MB (압축 59MB)', 웹용: '변환 중' },
+    notes: ['원본이 475MB DAE라 웹용(GLB) 변환이 아직 진행 중입니다.', '변환이 안 되면 이 공연장은 3D 없이 안내합니다. (좌석배치도는 홈페이지 자료라 협의 전에는 쓰지 않습니다.)'] },
+  { id: 'olympic-hall', name: '올림픽홀', alias: '', status: 'excluded', src: null, origin: 'own',
+    file: { 원본: '홈페이지 공식 도면으로 자체 제작 (좌석 2,470석)', 상태: '사용 협의 전까지 제외' },
+    notes: ['도면이 공공누리 표시가 없는 홈페이지 자료라, 기관 저작권정책에 따라 담당자와 협의한 뒤에만 쓸 수 있습니다.', '허락을 받으면 만들어 둔 모델(코드는 src/_보류/)을 바로 다시 넣습니다.'] },
   { id: 'handball', name: 'SK핸드볼경기장', alias: '티켓링크 라이브 아레나', status: 'ready', src: 'models/handball.glb.wasm', origin: 'org',
-    file: { 원본: 'GLB 56MB', 웹용: '2.7MB', 수용: '5,003석' },
-    visit: { 가까운입구: '동2문', 가까운주차장: 'P6 · 220대 · 06:00~23:00' },
-    data: [['주말·휴일 공연일', '2일 (표본 부족)'], ['평일 공연일', '4일 (표본 부족)']],
-    notes: ['화면에 아주 작게 보이던 문제를 고쳤습니다(압축 단계 오류). 이제 화면에 꽉 차게 보이는지 확인해 주세요.', '분석 표본이 적어 관람객 안내는 공원 전체 기준으로 할 예정입니다.'] },
+    file: { 원본: 'GLB 56MB', 웹용: '2.7MB' },
+    notes: ['화면에 아주 작게 보이던 문제를 고쳤습니다(압축 단계 오류). 화면에 꽉 차게 보이는지 확인해 주세요.'] },
   { id: 'woori', name: '우리금융아트홀', alias: '올림픽역도경기장', status: 'ready', src: 'models/woori.glb.wasm', origin: 'org',
     file: { 원본: 'GLB 170MB', 웹용: '5.9MB' },
-    visit: { 가까운입구: '남2문', 가까운주차장: 'P7 · 94대 · 06:00~23:00' },
-    data: [],
-    notes: ['건물 단면 안으로 객석과 무대가 보이는 형태입니다. 관람객이 보기에 충분한지 확인해 주세요.', '6개 중 웹용 파일이 가장 커서 휴대폰 로딩 시간을 같이 봐 주세요.'] },
+    notes: ['건물 단면 안으로 객석과 무대가 보이는 형태입니다. 관람객이 보기에 충분한지 확인해 주세요.', '웹용 파일이 가장 커서 휴대폰 로딩 시간을 같이 봐 주세요.'] },
   { id: 'jandi', name: '88잔디마당', alias: '야외', status: 'ready', src: 'models/88jandi.glb.wasm', origin: 'org',
     file: { 원본: 'GLB 11MB', 웹용: '2.1MB' },
-    visit: { 가까운입구: '홈페이지에 공연장별 정보 없음', 가까운주차장: '-' },
-    data: [],
-    notes: ['야외 페스티벌은 홈페이지에 공연장이 "기타시설"로만 적혀 있어, 88잔디마당 공연으로 확정할 수 없습니다.', '그래서 분석 수치를 붙이지 않았습니다.'] },
+    notes: ['야외 공연장이라 실내 공연장과 다른 안내가 필요할 수 있습니다. 3D 미리보기만 넣을지 정해 주세요.'] },
   { id: 'lakeside', name: '수변무대', alias: '야외', status: 'ready', src: 'models/lakeside.glb.wasm', origin: 'org',
     file: { 원본: 'GLB 25MB', 웹용: '3.9MB' },
-    visit: { 가까운입구: '홈페이지에 공연장별 정보 없음', 가까운주차장: '-' },
-    data: [],
-    notes: ['2025년 분석 대상 공연이 없습니다. 3D 미리보기만 제공할지 정해 주세요.'] },
+    notes: ['야외 공연장입니다. 3D 미리보기만 넣을지 정해 주세요.'] },
 ];
 const ORIGIN = { org: ['기관 제공', 'org'], own: ['자체 제작', 'own'] };
-const STATUS = { ready: ['준비됨', 'ready'], pending: ['변환 중', 'pending'] };
+const STATUS = { ready: ['준비됨', 'ready'], pending: ['변환 중', 'pending'], excluded: ['제외 · 협의 필요', 'pending'] };
 const CAMS = { angle: '30deg 60deg auto', top: '0deg 5deg auto', side: '90deg 80deg auto' };
 const $ = id => document.getElementById(id);
 const mv = $('mv');
@@ -174,20 +161,16 @@ function renderList(currentId) {
     nav.append(b);
   }
   const ready = VENUES.filter(v => v.status === 'ready').length;
-  $('count').textContent = `${VENUES.length}곳 중 ${ready}곳 준비됨`;
+  $('count').textContent = `${VENUES.length}곳 중 ${ready}곳 준비됨 (1곳 협의 대기)`;
 }
 
 function show(id) {
-  const v = VENUES.find(x => x.id === id) || VENUES[1];
+  const v = VENUES.find(x => x.id === id) || VENUES[2];
   renderList(v.id);
   $('v-name').textContent = v.name + (v.alias ? ` (${v.alias})` : '');
   const [o, oc] = ORIGIN[v.origin];
   const file = $('d-file'); fillDl(file, v.file);
   const chipRow = el('dd'); chipRow.append(el('span', 'chip ' + oc, o)); file.prepend(el('dt', '', '구분'), chipRow);
-  fillDl($('d-visit'), v.visit);
-  const data = $('d-data'); data.replaceChildren();
-  if (v.data.length) { const dl = el('dl'); for (const [k, val] of v.data) dl.append(el('dt', '', k), el('dd', '', val)); data.append(dl); }
-  else data.append(el('p', 'empty', '2025년에 이 공연장으로 확정되는 공연일이 없어 분석 수치가 없습니다.'));
   const notes = $('d-notes'); notes.replaceChildren(...v.notes.map(n => el('li', '', n)));
   $('s-size').textContent = v.file['웹용'];
   $('s-load').textContent = '-'; $('s-dim').textContent = '-';
@@ -198,7 +181,9 @@ function show(id) {
     mv.cameraOrbit = v.cam || CAMS.angle; mv.src = v.src;
   } else {
     mv.hidden = true; mv.removeAttribute('src'); ph.hidden = false;
-    ph.replaceChildren(el('strong', '', '웹용 3D 변환 중'), el('span', '', '원본 파일이 커서 변환에 시간이 걸리고 있습니다. 완료되면 이 자리에 표시됩니다.'));
+    ph.replaceChildren(...(v.status === 'excluded'
+      ? [el('strong', '', '사용 협의 전까지 제외'), el('span', '', '홈페이지 도면으로 만든 모델이라, 기관의 허락을 받은 뒤에 다시 넣습니다.')]
+      : [el('strong', '', '웹용 3D 변환 중'), el('span', '', '원본 파일이 커서 변환에 시간이 걸리고 있습니다. 완료되면 이 자리에 표시됩니다.')]));
   }
   $('ctrls').hidden = !v.src;
 }
@@ -212,5 +197,5 @@ for (const [k, orbit] of Object.entries(CAMS)) {
   $('cam-' + k).addEventListener('click', () => { mv.cameraOrbit = orbit; mv.cameraTarget = 'auto auto auto'; mv.fieldOfView = 'auto'; });
 }
 addEventListener('hashchange', () => show(location.hash.slice(1)));
-show(location.hash.slice(1) || 'olympic-hall');
+show(location.hash.slice(1) || 'handball');
 </script>

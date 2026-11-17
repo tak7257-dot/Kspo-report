@@ -3,7 +3,7 @@
     python run_all.py            # 이미 받은 원본으로 다시 만들기
     python run_all.py --fetch    # 원본부터 새로 받기
                                  #  (2025 연계 데이터 API는 환경변수 KCISA_KEY, 공연행사정보 API는 KSCPERF_KEY 가 있을 때만)
-                                 #  (홈페이지 공연 일정은 --fetch-events 를 붙였을 때만: 3초 간격, 약 25분)
+                                 #  ※ 홈페이지 자료를 쓰는 단계(공연장 매칭 등)는 사전 협의 전까지 src/_보류/ 에 보관
 """
 import os
 import subprocess
@@ -22,13 +22,9 @@ if "--fetch" in sys.argv:
         print("KCISA_KEY 가 없어 2025 연계 데이터 수집은 건너뜁니다.")
     if os.environ.get("KSCPERF_KEY"):
         steps.append(["src/fetch_kscperf.py"])
-if "--fetch-events" in sys.argv:
-    steps.append(["src/fetch_events.py", "5200"])
 steps += [["src/clean.py"], ["src/metrics.py"]]
 if any(Path("data/raw/kcisa").glob("kcisa_p*.xml")):
     steps += [["src/clean_kcisa.py"], ["src/metrics_2025.py"]]
-    if any(Path("data/raw/events").glob("*.json")) and any(Path("data/raw/kscperf").glob("*.json")):
-        steps += [["src/match_venue.py"], ["src/metrics_venue.py"]]
 steps.append(["src/report.py"])
 
 for step in steps:
