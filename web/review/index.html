@@ -1,0 +1,216 @@
+<title>공연장 3D 점검</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+KR:wght@400;600&display=swap">
+<style>
+/* 레이아웃: 공연장 목록 | 3D 무대 | 점검 정보 — 3단, 휴대폰에서는 한 줄로 쌓임 */
+:root {
+  --bg: #f3f4f6; --surface: #ffffff; --stage: #e6e8ec; --ink: #15181e; --muted: #5a616d; --line: #dcdfe5;
+  --accent: #2c55c9; --accent-ink: #ffffff; --own: #a8322f; --ok: #1b7542; --warn: #9a6400;
+  --font-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-num: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #101217; --surface: #191c23; --stage: #22262f; --ink: #edf0f4; --muted: #a2a9b5; --line: #2c313b;
+  --accent: #82a4ff; --accent-ink: #0d1220; --own: #e57a74; --ok: #56c48d; --warn: #e2b44f; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #101217; --surface: #191c23; --stage: #22262f; --ink: #edf0f4; --muted: #a2a9b5; --line: #2c313b;
+  --accent: #82a4ff; --accent-ink: #0d1220; --own: #e57a74; --ok: #56c48d; --warn: #e2b44f; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.6; }
+.wrap { max-width: 1320px; margin: 0 auto; padding-block: 24px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; margin-bottom: 20px; }
+h1 { font-size: 24px; font-weight: 600; margin: 0; text-wrap: balance; }
+.sub { color: var(--muted); margin: 0; font-size: 14px; }
+.layout { display: grid; grid-template-columns: 240px minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
+@media (max-width: 1080px) { .layout { grid-template-columns: minmax(0, 1fr) 300px; } .venues { grid-column: 1 / -1; } }
+@media (max-width: 760px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+
+/* 공연장 목록 */
+.venues { display: flex; flex-direction: column; gap: 8px; }
+@media (max-width: 1080px) { .venues { flex-direction: row; overflow-x: auto; padding-bottom: 4px; } .venue { flex: 0 0 auto; } }
+.venue { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; text-align: left; width: 100%;
+  background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px;
+  font: inherit; cursor: pointer; }
+.venue:hover { border-color: var(--muted); }
+.venue:focus-visible, .ctrl:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.venue[aria-current="true"] { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
+.venue .name { font-weight: 600; }
+.venue .meta { grid-column: 1 / -1; color: var(--muted); font-size: 12.5px; }
+.chip { font-size: 12px; padding: 1px 8px; border-radius: 999px; border: 1px solid currentColor; white-space: nowrap; align-self: center; }
+.chip.ready { color: var(--ok); } .chip.pending { color: var(--warn); } .chip.own { color: var(--own); } .chip.org { color: var(--accent); }
+
+/* 3D 무대 */
+.stage { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; min-width: 0; }
+.stage-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+.stage-head h2 { margin: 0; font-size: 18px; font-weight: 600; }
+.ctrls { display: flex; flex-wrap: wrap; gap: 6px; }
+.ctrl { font: inherit; font-size: 13px; background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 4px 10px; cursor: pointer; }
+.ctrl:hover { border-color: var(--muted); }
+.viewer-box { position: relative; aspect-ratio: 4 / 3; max-width: 100%; background: var(--stage); }
+model-viewer { width: 100%; height: 100%; background: var(--stage); --poster-color: transparent; }
+.placeholder { position: absolute; inset: 0; display: grid; place-content: center; gap: 8px; text-align: center; padding: 24px; color: var(--muted); }
+.placeholder strong { color: var(--ink); font-size: 16px; }
+.status { display: flex; flex-wrap: wrap; gap: 4px 16px; padding: 10px 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+.num { font-family: var(--font-num); font-variant-numeric: tabular-nums; color: var(--ink); }
+.hint { margin: 0; padding: 0 14px 12px; color: var(--muted); font-size: 12.5px; }
+
+/* 점검 정보 */
+.info { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; min-width: 0; }
+.panel h3 { margin: 0 0 10px; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: var(--muted); }
+dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 14px; margin: 0; }
+dt { color: var(--muted); font-size: 13.5px; } dd { margin: 0; }
+ul.notes { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+.empty { color: var(--muted); margin: 0; }
+footer { margin-top: 24px; color: var(--muted); font-size: 12.5px; max-width: 80ch; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>공연장 3D 점검</h1>
+    <p class="sub">공연 관람객용 방문 가이드에 넣을 공연장 3D 모델 · 2026-11-17 기준 · <span id="count"></span></p>
+  </header>
+
+  <div class="layout">
+    <nav class="venues" id="venues" aria-label="공연장 선택"></nav>
+
+    <section class="stage" aria-live="polite">
+      <div class="stage-head">
+        <h2 id="v-name"></h2>
+        <div class="ctrls" id="ctrls">
+          <button class="ctrl" id="cam-angle" type="button">비스듬히</button>
+          <button class="ctrl" id="cam-top" type="button">위에서</button>
+          <button class="ctrl" id="cam-side" type="button">옆에서</button>
+        </div>
+      </div>
+      <div class="viewer-box" id="viewer-box">
+        <model-viewer id="mv" camera-controls shadow-intensity="0.8" exposure="1.05" interaction-prompt="none"
+          alt="선택한 공연장의 3D 모델"></model-viewer>
+        <div class="placeholder" id="placeholder" hidden></div>
+      </div>
+      <div class="status">
+        <span>로딩 <span class="num" id="s-load">-</span></span>
+        <span>웹용 파일 <span class="num" id="s-size">-</span></span>
+        <span>모델 크기 <span class="num" id="s-dim">-</span></span>
+      </div>
+      <p class="hint">끌어서 회전, 스크롤·두 손가락으로 확대, 오른쪽 버튼·두 손가락 끌기로 이동합니다.</p>
+    </section>
+
+    <aside class="info">
+      <div class="panel"><h3>출처와 파일</h3><dl id="d-file"></dl></div>
+      <div class="panel"><h3>방문 정보 (올림픽공원 홈페이지)</h3><dl id="d-visit"></dl></div>
+      <div class="panel"><h3>2025 공연일 주차 분석</h3><div id="d-data"></div></div>
+      <div class="panel"><h3>점검할 것</h3><ul class="notes" id="d-notes"></ul></div>
+    </aside>
+  </div>
+
+  <footer>
+    3D 모델 출처: 한국체육산업개발 「올림픽공원 공연장 실감형 콘텐츠」(공공데이터포털), 올림픽홀은 기관 홈페이지 공식 도면(평면도·단면도)으로 자체 제작한 간이 모델입니다.
+    웹용 파일은 재질 형식 변환과 압축을 거쳐 원본과 색감이 다를 수 있습니다. 주차 분석 수치는 같은 달·같은 요일유형·같은 시각의 공연 없는 날을 1배로 둔 값입니다.
+  </footer>
+</div>
+
+<script>
+  // 3D 압축 해독기(Draco)를 페이지와 함께 올린 파일에서 읽게 한다 (외부 사이트 로딩은 막혀 있음)
+  self.ModelViewerElement = self.ModelViewerElement || {};
+  self.ModelViewerElement.dracoDecoderLocation = new URL('draco/', location.href).href;
+</script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.0.0/dist/model-viewer.min.js"></script>
+<script>
+// 3D 파일(GLB)은 이 페이지 호스팅이 .glb 확장자를 내보내지 않아 '.glb.wasm' 이름으로 올렸다. 내용은 GLB 그대로이고, 뷰어는 파일 내용으로 형식을 판별한다.
+const VENUES = [
+  { id: 'kspo-dome', name: 'KSPO DOME', alias: '올림픽체조경기장', status: 'pending', src: null, origin: 'org',
+    file: { 원본: 'DAE 475MB (압축 59MB)', 웹용: '변환 중', 수용: '15,000석' },
+    visit: { 가까운입구: '동2문, 북2문', 가까운주차장: 'P5 · 181대 · 06:00~22:00' },
+    data: [['주말·휴일 공연일', '58일'], ['평일 공연일', '17일'], ['주말 정점', '시작 1시간 후 평소의 2.7배'], ['평일 정점', '시작 2시간 후 2.3배']],
+    notes: ['원본이 475MB DAE라 웹용(GLB) 변환이 아직 진행 중입니다.', '분석상 가장 중요한 공연장(2025 공연일 75일)이라 변환이 실패하면 좌석배치도로 대체합니다.'] },
+  { id: 'olympic-hall', name: '올림픽홀', alias: '', status: 'ready', src: 'models/olympichall.glb.wasm', origin: 'own', cam: '200deg 55deg auto',
+    file: { 원본: '공식 도면(평면도·단면도) 기반 자체 제작', 웹용: '0.03MB' },
+    visit: { 가까운입구: '동2문', 가까운주차장: 'P2 · 380대 · 06:00~23:00' },
+    data: [['주말·휴일 공연일', '10일'], ['평일 공연일', '6일 (표본 적음)'], ['주말 정점', '시작 1시간 후 평소의 1.8배'], ['평일', '1.2배, 영향 거의 없음']],
+    notes: ['객석 배치가 2층 평면도와 맞는지 (무대 맞은편 곡선 객석, 플로어 좌우 대각선 객석, 바깥 좌우 세로 객석).', '객석 위치는 도면 이미지에서 잰 값이라 1~2m 오차가 있을 수 있습니다.', '단 높이와 외벽 높이(9m)는 도면에 없어 추정했습니다. 무대 1.3m, 무대 상부 23.4m는 단면도 수치입니다.', '지붕과 로비는 안이 보이도록 생략했습니다.'] },
+  { id: 'handball', name: 'SK핸드볼경기장', alias: '티켓링크 라이브 아레나', status: 'ready', src: 'models/handball.glb.wasm', origin: 'org',
+    file: { 원본: 'GLB 56MB', 웹용: '2.7MB', 수용: '5,003석' },
+    visit: { 가까운입구: '동2문', 가까운주차장: 'P6 · 220대 · 06:00~23:00' },
+    data: [['주말·휴일 공연일', '2일 (표본 부족)'], ['평일 공연일', '4일 (표본 부족)']],
+    notes: ['화면에 아주 작게 보이던 문제를 고쳤습니다(압축 단계 오류). 이제 화면에 꽉 차게 보이는지 확인해 주세요.', '분석 표본이 적어 관람객 안내는 공원 전체 기준으로 할 예정입니다.'] },
+  { id: 'woori', name: '우리금융아트홀', alias: '올림픽역도경기장', status: 'ready', src: 'models/woori.glb.wasm', origin: 'org',
+    file: { 원본: 'GLB 170MB', 웹용: '5.9MB' },
+    visit: { 가까운입구: '남2문', 가까운주차장: 'P7 · 94대 · 06:00~23:00' },
+    data: [],
+    notes: ['건물 단면 안으로 객석과 무대가 보이는 형태입니다. 관람객이 보기에 충분한지 확인해 주세요.', '6개 중 웹용 파일이 가장 커서 휴대폰 로딩 시간을 같이 봐 주세요.'] },
+  { id: 'jandi', name: '88잔디마당', alias: '야외', status: 'ready', src: 'models/88jandi.glb.wasm', origin: 'org',
+    file: { 원본: 'GLB 11MB', 웹용: '2.1MB' },
+    visit: { 가까운입구: '홈페이지에 공연장별 정보 없음', 가까운주차장: '-' },
+    data: [],
+    notes: ['야외 페스티벌은 홈페이지에 공연장이 "기타시설"로만 적혀 있어, 88잔디마당 공연으로 확정할 수 없습니다.', '그래서 분석 수치를 붙이지 않았습니다.'] },
+  { id: 'lakeside', name: '수변무대', alias: '야외', status: 'ready', src: 'models/lakeside.glb.wasm', origin: 'org',
+    file: { 원본: 'GLB 25MB', 웹용: '3.9MB' },
+    visit: { 가까운입구: '홈페이지에 공연장별 정보 없음', 가까운주차장: '-' },
+    data: [],
+    notes: ['2025년 분석 대상 공연이 없습니다. 3D 미리보기만 제공할지 정해 주세요.'] },
+];
+const ORIGIN = { org: ['기관 제공', 'org'], own: ['자체 제작', 'own'] };
+const STATUS = { ready: ['준비됨', 'ready'], pending: ['변환 중', 'pending'] };
+const CAMS = { angle: '30deg 60deg auto', top: '0deg 5deg auto', side: '90deg 80deg auto' };
+const $ = id => document.getElementById(id);
+const mv = $('mv');
+let t0 = 0;
+
+function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+function fillDl(dl, obj) { dl.replaceChildren(); for (const [k, v] of Object.entries(obj)) { dl.append(el('dt', '', k), el('dd', '', v)); } }
+
+function renderList(currentId) {
+  const nav = $('venues'); nav.replaceChildren();
+  for (const v of VENUES) {
+    const b = el('button', 'venue'); b.type = 'button'; b.id = 'venue-' + v.id;
+    b.setAttribute('aria-current', v.id === currentId ? 'true' : 'false');
+    const [st, sc] = STATUS[v.status];
+    b.append(el('span', 'name', v.name), el('span', 'chip ' + sc, st), el('span', 'meta', (v.alias ? v.alias + ' · ' : '') + ORIGIN[v.origin][0]));
+    b.addEventListener('click', () => { location.hash = v.id; });
+    nav.append(b);
+  }
+  const ready = VENUES.filter(v => v.status === 'ready').length;
+  $('count').textContent = `${VENUES.length}곳 중 ${ready}곳 준비됨`;
+}
+
+function show(id) {
+  const v = VENUES.find(x => x.id === id) || VENUES[1];
+  renderList(v.id);
+  $('v-name').textContent = v.name + (v.alias ? ` (${v.alias})` : '');
+  const [o, oc] = ORIGIN[v.origin];
+  const file = $('d-file'); fillDl(file, v.file);
+  const chipRow = el('dd'); chipRow.append(el('span', 'chip ' + oc, o)); file.prepend(el('dt', '', '구분'), chipRow);
+  fillDl($('d-visit'), v.visit);
+  const data = $('d-data'); data.replaceChildren();
+  if (v.data.length) { const dl = el('dl'); for (const [k, val] of v.data) dl.append(el('dt', '', k), el('dd', '', val)); data.append(dl); }
+  else data.append(el('p', 'empty', '2025년에 이 공연장으로 확정되는 공연일이 없어 분석 수치가 없습니다.'));
+  const notes = $('d-notes'); notes.replaceChildren(...v.notes.map(n => el('li', '', n)));
+  $('s-size').textContent = v.file['웹용'];
+  $('s-load').textContent = '-'; $('s-dim').textContent = '-';
+  const ph = $('placeholder');
+  if (v.src) {
+    ph.hidden = true; mv.hidden = false;
+    t0 = performance.now(); $('s-load').textContent = '불러오는 중';
+    mv.cameraOrbit = v.cam || CAMS.angle; mv.src = v.src;
+  } else {
+    mv.hidden = true; mv.removeAttribute('src'); ph.hidden = false;
+    ph.replaceChildren(el('strong', '', '웹용 3D 변환 중'), el('span', '', '원본 파일이 커서 변환에 시간이 걸리고 있습니다. 완료되면 이 자리에 표시됩니다.'));
+  }
+  $('ctrls').hidden = !v.src;
+}
+
+mv.addEventListener('load', () => {
+  $('s-load').textContent = ((performance.now() - t0) / 1000).toFixed(1) + '초';
+  try { const d = mv.getDimensions(); $('s-dim').textContent = `${d.x.toFixed(0)} × ${d.z.toFixed(0)} × ${d.y.toFixed(0)}m`; } catch (e) {}
+});
+mv.addEventListener('error', () => { $('s-load').textContent = '불러오지 못함'; });
+for (const [k, orbit] of Object.entries(CAMS)) {
+  $('cam-' + k).addEventListener('click', () => { mv.cameraOrbit = orbit; mv.cameraTarget = 'auto auto auto'; mv.fieldOfView = 'auto'; });
+}
+addEventListener('hashchange', () => show(location.hash.slice(1)));
+show(location.hash.slice(1) || 'olympic-hall');
+</script>
