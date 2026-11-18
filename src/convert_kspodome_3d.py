@@ -30,6 +30,10 @@ from PIL import Image
 
 OUT = Path(__file__).resolve().parent.parent / "output" / "3d"
 INCH = 0.0254
+# 건물이 아닌 요소: 'material' = SketchUp 방위 표시(N·S·E·W 글자, 211x247m). 모델 크기를 부풀려 화면이 작게 잡히므로 뺀다.
+EXCLUDE = {"material"}
+# 건물 전체를 감싼 외피(지름 131m). 지우지 않고 남겨서, 웹 화면에서 켜고 끌 수 있게 한다.
+SHELL = "외부"
 
 
 def section(mm, start_tag: bytes, end_tag: bytes) -> bytes:
@@ -155,7 +159,9 @@ def build(dae: Path):
 
     # 전체 위치를 미터·Y위로 바꾸고, 바닥 중심을 원점으로
     all_min, all_max = np.full(3, np.inf), np.full(3, -np.inf)
-    for parts in out.values():
+    for mat_id, parts in out.items():
+        if mats.get(mat_id, {}).get("name") in EXCLUDE:
+            continue
         for P, _, _ in parts:
             Q = to_gltf_axes(P)
             all_min, all_max = np.minimum(all_min, Q.min(0)), np.maximum(all_max, Q.max(0))
@@ -164,6 +170,9 @@ def build(dae: Path):
     scene = trimesh.Scene()
     for mat_id, parts in out.items():
         info = mats.get(mat_id, {"color": [0.8, 0.8, 0.8, 1], "texture": None, "name": mat_id})
+        if info["name"] in EXCLUDE:
+            print(f"제외: {info['name']} (삼각형 {sum(len(p) for p, _, _ in parts) // 3:,}개)")
+            continue
         P = np.concatenate([to_gltf_axes(p) for p, _, _ in parts]) + offset
         has_n = all(n is not None for _, n, _ in parts)
         N = np.concatenate([np.column_stack([n[:, 0], n[:, 2], -n[:, 1]]) for _, n, _ in parts]) if has_n else None
@@ -173,7 +182,7 @@ def build(dae: Path):
                                vertex_normals=None if N is None else N.astype(np.float32), process=False)
         r, g, b, a = info["color"]
         pbr = trimesh.visual.material.PBRMaterial(
-            name=info["name"], baseColorFactor=[1, 1, 1, 1] if use_uv else [r, g, b, a],
+            name=info["name"], baseColorFactor=[1.0, 1.0, 1.0, 1.0] if use_uv else [float(r), float(g), float(b), float(a)],  # 0~1 실수로 (정수 1은 1/255로 해석됨)
             baseColorTexture=tex if use_uv else None, metallicFactor=0.0, roughnessFactor=0.9,
             doubleSided=True, alphaMode="BLEND" if a < 0.999 else "OPAQUE")
         uv = np.concatenate([u for _, _, u in parts]).astype(np.float32) if use_uv else None

@@ -80,11 +80,7 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12.5px; max-width: 80
     <section class="stage" aria-live="polite">
       <div class="stage-head">
         <h2 id="v-name"></h2>
-        <div class="ctrls" id="ctrls">
-          <button class="ctrl" id="cam-angle" type="button">비스듬히</button>
-          <button class="ctrl" id="cam-top" type="button">위에서</button>
-          <button class="ctrl" id="cam-side" type="button">옆에서</button>
-        </div>
+        <div class="ctrls" id="ctrls"></div>
       </div>
       <div class="viewer-box" id="viewer-box">
         <model-viewer id="mv" camera-controls shadow-intensity="0.8" exposure="1.05" interaction-prompt="none"
@@ -121,9 +117,14 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12.5px; max-width: 80
 <script>
 // 3D 파일(GLB)은 이 페이지 호스팅이 .glb 확장자를 내보내지 않아 '.glb.wasm' 이름으로 올렸다. 내용은 GLB 그대로이고, 뷰어는 파일 내용으로 형식을 판별한다.
 const VENUES = [
-  { id: 'kspo-dome', name: 'KSPO DOME', alias: '올림픽체조경기장', status: 'pending', src: null, origin: 'org',
-    file: { 원본: 'DAE 475MB (압축 59MB)', 웹용: '변환 중' },
-    notes: ['원본이 475MB DAE라 웹용(GLB) 변환이 아직 진행 중입니다.', '변환이 안 되면 이 공연장은 3D 없이 안내합니다. (좌석배치도는 홈페이지 자료라 협의 전에는 쓰지 않습니다.)'] },
+  { id: 'kspo-dome', name: 'KSPO DOME', alias: '올림픽체조경기장', status: 'ready', src: 'models/kspodome.glb.wasm', origin: 'org', shell: '외부',
+    file: { 원본: 'DAE 475MB (SketchUp)', 웹용: '11.7MB', 형상: '삼각형 263만 개, 단순화 없음', 재질: '86종, 텍스처 9장 원본 해상도' },
+    cams: [
+      { label: '객석 안에서', orbit: '0deg 82deg 28m', target: '0m 9m -8m', fov: '70deg', shell: false },
+      { label: '위에서', orbit: '0deg 1deg 250m', shell: false },
+      { label: '바깥에서', orbit: '30deg 62deg 260m', shell: false },
+    ],
+    notes: ['원본 형상을 줄이지 않고 옮겼습니다. 바꾼 것은 단위(인치 → m), 위쪽 축, 재질별로 부품을 합친 것뿐입니다.', '건물을 감싼 외피(원본의 단순한 원통 덩어리)는 지우지 않았고, 위 버튼으로 켜고 끌 수 있습니다. 외벽 패널과 지붕이 보이도록 기본은 꺼 둡니다.', 'SketchUp 방위 표시(N·S·E·W 글자, 211×247m)는 건물이 아니라서 뺐습니다.', '삼각형이 많아 휴대폰에서 로딩·회전이 느린지 꼭 봐 주세요.'] },
   { id: 'olympic-hall', name: '올림픽홀', alias: '', status: 'excluded', src: null, origin: 'own',
     file: { 원본: '홈페이지 공식 도면으로 자체 제작 (좌석 2,470석)', 상태: '사용 협의 전까지 제외' },
     notes: ['도면이 공공누리 표시가 없는 홈페이지 자료라, 기관 저작권정책에 따라 담당자와 협의한 뒤에만 쓸 수 있습니다.', '허락을 받으면 만들어 둔 모델(코드는 src/_보류/)을 바로 다시 넣습니다.'] },
@@ -142,7 +143,25 @@ const VENUES = [
 ];
 const ORIGIN = { org: ['기관 제공', 'org'], own: ['자체 제작', 'own'] };
 const STATUS = { ready: ['준비됨', 'ready'], pending: ['변환 중', 'pending'], excluded: ['제외 · 협의 필요', 'pending'] };
-const CAMS = { angle: '30deg 60deg auto', top: '0deg 5deg auto', side: '90deg 80deg auto' };
+const DEFAULT_CAMS = [ { label: '비스듬히', orbit: '30deg 60deg auto' }, { label: '위에서', orbit: '0deg 5deg auto' }, { label: '옆에서', orbit: '90deg 80deg auto' } ];
+let current = null, shellOn = false;
+function setShell(on) {   // 외피 재질을 투명/불투명으로
+  shellOn = on; const v = current; if (!v || !v.shell || !mv.model) return;
+  for (const m of mv.model.materials) if (m.name === v.shell) {
+    const c = m.pbrMetallicRoughness.baseColorFactor; m.setAlphaMode(on ? 'OPAQUE' : 'BLEND'); m.pbrMetallicRoughness.setBaseColorFactor([c[0], c[1], c[2], on ? 1 : 0]);
+  }
+  const b = document.getElementById('shell-btn'); if (b) b.textContent = on ? '외피 숨기기' : '외피 보기';
+}
+function applyCam(c) {
+  mv.cameraOrbit = c.orbit; mv.cameraTarget = c.target || 'auto auto auto'; mv.fieldOfView = c.fov || 'auto';
+  mv.jumpCameraToGoal();   // 건물 안팎을 오갈 때 벽을 뚫고 지나가는 이동 대신 바로 이동
+  if (c.shell !== undefined) setShell(c.shell);
+}
+function renderCtrls(v) {
+  const box = $('ctrls'); box.replaceChildren();
+  for (const c of (v.cams || DEFAULT_CAMS)) { const b = el('button', 'ctrl', c.label); b.type = 'button'; b.addEventListener('click', () => applyCam(c)); box.append(b); }
+  if (v.shell) { const b = el('button', 'ctrl', '외피 보기'); b.type = 'button'; b.id = 'shell-btn'; b.addEventListener('click', () => setShell(!shellOn)); box.append(b); }
+}
 const $ = id => document.getElementById(id);
 const mv = $('mv');
 let t0 = 0;
@@ -161,11 +180,11 @@ function renderList(currentId) {
     nav.append(b);
   }
   const ready = VENUES.filter(v => v.status === 'ready').length;
-  $('count').textContent = `${VENUES.length}곳 중 ${ready}곳 준비됨 (1곳 협의 대기)`;
+  $('count').textContent = `${VENUES.length}곳 중 ${ready}곳 준비됨 (올림픽홀 협의 대기)`;
 }
 
 function show(id) {
-  const v = VENUES.find(x => x.id === id) || VENUES[2];
+  const v = VENUES.find(x => x.id === id) || VENUES[0];
   renderList(v.id);
   $('v-name').textContent = v.name + (v.alias ? ` (${v.alias})` : '');
   const [o, oc] = ORIGIN[v.origin];
@@ -178,24 +197,28 @@ function show(id) {
   if (v.src) {
     ph.hidden = true; mv.hidden = false;
     t0 = performance.now(); $('s-load').textContent = '불러오는 중';
-    mv.cameraOrbit = v.cam || CAMS.angle; mv.src = v.src;
+    current = v; renderCtrls(v);
+    mv.minCameraOrbit = v.shell ? 'auto auto 0.5m' : 'auto auto auto';   // 큰 공연장은 카메라가 건물 안으로 들어갈 수 있게
+    mv.maxCameraOrbit = v.shell ? 'auto auto 400m' : 'auto auto auto';   // 바깥에서 건물 전체가 보이도록 거리 제한 완화
+    mv.maxFieldOfView = v.shell ? '90deg' : 'auto';                      // 객석 시점은 넓은 시야각 필요
+    const first = (v.cams || [])[0];
+    mv.cameraOrbit = first ? first.orbit : (v.cam || DEFAULT_CAMS[0].orbit); mv.cameraTarget = (first && first.target) || 'auto auto auto'; mv.fieldOfView = (first && first.fov) || 'auto';
+    mv.src = v.src;
   } else {
     mv.hidden = true; mv.removeAttribute('src'); ph.hidden = false;
     ph.replaceChildren(...(v.status === 'excluded'
       ? [el('strong', '', '사용 협의 전까지 제외'), el('span', '', '홈페이지 도면으로 만든 모델이라, 기관의 허락을 받은 뒤에 다시 넣습니다.')]
       : [el('strong', '', '웹용 3D 변환 중'), el('span', '', '원본 파일이 커서 변환에 시간이 걸리고 있습니다. 완료되면 이 자리에 표시됩니다.')]));
   }
-  $('ctrls').hidden = !v.src;
+  $('ctrls').hidden = !v.src; if (!v.src) current = v;
 }
 
 mv.addEventListener('load', () => {
+  if (current && current.shell) setShell(((current.cams || [])[0] || {}).shell || false);
   $('s-load').textContent = ((performance.now() - t0) / 1000).toFixed(1) + '초';
   try { const d = mv.getDimensions(); $('s-dim').textContent = `${d.x.toFixed(0)} × ${d.z.toFixed(0)} × ${d.y.toFixed(0)}m`; } catch (e) {}
 });
 mv.addEventListener('error', () => { $('s-load').textContent = '불러오지 못함'; });
-for (const [k, orbit] of Object.entries(CAMS)) {
-  $('cam-' + k).addEventListener('click', () => { mv.cameraOrbit = orbit; mv.cameraTarget = 'auto auto auto'; mv.fieldOfView = 'auto'; });
-}
 addEventListener('hashchange', () => show(location.hash.slice(1)));
-show(location.hash.slice(1) || 'handball');
+show(location.hash.slice(1) || 'kspo-dome');
 </script>
