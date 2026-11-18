@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>방문 계획</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&amp;family=Noto+Sans+KR:wght@400;500;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#1F6B4E}a:hover{color:#164D38}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #1F6B4E;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F4F5F0; color: #17201B; font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <header style="padding: 18px 16px 10px; display: flex; align-items: center; gap: 10px">
+    <a href="Venue.dc.html" aria-label="공연장 3D로 돌아가기" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: #FFFFFF; border: 1px solid #DDE1DA; color: #17201B">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
+    </a>
+    <div style="display: flex; flex-direction: column; gap: 1px">
+      <h1 style="margin: 0; font-size: 20px; font-weight: 700">방문 계획</h1>
+      <p style="margin: 0; font-size: 12.5px; color: #5B6660">KSPO DOME · 공연일 주차 혼잡 예상</p>
+    </div>
+  </header>
+
+  <section aria-label="관람 조건" style="margin: 0 16px; background: #FFFFFF; border: 1px solid #DDE1DA; border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 10px">
+    <div role="group" aria-label="관람 날짜" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px">
+      <button type="button" aria-pressed="{{weekdayOn}}" onClick="{{pickWeekday}}" style="{{weekdayStyle}}">평일</button>
+      <button type="button" aria-pressed="{{weekendOn}}" onClick="{{pickWeekend}}" style="{{weekendStyle}}">주말·공휴일</button>
+    </div>
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+      <span style="font-size: 14px; font-weight: 500">티켓의 공연 시작 시각</span>
+      <div style="display: flex; align-items: center; gap: 6px">
+        <button type="button" aria-label="1시간 앞당기기" onClick="{{earlier}}" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #C9CEC6; background: #FFFFFF; font: inherit; font-size: 20px; color: #17201B">−</button>
+        <output aria-live="polite" style="min-width: 64px; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 20px">{{startLabel}}</output>
+        <button type="button" aria-label="1시간 늦추기" onClick="{{later}}" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #C9CEC6; background: #FFFFFF; font: inherit; font-size: 20px; color: #17201B">+</button>
+      </div>
+    </div>
+    <label for="rain" style="display: flex; align-items: center; gap: 8px; font-size: 14px; min-height: 32px">
+      <input id="rain" type="checkbox" checked="{{rain}}" onChange="{{toggleRain}}" style="width: 20px; height: 20px; accent-color: #1F6B4E">
+      비 오는 날
+    </label>
+  </section>
+
+  <section aria-label="시간대별 혼잡 예상" style="margin: 12px 16px 0; background: #FFFFFF; border: 1px solid #DDE1DA; border-radius: 16px; padding: 12px 12px 10px; display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; justify-content: space-between; align-items: baseline">
+      <h2 style="margin: 0; font-size: 14px; font-weight: 700">시간대별 주차 혼잡</h2>
+      <span style="font-size: 11.5px; color: #5B6660">평소 = 1배</span>
+    </div>
+    <div role="img" aria-label="{{chartLabel}}" style="height: 168px; display: grid; grid-template-columns: repeat(14, minmax(0, 1fr)); gap: 3px; align-items: end">
+      <sc-for list="{{bars}}" as="bar" hint-placeholder-count="14">
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 168px; gap: 3px">
+          <span style="font-size: 10px; font-weight: 700; color: #17201B; height: 13px">{{bar.tag}}</span>
+          <div style="width: 100%; height: {{bar.h}}px; background: {{bar.color}}; border-radius: 4px 4px 0 0; box-shadow: {{bar.ring}}"></div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(14, minmax(0, 1fr)); gap: 3px; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #5B6660; text-align: center">
+      <sc-for list="{{bars}}" as="bar" hint-placeholder-count="14"><span>{{bar.hour}}</span></sc-for>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 11.5px; color: #3A443E">
+      <span style="display: flex; align-items: center; gap: 5px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #CFE3D6"></span>보통 (1.3배 미만)</span>
+      <span style="display: flex; align-items: center; gap: 5px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #F2B45A"></span>붐빔</span>
+      <span style="display: flex; align-items: center; gap: 5px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #C8541D"></span>매우 붐빔 (2배 이상)</span>
+    </div>
+  </section>
+
+  <section aria-label="안내" style="margin: 12px 16px 0; display: flex; flex-direction: column; gap: 8px">
+    <div style="background: #1F6B4E; color: #FFFFFF; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 4px">
+      <p style="margin: 0; font-size: 12px; font-weight: 500; letter-spacing: 0.02em; color: #D6EADF">권장 도착</p>
+      <p style="margin: 0; font-size: 20px; font-weight: 700">{{arriveTitle}}</p>
+      <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #E8F3EC">{{arriveDetail}}</p>
+    </div>
+    <div style="background: #FFFFFF; border: 1px solid #DDE1DA; border-radius: 14px; padding: 12px 14px; font-size: 13px; line-height: 1.55">
+      <strong style="font-weight: 700">공연이 끝날 때</strong> · {{exitText}}
+    </div>
+    <sc-if value="{{rain}}" hint-placeholder-val="{{false}}">
+      <div style="background: #FFFFFF; border: 1px solid #DDE1DA; border-radius: 14px; padding: 12px 14px; font-size: 13px; line-height: 1.55">
+        <strong style="font-weight: 700">비 오는 날</strong> · 2025년 비 온 시간에는 평소보다 차가 약 9% 적었어요(168시간 기준).
+      </div>
+    </sc-if>
+  </section>
+
+  <footer style="margin-top: auto; padding: 10px 20px 20px; font-size: 11px; line-height: 1.5; color: #5B6660">
+    2025년 공연일 시간대별 평균(공원 전체). 같은 달·같은 시각의 공연 없는 날을 1배로 둔 예상치이며 실제와 다를 수 있어요. 데이터: 한국체육산업개발, 공공데이터포털
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { day: 'weekend', start: 18, rain: false };
+  }
+  renderVals() {
+    // 2025년 공연일 시간대별 주차 지수 (같은 달·같은 시각의 공연 없는 날 = 100), 0~23시
+    var PROFILE = {
+      weekend: [99, 99, 100, 102, 102, 104, 113, 129, 136, 146, 150, 155, 159, 158, 164, 184, 204, 226, 252, 246, 197, 148, 115, 108],
+      weekday: [108, 108, 107, 107, 106, 99, 97, 97, 96, 98, 100, 101, 102, 103, 105, 107, 111, 119, 140, 145, 153, 186, 183, 116]
+    };
+    var s = this.state;
+    var rainFactor = s.rain ? 0.91 : 1;
+    var idx = PROFILE[s.day].map(function (v) { return v * rainFactor; });
+    var level = function (v) { return v < 130 ? '보통' : (v < 200 ? '붐빔' : '매우 붐빔'); };
+    var color = function (v) { return v < 130 ? '#CFE3D6' : (v < 200 ? '#F2B45A' : '#C8541D'); };
+    var ratio = function (v) { return (v / 100).toFixed(1) + '배'; };
+
+    var bars = [];
+    for (var h = 10; h <= 23; h++) {
+      bars.push({
+        hour: String(h),
+        h: Math.round(idx[h] / 260 * 140),
+        color: color(idx[h]),
+        tag: h === s.start ? '시작' : '',
+        ring: h === s.start ? '0 0 0 2px #17201B' : 'none'
+      });
+    }
+
+    // 권장 도착: 시작 전 시각 중 '매우 붐빔'이 아닌 마지막 시각
+    var arrive = null;
+    for (var a = s.start - 1; a >= 10; a--) { if (idx[a] < 200) { arrive = a; break; } }
+    var before = idx[s.start - 1];
+    var arriveTitle, arriveDetail;
+    if (arrive === s.start - 1) {
+      arriveTitle = arrive + '시까지 도착';
+      arriveDetail = '시작 1시간 전(' + arrive + '시)은 평소의 ' + ratio(before) + ', ' + level(before) + ' 단계예요.';
+    } else if (arrive !== null) {
+      arriveTitle = arrive + '시 이전 도착 또는 대중교통';
+      arriveDetail = (arrive + 1) + '시부터 매우 붐빔(2배 이상)이에요. 시작 1시간 전(' + (s.start - 1) + '시)은 평소의 ' + ratio(before) + '.';
+    } else {
+      arriveTitle = '대중교통 권장';
+      arriveDetail = '시작 전 시간대가 모두 매우 붐빔이에요.';
+    }
+    var end = s.start + 2;
+    var exitText = '공연이 약 2시간이라면 ' + end + '~' + (end + 1) + '시에 차가 한꺼번에 빠져요. 바로 출차하기보다 여유를 두거나 대중교통을 이용하세요.';
+    var on = 'font: inherit; font-size: 14px; font-weight: 700; min-height: 44px; border-radius: 12px; border: 1px solid #1F6B4E; background: #1F6B4E; color: #FFFFFF';
+    var off = 'font: inherit; font-size: 14px; min-height: 44px; border-radius: 12px; border: 1px solid #C9CEC6; background: #FFFFFF; color: #17201B';
+    var self = this;
+    return {
+      bars: bars,
+      startLabel: s.start + ':00',
+      rain: s.rain,
+      weekdayOn: s.day === 'weekday' ? 'true' : 'false',
+      weekendOn: s.day === 'weekend' ? 'true' : 'false',
+      weekdayStyle: s.day === 'weekday' ? on : off,
+      weekendStyle: s.day === 'weekend' ? on : off,
+      arriveTitle: arriveTitle,
+      arriveDetail: arriveDetail,
+      exitText: exitText,
+      chartLabel: (s.day === 'weekend' ? '주말·공휴일' : '평일') + ' 공연일 10시~23시 주차 혼잡. ' + s.start + '시 시작 기준, 시작 1시간 전은 평소의 ' + ratio(before),
+      pickWeekday: function () { self.setState({ day: 'weekday', start: 19 }); },
+      pickWeekend: function () { self.setState({ day: 'weekend', start: 18 }); },
+      earlier: function () { self.setState({ start: Math.max(11, s.start - 1) }); },
+      later: function () { self.setState({ start: Math.min(21, s.start + 1) }); },
+      toggleRain: function () { self.setState({ rain: !s.rain }); }
+    };
+  }
+}
+</script>
+</body>
+</html>
