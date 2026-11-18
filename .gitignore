@@ -3,3 +3,4 @@ __pycache__/
 .env
 *.key
 kspo-report_backup_*.zip
+output/3d/*.raw.glb
