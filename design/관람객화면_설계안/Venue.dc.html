@@ -2,64 +2,52 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<title>KSPO DOME 3D</title>
+<title>KSPO DOME 미리보기</title>
 <script src="./support.js"></script>
 </head>
 <body>
 <x-dc>
 <helmet>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&amp;family=Noto+Sans+KR:wght@400;500;700;900&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&amp;family=IBM+Plex+Sans+KR:wght@400;500;600&amp;display=swap">
 <style>
 body{margin:0}
-a{color:#7C3AED}a:hover{color:#5B21B6}
-button,a.cta{transition:background-color 200ms ease, box-shadow 200ms ease}
-button:active,a.cta:active{box-shadow:0 0 0 3px #C4B5FD}
-button:focus-visible,a:focus-visible{outline:3px solid #7C3AED;outline-offset:2px}
-@media (prefers-reduced-motion: reduce){button,a.cta{transition:none}}
+a{color:#2B35D9}a:hover{color:#191D5C}
+button:active,a.cta:active{background:#E7E9FB}
+button:focus-visible,a:focus-visible{outline:3px solid #2B35D9;outline-offset:3px}
 </style>
 </helmet>
-<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FAF5FF; color: #1E1033; font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif; display: flex; flex-direction: column; overflow: hidden">
-  <section aria-label="3D 미리보기" style="background: #1E1B4B; color: #FFFFFF; display: flex; flex-direction: column">
-    <header style="padding: 16px 16px 12px; display: flex; align-items: center; gap: 12px">
-      <a href="Main.dc.html" aria-label="공연장 목록으로" style="width: 44px; height: 44px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: #312E81; color: #FFFFFF">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
-      </a>
-      <div style="display: flex; flex-direction: column">
-        <h1 style="margin: 0; font-size: 26px; font-weight: 900; letter-spacing: -0.01em">KSPO DOME</h1>
-        <p style="margin: 0; font-size: 13px; color: #C4B5FD">올림픽체조경기장</p>
-      </div>
-    </header>
-    <div style="position: relative; height: 300px; background: #312E81">
-      <img src="/_blob/4b5295b492b15d3d1b5e11cff9b13fab" alt="KSPO DOME 객석에서 무대 쪽을 본 3D 화면" style="width: 100%; height: 100%; object-fit: cover; display: block">
-      <span style="position: absolute; right: 10px; top: 10px; display: flex; align-items: center; gap: 6px; font-size: 12px; padding: 6px 10px; border-radius: 999px; background: #1E1B4BD9; color: #FFFFFF">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"></path><path d="M21 4v5h-5"></path></svg>
-        끌어서 회전
-      </span>
-    </div>
-    <div role="group" aria-label="3D 시점" style="display: flex; gap: 6px; padding: 12px 16px 16px; overflow: hidden">
-      <button type="button" aria-pressed="true" style="font: inherit; font-size: 14px; font-weight: 700; min-height: 44px; padding: 0 14px; border-radius: 12px; border: 0; background: #7C3AED; color: #FFFFFF">객석 안에서</button>
-      <button type="button" aria-pressed="false" style="font: inherit; font-size: 14px; min-height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid #4C4A8A; background: #1E1B4B; color: #FFFFFF">위에서</button>
-      <button type="button" aria-pressed="false" style="font: inherit; font-size: 14px; min-height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid #4C4A8A; background: #1E1B4B; color: #FFFFFF">바깥에서</button>
-      <button type="button" aria-pressed="false" aria-label="외피 보기" style="font: inherit; font-size: 14px; min-height: 44px; min-width: 44px; padding: 0 12px; border-radius: 12px; border: 1px dashed #4C4A8A; background: #1E1B4B; color: #DDD6FE">외피</button>
-    </div>
-  </section>
-
-  <section style="padding: 16px; display: flex; flex-direction: column; gap: 12px">
-    <div style="display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: center; background: #FFFFFF; border: 1px solid #E9E0F7; border-radius: 18px; padding: 16px">
-      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 40px; font-weight: 600; line-height: 1; color: #C2410C">2.5<span style="font-size: 20px">배</span></span>
-      <span style="display: flex; flex-direction: column; gap: 4px">
-        <span style="font-size: 15px; font-weight: 700; line-height: 1.4">주말 공연일 18시 주차장 차량</span>
-        <span style="font-size: 12.5px; line-height: 1.45; color: #5B5470">같은 달·같은 시각 공연 없는 날 대비 · 2025년 공원 전체</span>
-      </span>
-    </div>
-    <a class="cta" href="Plan.dc.html" style="display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 56px; border-radius: 16px; background: #7C3AED; color: #FFFFFF; font-size: 17px; font-weight: 700; text-decoration: none">
-      내 방문 시간 정하기
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"></path></svg>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F6F7FB; color: #191D5C; font-family: 'IBM Plex Sans KR', 'Apple SD Gothic Neo', sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <header style="padding: 16px 16px 14px; display: flex; align-items: center; gap: 12px">
+    <a href="Main.dc.html" aria-label="공연장 목록으로" style="width: 44px; height: 44px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 2px solid #2B35D9; color: #2B35D9">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
     </a>
+    <h1 style="margin: 0; font-family: 'Black Han Sans', sans-serif; font-weight: 400; font-size: 32px; line-height: 1; color: #2B35D9">KSPO DOME</h1>
+  </header>
+
+  <section aria-label="3D 미리보기" style="display: flex; flex-direction: column">
+    <div style="height: 312px; background: #191D5C">
+      <img src="/_blob/4b5295b492b15d3d1b5e11cff9b13fab" alt="KSPO DOME 객석에서 무대 쪽을 본 3D 화면. 끌어서 돌려 볼 수 있어요." style="width: 100%; height: 100%; object-fit: cover; display: block">
+    </div>
+    <div role="group" aria-label="3D 보는 위치" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 2px solid #2B35D9">
+      <button type="button" aria-pressed="true" style="font: inherit; font-size: 14px; font-weight: 600; min-height: 48px; border: 0; background: #2B35D9; color: #FFFFFF">객석에서</button>
+      <button type="button" aria-pressed="false" style="font: inherit; font-size: 14px; min-height: 48px; border: 0; border-left: 1px solid #D5D7F7; background: #FFFFFF; color: #191D5C">위에서</button>
+      <button type="button" aria-pressed="false" style="font: inherit; font-size: 14px; min-height: 48px; border: 0; border-left: 1px solid #D5D7F7; background: #FFFFFF; color: #191D5C">바깥에서</button>
+      <button type="button" aria-pressed="false" style="font: inherit; font-size: 14px; min-height: 48px; border: 0; border-left: 1px solid #D5D7F7; background: #FFFFFF; color: #191D5C">외벽 켜기</button>
+    </div>
+    <p style="margin: 0; padding: 8px 16px 0; font-size: 12.5px; color: #4A4F86">손가락으로 끌면 돌아가고, 두 손가락으로 확대돼요.</p>
   </section>
 
-  <footer style="margin-top: auto; padding: 10px 20px 20px; font-size: 12px; line-height: 1.5; color: #5B5470">
-    3D: 한국체육산업개발 「올림픽공원 공연장 실감형 콘텐츠」(공공데이터포털) · 원본 형상 그대로
+  <section style="margin: 18px 16px 0; background: #2B35D9; color: #FFFFFF; border-radius: 6px; padding: 20px 18px 18px; display: flex; flex-direction: column; gap: 10px">
+    <p style="margin: 0; font-family: 'Black Han Sans', sans-serif; font-size: 30px; line-height: 1.2">주말 공연날 저녁 6시,<br>주차장 차가 평소의 2.5배</p>
+    <p style="margin: 0; font-size: 13px; line-height: 1.55; color: #D5D7F7">2025년 공연이 있던 주말을 같은 달 공연 없는 주말의 같은 시각과 비교했어요. 올림픽공원 전체 주차장 기준이에요.</p>
+  </section>
+
+  <div style="margin: 14px 16px 0">
+    <a class="cta" href="Plan.dc.html" style="display: flex; align-items: center; justify-content: center; min-height: 56px; border: 2px solid #2B35D9; border-radius: 6px; background: #FFFFFF; color: #2B35D9; font-family: 'Black Han Sans', sans-serif; font-size: 22px; text-decoration: none">언제 도착할지 정하기</a>
+  </div>
+
+  <footer style="margin-top: auto; padding: 12px 22px 20px; font-size: 12px; line-height: 1.5; color: #4A4F86">
+    3D 모델: 한국체육산업개발 「올림픽공원 공연장 실감형 콘텐츠」, 원본 형상 그대로
   </footer>
 </div>
 </x-dc>
