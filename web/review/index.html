@@ -29,8 +29,8 @@ h1 { font-size: 24px; font-weight: 600; margin: 0; text-wrap: balance; }
 
 /* 공연장 목록 */
 .venues { display: flex; flex-direction: column; gap: 8px; }
-@media (max-width: 1080px) { .venues { flex-direction: row; overflow-x: auto; padding-bottom: 4px; } .venue { flex: 0 0 auto; } }
-.venue { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; text-align: left; width: 100%;
+@media (max-width: 1080px) { .venues { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.venue { min-height: 44px; touch-action: manipulation; display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; text-align: left; width: 100%;
   background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px;
   font: inherit; cursor: pointer; }
 .venue:hover { border-color: var(--muted); }
@@ -46,12 +46,17 @@ h1 { font-size: 24px; font-weight: 600; margin: 0; text-wrap: balance; }
 .stage-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid var(--line); }
 .stage-head h2 { margin: 0; font-size: 18px; font-weight: 600; }
 .ctrls { display: flex; flex-wrap: wrap; gap: 6px; }
-.ctrl { font: inherit; font-size: 13px; background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 4px 10px; cursor: pointer; }
+.ctrl { font: inherit; font-size: 14px; min-height: 44px; background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 0 12px; cursor: pointer; touch-action: manipulation; }
 .ctrl:hover { border-color: var(--muted); }
 .viewer-box { position: relative; aspect-ratio: 4 / 3; max-width: 100%; background: var(--stage); }
 model-viewer { width: 100%; height: 100%; background: var(--stage); --poster-color: transparent; }
 .placeholder { position: absolute; inset: 0; display: grid; place-content: center; gap: 8px; text-align: center; padding: 24px; color: var(--muted); }
 .placeholder strong { color: var(--ink); font-size: 16px; }
+.placeholder img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.placeholder .load-btn { position: relative; justify-self: center; font: inherit; font-size: 16px; font-weight: 600; min-height: 48px; padding: 0 20px; border-radius: 10px; border: 0; background: var(--accent); color: var(--accent-ink); cursor: pointer; touch-action: manipulation; }
+.placeholder .load-note { position: relative; justify-self: center; font-size: 13px; padding: 4px 10px; border-radius: 6px; background: var(--surface); color: var(--ink); }
+.progress { position: absolute; left: 0; right: 0; bottom: 0; height: 5px; background: var(--line); }
+.progress span { display: block; height: 100%; width: 0; background: var(--accent); transition: width 150ms linear; }
 .status { display: flex; flex-wrap: wrap; gap: 4px 16px; padding: 10px 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
 .num { font-family: var(--font-num); font-variant-numeric: tabular-nums; color: var(--ink); }
 .hint { margin: 0; padding: 0 14px 12px; color: var(--muted); font-size: 12.5px; }
@@ -86,6 +91,7 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12.5px; max-width: 80
         <model-viewer id="mv" camera-controls shadow-intensity="0.8" exposure="1.05" interaction-prompt="none"
           alt="선택한 공연장의 3D 모델"></model-viewer>
         <div class="placeholder" id="placeholder" hidden></div>
+        <div class="progress" id="progress" hidden><span id="progress-bar"></span></div>
       </div>
       <div class="status">
         <span>로딩 <span class="num" id="s-load">-</span></span>
@@ -117,7 +123,7 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12.5px; max-width: 80
 <script>
 // 3D 파일(GLB)은 이 페이지 호스팅이 .glb 확장자를 내보내지 않아 '.glb.wasm' 이름으로 올렸다. 내용은 GLB 그대로이고, 뷰어는 파일 내용으로 형식을 판별한다.
 const VENUES = [
-  { id: 'kspo-dome', name: 'KSPO DOME', alias: '올림픽체조경기장', status: 'ready', src: 'models/kspodome.glb.wasm', origin: 'org', shell: '외부',
+  { id: 'kspo-dome', name: 'KSPO DOME', alias: '올림픽체조경기장', status: 'ready', src: 'models/kspodome.glb.wasm', origin: 'org', shell: '외부', heavy: true, poster: 'poster/kspo.png',
     file: { 원본: 'DAE 475MB (SketchUp)', 웹용: '11.7MB', 형상: '삼각형 263만 개, 단순화 없음', 재질: '86종, 텍스처 9장 원본 해상도' },
     cams: [
       { label: '객석 안에서', orbit: '0deg 82deg 28m', target: '0m 9m -8m', fov: '70deg', shell: false },
@@ -141,6 +147,7 @@ const VENUES = [
     file: { 원본: 'GLB 25MB', 웹용: '3.9MB' },
     notes: ['야외 공연장입니다. 3D 미리보기만 넣을지 정해 주세요.'] },
 ];
+const IS_PHONE = matchMedia('(max-width: 760px), (pointer: coarse)').matches;
 const ORIGIN = { org: ['기관 제공', 'org'], own: ['자체 제작', 'own'] };
 const STATUS = { ready: ['준비됨', 'ready'], pending: ['변환 중', 'pending'], excluded: ['제외 · 협의 필요', 'pending'] };
 const DEFAULT_CAMS = [ { label: '비스듬히', orbit: '30deg 60deg auto' }, { label: '위에서', orbit: '0deg 5deg auto' }, { label: '옆에서', orbit: '90deg 80deg auto' } ];
@@ -194,6 +201,14 @@ function show(id) {
   $('s-size').textContent = v.file['웹용'];
   $('s-load').textContent = '-'; $('s-dim').textContent = '-';
   const ph = $('placeholder');
+  if (v.src && v.heavy && IS_PHONE && !v.optIn) {   // 휴대폰: 무거운 모델은 누를 때만 불러오기
+    mv.hidden = true; mv.removeAttribute('src'); ph.hidden = false; $('progress').hidden = true;
+    const img = el('img'); img.src = v.poster; img.alt = v.name + ' 객석 3D 미리보기 이미지';
+    const btn = el('button', 'load-btn', `3D 불러오기 (${v.file['웹용']})`); btn.type = 'button';
+    btn.addEventListener('click', () => { v.optIn = true; show(v.id); });
+    ph.replaceChildren(img, btn, el('span', 'load-note', '삼각형이 많아 휴대폰에서는 몇 초 걸릴 수 있어요'));
+    current = v; $('ctrls').hidden = true; return;
+  }
   if (v.src) {
     ph.hidden = true; mv.hidden = false;
     t0 = performance.now(); $('s-load').textContent = '불러오는 중';
@@ -203,6 +218,7 @@ function show(id) {
     mv.maxFieldOfView = v.shell ? '90deg' : 'auto';                      // 객석 시점은 넓은 시야각 필요
     const first = (v.cams || [])[0];
     mv.cameraOrbit = first ? first.orbit : (v.cam || DEFAULT_CAMS[0].orbit); mv.cameraTarget = (first && first.target) || 'auto auto auto'; mv.fieldOfView = (first && first.fov) || 'auto';
+    $('progress').hidden = false; $('progress-bar').style.width = '0%';
     mv.src = v.src;
   } else {
     mv.hidden = true; mv.removeAttribute('src'); ph.hidden = false;
@@ -218,7 +234,11 @@ mv.addEventListener('load', () => {
   $('s-load').textContent = ((performance.now() - t0) / 1000).toFixed(1) + '초';
   try { const d = mv.getDimensions(); $('s-dim').textContent = `${d.x.toFixed(0)} × ${d.z.toFixed(0)} × ${d.y.toFixed(0)}m`; } catch (e) {}
 });
-mv.addEventListener('error', () => { $('s-load').textContent = '불러오지 못함'; });
+mv.addEventListener('error', () => { $('s-load').textContent = '불러오지 못함'; $('progress').hidden = true; });
+mv.addEventListener('progress', (e) => {   // 불러오는 중임을 보여 주는 막대
+  const p = e.detail.totalProgress; $('progress-bar').style.width = Math.round(p * 100) + '%';
+  if (p >= 1) setTimeout(() => { $('progress').hidden = true; }, 300);
+});
 addEventListener('hashchange', () => show(location.hash.slice(1)));
 show(location.hash.slice(1) || 'kspo-dome');
 </script>
