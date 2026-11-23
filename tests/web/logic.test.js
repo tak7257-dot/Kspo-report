@@ -78,3 +78,33 @@ test('baseline: 있는 칸은 값, 8월·없는 달은 null', () => {
   assert.equal(L.baseline(t, 12, 'weekend', 18), null);
   assert.equal(L.baseline(t, 11, 'weekday', 18), null);
 });
+
+// ── Task 4: 캘린더 파일과 공유 문구 ──
+const ICS_BASE = { dateISO: '2026-11-28', venueName: 'KSPO DOME', startHour: 18, startMinute: 0, showMinutes: 120, now: new Date('2026-11-23T10:00:00Z') };
+test('buildIcs: 차면 도착 15시부터 20시까지, CRLF, 30분 전 알림', () => {
+  const s = L.buildIcs({ ...ICS_BASE, arriveHour: 15, mode: 'car' });
+  assert.match(s, /^BEGIN:VCALENDAR\r\n/);
+  assert.ok(s.includes('DTSTART;TZID=Asia/Seoul:20261128T150000\r\n'));
+  assert.ok(s.includes('DTEND;TZID=Asia/Seoul:20261128T200000\r\n'));
+  assert.ok(s.includes('TRIGGER:-PT30M'));
+  assert.ok(s.includes('SUMMARY:KSPO DOME 공연 (덜붐빌때)'));
+  assert.match(s, /END:VCALENDAR\r\n$/);
+});
+test('buildIcs: 지하철이면 시작 1시간 전부터', () => {
+  assert.ok(L.buildIcs({ ...ICS_BASE, arriveHour: 15, mode: 'subway' }).includes('DTSTART;TZID=Asia/Seoul:20261128T170000'));
+});
+test('buildIcs: 22시 공연은 다음 날 00시에 끝남', () => {
+  assert.ok(L.buildIcs({ ...ICS_BASE, startHour: 22, arriveHour: 21, mode: 'car' }).includes('DTEND;TZID=Asia/Seoul:20261129T000000'));
+});
+test('shareText: 지하철 추천 문구', () => {
+  const advice = L.arrivalAdvice({ profile: P.weekend, startHour: 18, rain: false, rainFactor: 0.907 });
+  const exit = L.exitPlan({ startHour: 18, startMinute: 0, showMinutes: 120, decay: D });
+  assert.equal(L.shareText({ dateISO: '2026-11-28', venueName: 'KSPO DOME', startHour: 18, startMinute: 0, advice, exit, url: 'https://x.example/' }),
+    '11월 28일(토) KSPO DOME 18:00 · 지하철 추천 (차라면 15:00 전 도착) — 덜붐빌때 https://x.example/');
+});
+test('shareText: 차 문구와 출차 안내', () => {
+  const advice = L.arrivalAdvice({ profile: P.weekday, startHour: 19, rain: false, rainFactor: 0.907 });
+  const exit = L.exitPlan({ startHour: 19, startMinute: 0, showMinutes: 120, decay: D });
+  assert.equal(L.shareText({ dateISO: '2026-11-30', venueName: 'KSPO DOME', startHour: 19, startMinute: 0, advice, exit, url: 'https://x.example/' }),
+    '11월 30일(월) KSPO DOME 19:00 · 차는 18:00 전 도착, 끝나고 20분 뒤 출차 — 덜붐빌때 https://x.example/');
+});

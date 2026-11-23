@@ -107,7 +107,55 @@
     return typeof v === 'number' ? v : null;
   }
 
+  // 날짜 문자열 + 분 → 'YYYYMMDDTHHMM00' (자정을 넘으면 다음 날)
+  function icsStamp(dateISO, minutes) {
+    var d = new Date(dateISO + 'T00:00:00');
+    d.setMinutes(minutes);
+    return d.getFullYear() + pad2(d.getMonth() + 1) + pad2(d.getDate()) + 'T' + pad2(d.getHours()) + pad2(d.getMinutes()) + '00';
+  }
+
+  // 캘린더 파일(.ics) 내용. 차면 권장 도착부터, 지하철이면 시작 1시간 전부터 공연 끝까지, 30분 전 알림
+  function buildIcs(o) {
+    var start = o.startHour * 60 + o.startMinute;
+    var from = (o.mode === 'car' && o.arriveHour !== null) ? o.arriveHour * 60 : start - 60;
+    var now = (o.now || new Date()).toISOString().replace(/[-:]/g, '').replace(/\.\d+Z$/, 'Z');
+    var note = o.mode === 'car'
+      ? '차는 ' + pad2(o.arriveHour) + ':00 전 도착. 끝나고 20분 쉬었다 나가면 덜 막혀요.'
+      : '이날은 지하철을 권해요.';
+    var lines = [
+      'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//deolbumbilttae//KO', 'CALSCALE:GREGORIAN',
+      'BEGIN:VTIMEZONE', 'TZID:Asia/Seoul', 'BEGIN:STANDARD', 'DTSTART:19700101T000000',
+      'TZOFFSETFROM:+0900', 'TZOFFSETTO:+0900', 'TZNAME:KST', 'END:STANDARD', 'END:VTIMEZONE',
+      'BEGIN:VEVENT',
+      'UID:' + o.dateISO + '-' + start + '@deolbumbilttae',
+      'DTSTAMP:' + now,
+      'DTSTART;TZID=Asia/Seoul:' + icsStamp(o.dateISO, from),
+      'DTEND;TZID=Asia/Seoul:' + icsStamp(o.dateISO, start + o.showMinutes),
+      'SUMMARY:' + o.venueName + ' 공연 (덜붐빌때)',
+      'LOCATION:올림픽공원 ' + o.venueName,
+      'DESCRIPTION:' + note,
+      'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:' + o.venueName + ' 공연', 'TRIGGER:-PT30M', 'END:VALARM',
+      'END:VEVENT', 'END:VCALENDAR'
+    ];
+    return lines.join('\r\n') + '\r\n';
+  }
+
+  // 같이 갈 사람에게 보낼 한 줄 문구
+  function shareText(o) {
+    var d = new Date(o.dateISO + 'T00:00:00');
+    var head = (d.getMonth() + 1) + '월 ' + d.getDate() + '일(' + '일월화수목금토'[d.getDay()] + ') ' + o.venueName + ' ' +
+      pad2(o.startHour) + ':' + pad2(o.startMinute) + ' · ';
+    var a = o.advice, body;
+    if (a.mode === 'car') {
+      body = '차는 ' + pad2(a.arriveHour) + ':00 전 도착' + (o.exit.showRatios ? ', 끝나고 ' + o.exit.wait.minutes + '분 뒤 출차' : '');
+    } else {
+      body = '지하철 추천' + (a.arriveHour !== null ? ' (차라면 ' + pad2(a.arriveHour) + ':00 전 도착)' : '');
+    }
+    return head + body + ' — 덜붐빌때 ' + o.url;
+  }
+
   return {
+    buildIcs: buildIcs, shareText: shareText,
     baseline: baseline,
     HOLIDAYS: HOLIDAYS, dayType: dayType, levelOf: levelOf, arrivalAdvice: arrivalAdvice,
     exitPlan: exitPlan, exitModeActive: exitModeActive, parseLive: parseLive, outflow10: outflow10
