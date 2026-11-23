@@ -11,50 +11,50 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&amp;family=IBM+Plex+Sans+KR:wght@400;500;600&amp;display=swap">
 <style>
 body{margin:0}
-a{color:#2E4A8C}a:hover{color:#1B2540}
-button:active{background:#E9EDF4}
-button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #2E4A8C;outline-offset:3px}
+a{color:#1B7255}a:hover{color:#15302A}
+button:active{background:#E6F2EC}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #1B7255;outline-offset:3px}
 </style>
 </helmet>
-<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F4F5F7; color: #1B2540; font-family: 'IBM Plex Sans KR', 'Apple SD Gothic Neo', sans-serif; display: flex; flex-direction: column; overflow: hidden">
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F3F7F4; color: #15302A; font-family: 'IBM Plex Sans KR', 'Apple SD Gothic Neo', sans-serif; display: flex; flex-direction: column; overflow: hidden">
   <header style="padding: 16px 16px 12px; display: flex; align-items: center; gap: 12px">
-    <a href="Venue.dc.html" aria-label="공연장 미리보기로" style="width: 44px; height: 44px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 2px solid #2E4A8C; color: #2E4A8C">
+    <a href="Venue.dc.html" aria-label="공연장 미리보기로" style="width: 44px; height: 44px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 2px solid #1B7255; color: #1B7255">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
     </a>
     <div>
-      <h1 style="margin: 0; font-family: 'Black Han Sans', sans-serif; font-weight: 400; font-size: 26px; line-height: 1.1; color: #2E4A8C">언제 도착할까</h1>
-      <p style="margin: 2px 0 0; font-size: 13px; color: #4F5873">KSPO DOME 공연 날</p>
+      <h1 style="margin: 0; font-family: 'Black Han Sans', sans-serif; font-weight: 400; font-size: 26px; line-height: 1.1; color: #1B7255">언제 도착할까</h1>
+      <p style="margin: 2px 0 0; font-size: 13px; color: #4B635C">KSPO DOME 공연 날</p>
     </div>
   </header>
 
-  <section aria-label="관람 조건과 권장 도착" style="margin: 0 16px; background: #FFFFFF; border: 2px solid #2E4A8C; border-radius: 6px; display: flex; flex-direction: column">
+  <section aria-label="관람 조건과 권장 도착" style="margin: 0 16px; background: #FFFFFF; border: 2px solid #1B7255; border-radius: 6px; display: flex; flex-direction: column">
     <div style="padding: 14px 14px 16px; display: flex; flex-direction: column; gap: 12px">
-      <div role="group" aria-label="관람일" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border: 2px solid #2E4A8C; border-radius: 6px; overflow: hidden">
+      <div role="group" aria-label="관람일" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border: 2px solid #1B7255; border-radius: 6px; overflow: hidden">
         <button type="button" aria-pressed="{{weekdayOn}}" onClick="{{pickWeekday}}" style="{{weekdayStyle}}">평일</button>
         <button type="button" aria-pressed="{{weekendOn}}" onClick="{{pickWeekend}}" style="{{weekendStyle}}">주말·공휴일</button>
       </div>
       <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
         <span style="font-size: 15px; font-weight: 500">티켓에 적힌 시작 시각</span>
         <div style="display: flex; align-items: center; gap: 4px">
-          <button type="button" aria-label="1시간 앞당기기" onClick="{{earlier}}" style="width: 44px; height: 44px; border-radius: 6px; border: 2px solid #2E4A8C; background: #FFFFFF; color: #2E4A8C; font: inherit; font-size: 22px; font-weight: 600">−</button>
-          <output aria-live="polite" style="min-width: 84px; text-align: center; font-family: 'Black Han Sans', sans-serif; font-size: 30px; color: #2E4A8C; font-variant-numeric: tabular-nums">{{startLabel}}</output>
-          <button type="button" aria-label="1시간 늦추기" onClick="{{later}}" style="width: 44px; height: 44px; border-radius: 6px; border: 2px solid #2E4A8C; background: #FFFFFF; color: #2E4A8C; font: inherit; font-size: 22px; font-weight: 600">+</button>
+          <button type="button" aria-label="1시간 앞당기기" onClick="{{earlier}}" style="width: 44px; height: 44px; border-radius: 6px; border: 2px solid #1B7255; background: #FFFFFF; color: #1B7255; font: inherit; font-size: 22px; font-weight: 600">−</button>
+          <output aria-live="polite" style="min-width: 84px; text-align: center; font-family: 'Black Han Sans', sans-serif; font-size: 30px; color: #1B7255; font-variant-numeric: tabular-nums">{{startLabel}}</output>
+          <button type="button" aria-label="1시간 늦추기" onClick="{{later}}" style="width: 44px; height: 44px; border-radius: 6px; border: 2px solid #1B7255; background: #FFFFFF; color: #1B7255; font: inherit; font-size: 22px; font-weight: 600">+</button>
         </div>
       </div>
       <label for="rain" style="display: flex; align-items: center; gap: 10px; min-height: 32px; font-size: 15px">
-        <input id="rain" type="checkbox" checked="{{rain}}" onChange="{{toggleRain}}" style="width: 22px; height: 22px; accent-color: #2E4A8C; flex: none">
+        <input id="rain" type="checkbox" checked="{{rain}}" onChange="{{toggleRain}}" style="width: 22px; height: 22px; accent-color: #1B7255; flex: none">
         비 오는 날이에요
       </label>
     </div>
 
-    <div aria-hidden="true" style="position: relative; height: 0; border-top: 2px dashed #2E4A8C; margin: 0 14px">
-      <span style="position: absolute; left: -27px; top: -12px; width: 22px; height: 22px; border-radius: 50%; background: #F4F5F7; border-right: 2px solid #2E4A8C"></span>
-      <span style="position: absolute; right: -27px; top: -12px; width: 22px; height: 22px; border-radius: 50%; background: #F4F5F7; border-left: 2px solid #2E4A8C"></span>
+    <div aria-hidden="true" style="position: relative; height: 0; border-top: 2px dashed #1B7255; margin: 0 14px">
+      <span style="position: absolute; left: -27px; top: -12px; width: 22px; height: 22px; border-radius: 50%; background: #F3F7F4; border-right: 2px solid #1B7255"></span>
+      <span style="position: absolute; right: -27px; top: -12px; width: 22px; height: 22px; border-radius: 50%; background: #F3F7F4; border-left: 2px solid #1B7255"></span>
     </div>
 
     <div style="padding: 16px 16px 18px; display: flex; flex-direction: column; gap: 4px">
       <p style="margin: 0; font-size: 14px; font-weight: 600">이때까지 도착하세요</p>
-      <p style="margin: 0; font-family: 'Black Han Sans', sans-serif; font-size: 52px; line-height: 1; color: #2E4A8C">{{arriveTitle}}</p>
+      <p style="margin: 0; font-family: 'Black Han Sans', sans-serif; font-size: 52px; line-height: 1; color: #1B7255">{{arriveTitle}}</p>
       <p style="margin: 6px 0 0; font-size: 14px; line-height: 1.55">{{arriveDetail}}</p>
     </div>
   </section>
@@ -64,31 +64,31 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #2E4A
     <svg width="358" height="160" viewBox="0 0 358 160" role="img" aria-label="{{chartLabel}}" style="display: block">
       <defs>
         <pattern id="busy" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-          <rect width="6" height="6" fill="#DCE2EE"></rect>
-          <line x1="0" y1="0" x2="0" y2="6" stroke="#2E4A8C" stroke-width="2"></line>
+          <rect width="6" height="6" fill="#DCEFE6"></rect>
+          <line x1="0" y1="0" x2="0" y2="6" stroke="#1B7255" stroke-width="2"></line>
         </pattern>
       </defs>
       <rect x="34" y="10" width="316" height="{{zoneH}}" fill="url(#busy)"></rect>
-      <text x="344" y="24" text-anchor="end" font-size="11" font-weight="600" fill="#1B2540">평소의 2배 넘음</text>
-      <line x1="34" y1="{{y100}}" x2="350" y2="{{y100}}" stroke="#9FAECB" stroke-width="1"></line>
-      <text x="30" y="{{y100t}}" text-anchor="end" font-size="11" fill="#4F5873">평소</text>
-      <text x="30" y="{{y200t}}" text-anchor="end" font-size="11" fill="#4F5873">2배</text>
-      <path d="{{areaPath}}" fill="#2E4A8C" fill-opacity="0.16"></path>
-      <path d="{{linePath}}" fill="none" stroke="#2E4A8C" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"></path>
-      <line x1="{{startX}}" y1="10" x2="{{startX}}" y2="136" stroke="#1B2540" stroke-width="2"></line>
+      <text x="344" y="24" text-anchor="end" font-size="11" font-weight="600" fill="#15302A">평소의 2배 넘음</text>
+      <line x1="34" y1="{{y100}}" x2="350" y2="{{y100}}" stroke="#9CCDB8" stroke-width="1"></line>
+      <text x="30" y="{{y100t}}" text-anchor="end" font-size="11" fill="#4B635C">평소</text>
+      <text x="30" y="{{y200t}}" text-anchor="end" font-size="11" fill="#4B635C">2배</text>
+      <path d="{{areaPath}}" fill="#1B7255" fill-opacity="0.16"></path>
+      <path d="{{linePath}}" fill="none" stroke="#1B7255" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"></path>
+      <line x1="{{startX}}" y1="10" x2="{{startX}}" y2="136" stroke="#15302A" stroke-width="2"></line>
       <sc-if value="{{hasArrive}}" hint-placeholder-val="{{true}}">
-        <circle cx="{{arriveX}}" cy="{{arriveY}}" r="7" fill="#FFFFFF" stroke="#2E4A8C" stroke-width="3.5"></circle>
+        <circle cx="{{arriveX}}" cy="{{arriveY}}" r="7" fill="#FFFFFF" stroke="#1B7255" stroke-width="3.5"></circle>
       </sc-if>
       <sc-for list="{{ticks}}" as="t" hint-placeholder-count="7">
-        <text x="{{t.x}}" y="154" text-anchor="middle" font-size="11" fill="#4F5873">{{t.label}}</text>
+        <text x="{{t.x}}" y="154" text-anchor="middle" font-size="11" fill="#4B635C">{{t.label}}</text>
       </sc-for>
     </svg>
-    <p style="margin: 0; font-size: 12.5px; line-height: 1.5; color: #4F5873">세로선은 공연 시작, 동그라미는 권장 도착이에요.</p>
+    <p style="margin: 0; font-size: 12.5px; line-height: 1.5; color: #4B635C">세로선은 공연 시작, 동그라미는 권장 도착이에요.</p>
   </section>
 
-  <p style="margin: 12px 16px 0; padding: 12px 14px; border-left: 4px solid #2E4A8C; background: #FFFFFF; font-size: 14px; line-height: 1.55">{{exitText}}</p>
+  <p style="margin: 12px 16px 0; padding: 12px 14px; border-left: 4px solid #1B7255; background: #FFFFFF; font-size: 14px; line-height: 1.55">{{exitText}}</p>
 
-  <footer style="margin-top: auto; padding: 10px 22px 18px; font-size: 12px; line-height: 1.5; color: #4F5873">
+  <footer style="margin-top: auto; padding: 10px 22px 18px; font-size: 12px; line-height: 1.5; color: #4B635C">
     {{footNote}}
   </footer>
 </div>
@@ -134,8 +134,8 @@ class Component extends DCLogic {
       arriveDetail = '시작 전 내내 평소의 2배를 넘어요. 차보다 지하철을 권해요.';
     }
     var end = s.start + 2;
-    var on = 'font: inherit; font-size: 15px; font-weight: 600; min-height: 46px; border: 0; background: #2E4A8C; color: #FFFFFF';
-    var off = 'font: inherit; font-size: 15px; min-height: 46px; border: 0; background: #FFFFFF; color: #1B2540';
+    var on = 'font: inherit; font-size: 15px; font-weight: 600; min-height: 46px; border: 0; background: #1B7255; color: #FFFFFF';
+    var off = 'font: inherit; font-size: 15px; min-height: 46px; border: 0; background: #FFFFFF; color: #15302A';
     var self = this;
     return {
       linePath: linePath, areaPath: areaPath, ticks: ticks,
