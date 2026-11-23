@@ -38,3 +38,33 @@ test('levelOf 경계: 129 보통, 130 붐빔, 200 매우 붐빔', () => {
   assert.equal(L.levelOf(130), 'busy');
   assert.equal(L.levelOf(200), 'very');
 });
+
+// ── Task 2: 나가기 판단과 실시간 값 ──
+const D = { offsets_min: [0, 10, 20, 30, 40, 50, 60], ratio: [1, 0.68, 0.42, 0.41, 0.44, 0.57, 0.54] };
+test('18시+120분 → 20:00, 비율 표시, 20분 뒤 0.42', () => {
+  const e = L.exitPlan({ startHour: 18, startMinute: 0, showMinutes: 120, decay: D });
+  assert.deepEqual([e.endLabel, e.showRatios, e.wait.minutes, e.wait.ratio], ['20:00', true, 20, 0.42]);
+});
+test('14시 공연 → 16:00, 비율 숨김', () => {
+  assert.equal(L.exitPlan({ startHour: 14, startMinute: 0, showMinutes: 120, decay: D }).showRatios, false);
+});
+test('22시 공연 → 00:00 (다음 날)', () => {
+  const e = L.exitPlan({ startHour: 22, startMinute: 0, showMinutes: 120, decay: D });
+  assert.deepEqual([e.endLabel, e.nextDay, e.showRatios], ['00:00 (다음 날)', true, true]);
+});
+test('나가기 모드 창: 19:45 true, 19:44 false, 21:30 true, 21:31 false', () => {
+  const a = h => L.exitModeActive({ now: new Date('2026-11-28T' + h + ':00'), showDateISO: '2026-11-28', startHour: 18, startMinute: 0, showMinutes: 120 });
+  assert.deepEqual([a('19:45'), a('19:44'), a('21:30'), a('21:31')], [true, false, true, false]);
+});
+test('자정 넘김: 22시 공연, 다음 날 00:30 true', () => {
+  assert.equal(L.exitModeActive({ now: new Date('2026-11-29T00:30:00'), showDateISO: '2026-11-28', startHour: 22, startMinute: 0, showMinutes: 120 }), true);
+});
+test('parseLive: 정상 값만 숫자, 나머지 null', () => {
+  assert.equal(L.parseLive('[{"parking_sum":1961}]'), 1961);
+  for (const bad of ['', '9999', '{', '[]', '[{"parking_sum":-3}]']) assert.equal(L.parseLive(bad), null);
+});
+test('outflow10: 10분 전 2000 → 지금 1860 = 140, 표본 부족이면 null', () => {
+  const t0 = Date.parse('2026-11-28T20:00:00');
+  assert.equal(L.outflow10([{ t: t0, n: 2000 }, { t: t0 + 10 * 60e3, n: 1860 }]), 140);
+  assert.equal(L.outflow10([{ t: t0, n: 2000 }, { t: t0 + 3 * 60e3, n: 1990 }]), null);
+});

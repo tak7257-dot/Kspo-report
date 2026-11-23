@@ -54,5 +54,54 @@
     };
   }
 
-  return { HOLIDAYS: HOLIDAYS, dayType: dayType, levelOf: levelOf, arrivalAdvice: arrivalAdvice };
+  var pad2 = function (n) { return (n < 10 ? '0' : '') + n; };
+  var WAIT_MINUTES = 20;     // 끝나고 기다렸다 나가기를 권하는 시간
+  var EVENING_MIN = 20 * 60; // 출차 몰림 모양은 20:30 이후 저녁 기록 → 20시 이후 끝나는 공연에만 비율을 보여 준다
+
+  // 공연이 언제 끝나고, 20분 기다리면 출차가 얼마로 줄어드는지
+  function exitPlan(o) {
+    var end = o.startHour * 60 + o.startMinute + o.showMinutes;
+    var nextDay = end >= 24 * 60;
+    var m = end % (24 * 60);
+    var i = o.decay.offsets_min.indexOf(WAIT_MINUTES);
+    return {
+      endHour: Math.floor(m / 60), endMinute: m % 60, nextDay: nextDay,
+      endLabel: pad2(Math.floor(m / 60)) + ':' + pad2(m % 60) + (nextDay ? ' (다음 날)' : ''),
+      showRatios: end >= EVENING_MIN,
+      wait: { minutes: WAIT_MINUTES, ratio: o.decay.ratio[i] }
+    };
+  }
+
+  // 나가기 모드를 띄울 때인가: 예상 종료 15분 전부터 종료 90분 뒤까지
+  function exitModeActive(o) {
+    var day0 = new Date(o.showDateISO + 'T00:00:00').getTime();
+    var end = day0 + (o.startHour * 60 + o.startMinute + o.showMinutes) * 60e3;
+    var t = o.now.getTime();
+    return t >= end - 15 * 60e3 && t <= end + 90 * 60e3;
+  }
+
+  // 실시간 주차 API 응답 '[{"parking_sum":1961}]' → 1961. 점검(9999)·빈 응답·이상한 값은 null
+  function parseLive(text) {
+    try {
+      var j = JSON.parse(text);
+      var n = Array.isArray(j) && j[0] ? j[0].parking_sum : null;
+      return (typeof n === 'number' && isFinite(n) && n >= 0) ? n : null;
+    } catch (e) { return null; }
+  }
+
+  // 최근 10분 동안 줄어든 대수: 가장 최근 표본과 8~12분 앞선 표본의 차이. 맞는 표본이 없으면 null
+  function outflow10(samples) {
+    if (!samples || samples.length < 2) return null;
+    var last = samples[samples.length - 1], best = null;
+    for (var i = 0; i < samples.length - 1; i++) {
+      var gap = last.t - samples[i].t;
+      if (gap >= 8 * 60e3 && gap <= 12 * 60e3 && (best === null || Math.abs(gap - 6e5) < Math.abs(last.t - best.t - 6e5))) best = samples[i];
+    }
+    return best === null ? null : Math.max(0, best.n - last.n);
+  }
+
+  return {
+    HOLIDAYS: HOLIDAYS, dayType: dayType, levelOf: levelOf, arrivalAdvice: arrivalAdvice,
+    exitPlan: exitPlan, exitModeActive: exitModeActive, parseLive: parseLive, outflow10: outflow10
+  };
 });
