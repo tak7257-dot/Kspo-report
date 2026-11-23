@@ -4,18 +4,14 @@
 const { chromium, devices } = require('playwright');
 const fs = require('fs'), os = require('os'), path = require('path'), { spawn } = require('child_process');
 
-const APP = path.resolve(__dirname, '../../web/app');
 const PORT = 8790;
 const NOW = new Date('2026-11-23T10:00:00+09:00');   // 테스트 기준 "오늘"
 const fails = [];
 const check = (name, ok, extra = '') => { if (!ok) fails.push(name + (extra ? ' — ' + extra : '')); console.log((ok ? 'ok   ' : 'FAIL ') + name); };
 
-function serveDir() {
+function serveDir() {   // GitHub Pages에 올라갈 결과물 그대로 (tools/build_site.sh)
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'dbt-'));
-  for (const d of ['data', 'js', 'models', 'img', 'draco']) if (fs.existsSync(path.join(APP, d))) fs.symlinkSync(path.join(APP, d), path.join(dir, d));
-  fs.writeFileSync(path.join(dir, 'index.html'),
-    '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">' +
-    '<style>[hidden]{display:none!important}body{margin:0}</style></head><body>' + fs.readFileSync(path.join(APP, 'index.html'), 'utf8'));
+  require('child_process').execFileSync('sh', [path.resolve(__dirname, '../../tools/build_site.sh'), dir]);
   return dir;
 }
 
@@ -53,6 +49,12 @@ const noSideScroll = page => page.evaluate(() => document.documentElement.scroll
       await page.click('button[data-start="16"]');
       check(`${name}: 주말 16시 → 차`, (await text(page, '#answer-title')).includes('차'));
       check(`${name}: 가로 스크롤 없음`, await noSideScroll(page));
+      check(`${name}: 차 답이면 지도 링크 숨김`, await page.locator('#maplinks').isHidden());
+      check(`${name}: 공연 날이 아니면 나가기 띠 숨김`, await page.locator('#exit-band').isHidden());
+      await page.click('button[data-venue="handball"]');
+      check(`${name}: 다른 공연장이면 내 자리 링크 숨김`, await page.locator('#to-seat').isHidden());
+      await page.click('button[data-venue="kspo-dome"]');
+      if (name !== '컴퓨터') check(`${name}: 휴대폰 폭으로 그려짐`, (await page.evaluate(() => innerWidth)) === 390);
       check(`${name}: 실시간 실패 시 줄 숨김`, await page.locator('#live-line').isHidden());
       check(`${name}: 페이지 오류 없음`, page.errors.length === 0, page.errors.join(' | '));
       await page.context().close();

@@ -24,6 +24,7 @@
   --lv-normal: #2A4A3D; --lv-busy: #5BA884; --lv-very: #B5EBCD; --stage: #0A1511; color-scheme: dark; }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }   /* 숨긴 요소는 어떤 배치 규칙보다 먼저 숨김 */
 body { background: var(--paper); color: var(--ink); font-family: var(--font); font-size: 15px; line-height: 1.55; word-break: keep-all; overflow-wrap: break-word; -webkit-text-size-adjust: 100%; }
 h1, h2, h3, p { margin: 0; }
 h1, h2 { text-wrap: balance; }
