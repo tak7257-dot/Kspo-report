@@ -111,6 +111,45 @@ const noSideScroll = page => page.evaluate(() => document.documentElement.scroll
       check('나가기: 14시 공연은 비율 숨김', !(await text(page, '#exit-wait')).includes('42%'));
       await page.context().close();
     }
+    // ── Task 7: 하루 미리 보기·내 자리·일정표 ──
+    {
+      const page = await open(browser, { viewport: { width: 1280, height: 860 } });
+      await page.click('button[data-date="2026-11-28"]');
+      await page.click('button[data-start="18"]');
+      await page.click('#to-day');
+      await page.waitForSelector('#s-day:not([hidden])');
+      check('하루: 단계 버튼 4개', (await page.locator('#day-stops button').count()) === 4);
+      const cam0 = await page.evaluate(() => document.getElementById('mv').dataset.cam);
+      await page.locator('#day-stops button').nth(2).click();
+      const cam2 = await page.evaluate(() => document.getElementById('mv').dataset.cam);
+      check('하루: 끝 단계에서 3D 시점이 바뀜', cam0 !== cam2 && cam2 === 'end', `${cam0} → ${cam2}`);
+      check('하루: 끝 단계 안내에 20분', (await text(page, '#day-card')).includes('20분'));
+      check('하루: 가로 스크롤 없음', await noSideScroll(page));
+      await page.goto(page.url().replace('#day', '#seat'));
+      await page.waitForSelector('#seat-pick:not([hidden])');
+      check('내 자리: 구역 버튼 8개', (await page.locator('.seat-btn').count()) === 8);
+      await page.click('.seat-btn[data-id="l2-center"]');
+      check('내 자리: 2층 정면 무대까지 72m', (await text(page, '#seat-now')).includes('72m'));
+      check('내 자리: 시점이 자리로', await page.evaluate(() => document.getElementById('mv').dataset.cam === 'seat:l2-center'));
+      check('하루·내 자리: 페이지 오류 없음', page.errors.length === 0, page.errors.join(' | '));
+      await page.context().close();
+    }
+    {
+      const page = await open(browser, devices['iPhone 13']);
+      await page.click('button[data-date="2026-11-28"]');
+      await page.click('button[data-start="18"]');
+      await page.goto(page.url().replace('#home', '#plan'));
+      await page.waitForSelector('#s-plan:not([hidden])');
+      check('일정표: 시작·끝 일정 표시', (await text(page, '#s-plan')).includes('18:00') && (await text(page, '#s-plan')).includes('20:00'));
+      await page.click('#ics-btn');
+      const ics = await page.evaluate(async () => { const a = document.getElementById('ics-link'); return a && a.download.endsWith('.ics') ? (await fetch(a.href)).text() : ''; });
+      check('일정표: 캘린더 파일 만들기', ics.includes('BEGIN:VCALENDAR') && ics.includes('20261128T170000'));
+      await page.click('#share-btn');
+      check('일정표: 공유 문구 보임', (await page.locator('#share-text').isVisible()) && (await text(page, '#share-text')).includes('덜붐빌때'));
+      check('일정표: 가로 스크롤 없음', await noSideScroll(page));
+      check('일정표: 페이지 오류 없음', page.errors.length === 0, page.errors.join(' | '));
+      await page.context().close();
+    }
     // (다음 작업의 확인은 이 줄 위에 이어 붙인다)
   } finally {
     await browser.close();

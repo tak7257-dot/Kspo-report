@@ -115,11 +115,63 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .opt.pick-me { background: var(--field); color: var(--field-ink); border: 2px solid var(--stroke); }
 .opt.pick-me .k { color: var(--field-sub); }
 .decay { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; align-items: end; height: 96px; margin-top: 6px; }
-.decay span { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 3px; height: 100%; font-size: 12px; }
+.decay > span { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 3px; height: 100%; font-size: 12px; }
 .decay i { width: 100%; border-radius: 3px 3px 0 0; display: block; }
 .timer { margin-top: 14px; display: flex; flex-direction: column; gap: 6px; }
 .timer button { min-height: 56px; border-radius: var(--r); border: 2px solid var(--stroke); background: var(--stroke); color: var(--surface); font-size: 18px; font-weight: 700; }
 .timer output { font-size: 40px; text-align: center; color: var(--stroke); }
+
+/* 하루 미리 보기 (3D) */
+.viewer { position: relative; aspect-ratio: 4 / 3; max-width: 100%; background: var(--stage); border-radius: var(--r); overflow: hidden; }
+model-viewer { width: 100%; height: 100%; background: var(--stage); --poster-color: transparent; --progress-bar-color: transparent; }
+.scene-chip { position: absolute; left: 10px; bottom: 10px; margin: 0; padding: 5px 10px; border-radius: 999px; background: var(--stage); color: #FFFFFF; font-size: 13px; font-weight: 600; pointer-events: none; }
+.ph { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 10px; padding: 20px; text-align: center; }
+.ph img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ph .load { position: relative; min-height: 52px; padding: 0 22px; border: 0; border-radius: var(--r); background: var(--field); color: var(--field-ink); font-size: 17px; font-weight: 700; }
+.ph .note2 { position: relative; font-size: 13px; padding: 4px 10px; border-radius: 4px; background: var(--surface); color: var(--ink); }
+.progress { position: absolute; left: 0; right: 0; bottom: 0; height: 6px; background: rgba(0,0,0,.35); }
+.progress span { display: block; height: 100%; width: 0; background: var(--field); transition: width 150ms linear; }
+.stage-tag { font: 600 12px/1 var(--font); padding: 5px 8px; border-radius: 4px; background: var(--field); color: var(--field-ink); pointer-events: none; white-space: nowrap; }
+.stops { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 12px; }
+.stops::before { content: ""; position: absolute; left: 12.5%; right: 12.5%; top: 21px; height: 4px; border-radius: 2px; background: var(--line-soft); }
+.stops button { position: relative; border: 0; background: transparent; padding: 0; min-height: 72px; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.stops .dot { width: 16px; height: 16px; margin-top: 15px; border-radius: 50%; border: 2px solid var(--stroke); background: var(--surface); }
+.stops button[aria-pressed="true"] .dot { width: 24px; height: 24px; margin-top: 11px; background: var(--stroke); box-shadow: 0 0 0 4px var(--field); }
+.stops .t { font-size: 15px; font-weight: 600; }
+.stops .n { font-size: 12px; color: var(--muted); }
+.stops button[aria-pressed="true"] .t { font-weight: 700; }
+.card { margin-top: 8px; padding: 14px; border-radius: var(--r); display: flex; flex-direction: column; gap: 4px; background: var(--surface); border: 2px solid var(--stroke); }
+.card.ans { background: var(--field); color: var(--field-ink); border-color: var(--field); }
+.card .k { font-size: 13px; font-weight: 600; }
+.card .v { font-size: 26px; }
+.day-nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+.day-nav button { min-height: 48px; border-radius: var(--r); border: 2px solid var(--stroke); background: var(--surface); color: var(--stroke); font-size: 15px; }
+.day-nav button:last-child { background: var(--stroke); color: var(--surface); font-weight: 700; }
+.day-nav button:disabled { opacity: .35; cursor: default; }
+.seat-pick { margin-top: 12px; padding: 14px; border-radius: var(--r); background: var(--surface); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; }
+.seat-map { width: 100%; max-width: 300px; height: auto; align-self: center; display: block; }
+.tier { display: grid; grid-template-columns: 52px minmax(0, 1fr); align-items: center; gap: 8px; }
+.tier > span { font-size: 13px; font-weight: 600; color: var(--muted); }
+.tier .row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.tier .row.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.seat-btn { min-height: 44px; border: 1px solid var(--stroke); border-radius: var(--r); background: var(--surface); font-size: 14px; }
+.seat-btn[aria-pressed="true"] { background: var(--field); color: var(--field-ink); border-color: var(--field); font-weight: 700; }
+.seat-now { padding: 10px 12px; border-left: 4px solid var(--stroke); background: var(--paper); font-size: 14px; }
+
+/* 일정표 */
+.sched { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; }
+.sched li { display: grid; grid-template-columns: 44px 12px minmax(0, 1fr); gap: 0 12px; min-height: 56px; }
+.sched .h { font-size: 14px; font-weight: 600; color: var(--muted); padding-top: 2px; }
+.sched .strip { display: block; }
+.sched .evs { display: flex; flex-direction: column; gap: 6px; padding-bottom: 8px; }
+.ev { display: flex; flex-direction: column; padding: 8px 10px; border-radius: var(--r); background: var(--surface); border: 1px solid var(--line); }
+.ev.key { background: var(--field); color: var(--field-ink); border-color: var(--field); }
+.ev b { font-size: 15px; }
+.ev span { font-size: 12.5px; line-height: 1.45; }
+.plan-actions { margin-top: 14px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 8px; }
+.plan-actions button { min-height: 52px; border-radius: var(--r); border: 2px solid var(--stroke); background: var(--surface); color: var(--stroke); font-size: 16px; font-weight: 700; }
+.plan-actions button:first-child { background: var(--stroke); color: var(--surface); }
+.share-text { margin-top: 10px; padding: 12px; border-radius: var(--r); border: 1px dashed var(--stroke); background: var(--surface); font-size: 14px; user-select: all; }
 
 /* 사용법 */
 dialog.help { width: min(600px, 100%); max-width: 100%; max-height: min(88vh, 900px); margin: auto auto 0; padding: 0; border: 0; border-radius: 14px 14px 0 0; background: var(--paper); color: var(--ink); overflow: hidden; }
@@ -227,6 +279,62 @@ dialog.help::backdrop { background: rgba(10, 30, 24, .55); }
   </div>
 </section>
 
+<!-- 공연 날 하루 미리 보기 (#day) / 내 자리에서 보기 (#seat) — 같은 3D 화면을 함께 쓴다 -->
+<section class="screen" id="s-day" hidden>
+  <div class="wrap">
+    <header class="bar">
+      <a class="icon-btn" href="#home" aria-label="첫 화면으로"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg></a>
+      <div><h1 class="big" id="day-title">공연 날 하루</h1><p class="sub" id="day-what"></p></div>
+      <button type="button" class="icon-btn help-btn" aria-label="사용법 보기" aria-haspopup="dialog">?</button>
+    </header>
+    <div class="viewer">
+      <model-viewer id="mv" loading="eager" camera-controls interaction-prompt="none" shadow-intensity="0.6" exposure="1.05" alt="공연장 3D 모델. 끌어서 돌려 볼 수 있어요.">
+        <span slot="hotspot-stage" class="stage-tag" id="stage-tag" data-position="0m 6m 24m" data-normal="0m 1m 0m" hidden>무대 쪽</span>
+      </model-viewer>
+      <div class="ph" id="ph" hidden></div>
+      <div class="progress" id="progress" hidden><span id="progress-bar"></span></div>
+      <p class="scene-chip" id="scene-chip"></p>
+    </div>
+    <p class="small" style="margin-top: 6px">끌면 돌아가고, 두 손가락이나 마우스 휠로 확대돼요. 3D: 「공연장 실감형 콘텐츠」 원본 형상 그대로.</p>
+    <div class="stops" id="day-stops" role="group" aria-label="하루 단계"></div>
+    <div id="day-card" aria-live="polite"></div>
+    <section class="seat-pick" id="seat-pick" aria-labelledby="seat-h" hidden>
+      <h2 id="seat-h" style="font-size: 17px">내 자리에서 보기</h2>
+      <svg class="seat-map" id="seat-map" viewBox="0 0 340 290" role="img" aria-label="KSPO DOME 객석 위치 그림. 위쪽이 무대."></svg>
+      <div class="tier"><span>플로어</span><div class="row two" id="t-floor"></div></div>
+      <div class="tier"><span>1층</span><div class="row" id="t-1"></div></div>
+      <div class="tier"><span>2층</span><div class="row" id="t-2"></div></div>
+      <p class="seat-now" id="seat-now" aria-live="polite"></p>
+      <p class="small">무대 위치와 객석 배치는 공연마다 달라요. 무대가 한쪽 끝에 놓인 공연을 가정했고, 공식 구역 이름 대신 방향으로 나눴어요. 거리는 3D 모델에서 잰 값이에요.</p>
+    </section>
+    <div class="day-nav"><button type="button" id="day-prev">이전 단계</button><button type="button" id="day-next">다음 단계</button></div>
+  </div>
+</section>
+
+<!-- 하루 일정표 · 캘린더 · 공유 -->
+<section class="screen" id="s-plan" hidden>
+  <div class="wrap">
+    <header class="bar">
+      <a class="icon-btn" href="#home" aria-label="첫 화면으로"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg></a>
+      <div><h1 class="big">하루 일정표</h1><p class="sub" id="plan-what"></p></div>
+      <button type="button" class="icon-btn help-btn" aria-label="사용법 보기" aria-haspopup="dialog">?</button>
+    </header>
+    <div class="legend" aria-hidden="true">
+      <span>주차장</span>
+      <span><i style="background: var(--lv-normal); border: 1px solid var(--line)"></i>보통</span>
+      <span><i style="background: var(--lv-busy)"></i>붐빔</span>
+      <span><i style="background: var(--lv-very)"></i>매우 붐빔</span>
+    </div>
+    <ol class="sched" id="sched" aria-label="시간대별 일정"></ol>
+    <div class="plan-actions">
+      <button type="button" id="ics-btn">캘린더에 넣기</button>
+      <button type="button" id="share-btn">같이 갈 사람에게</button>
+    </div>
+    <p class="small" id="ics-note" hidden style="margin-top: 8px">캘린더 파일을 만들었어요. 저장이 안 되면 공개 주소(tak7257-dot.github.io/kspo-report)에서 다시 눌러 주세요. <a id="ics-link" href="#plan">파일 받기</a></p>
+    <p class="share-text" id="share-text" hidden></p>
+  </div>
+</section>
+
 <!-- 사용법 -->
 <dialog class="help" id="help" aria-labelledby="help-h">
   <header class="help-head">
@@ -259,6 +367,12 @@ dialog.help::backdrop { background: rgba(10, 30, 24, .55); }
   </div>
 </dialog>
 
+<script>
+  // 3D 압축 해독기(Draco)는 페이지와 함께 올린 파일에서 읽는다
+  self.ModelViewerElement = self.ModelViewerElement || {};
+  self.ModelViewerElement.dracoDecoderLocation = new URL('draco/', location.href).href;
+</script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.0.0/dist/model-viewer.min.js"></script>
 <script src="js/logic.js"></script>
 <script src="js/live.js"></script>
 <script>
@@ -453,19 +567,212 @@ $('timer-btn').addEventListener('click', () => {
   $('timer-btn').textContent = '타이머 다시 시작';
 });
 
+/* ── 3D: 공연 날 하루 미리 보기 / 내 자리 ── */
+// 3D 파일(GLB)은 호스팅이 .glb 확장자를 내보내지 않아 '.glb.wasm' 이름으로 올렸다. 내용은 GLB 그대로다.
+const MODELS = {
+  'kspo-dome': { src: 'models/kspodome.glb.wasm', size: '11.7MB', heavy: true, poster: 'img/kspo_poster.png', shell: '외부' },
+  handball: { src: 'models/handball.glb.wasm' }, woori: { src: 'models/woori.glb.wasm' },
+  jandi: { src: 'models/88jandi.glb.wasm' }, lakeside: { src: 'models/lakeside.glb.wasm' },
+};
+const IS_PHONE = matchMedia('(max-width: 760px), (pointer: coarse)').matches;
+const mv = $('mv');
+let pendingCam = null, seatId = 'l1-center', dayStage = 0, optIn = false;
+// 단계별 시점. KSPO DOME은 실측한 시점, 나머지 공연장은 모델 크기에 맞춘 기본 시점
+const CAMS = {
+  kspo: { outside: { orbit: '205deg 70deg 190m', target: '0m 12m 0m', fov: '40deg' }, end: { orbit: '0deg 84deg 26m', target: '0m 6m -10m', fov: '68deg' } },
+  other: { outside: { orbit: '30deg 60deg auto' }, show: { orbit: '0deg 75deg auto' }, end: { orbit: '90deg 80deg auto' } },
+};
+function setShell(on) {
+  const m = MODELS[state.venue]; if (!m.shell || !mv.model) return;
+  for (const mat of mv.model.materials) if (mat.name === m.shell) {
+    const c = mat.pbrMetallicRoughness.baseColorFactor; mat.setAlphaMode(on ? 'OPAQUE' : 'BLEND'); mat.pbrMetallicRoughness.setBaseColorFactor([c[0], c[1], c[2], on ? 1 : 0]);
+  }
+}
+function seatCam(id) {
+  const s = DATA.seats.views.find(x => x.id === id);
+  return { orbit: s.orbit, target: s.target, fov: IS_PHONE && innerWidth < innerHeight ? '80deg' : '62deg' };
+}
+function camFor(key) {
+  const kspo = state.venue === 'kspo-dome';
+  if (key.startsWith('seat:')) return kspo ? seatCam(key.slice(5)) : CAMS.other.show;
+  if (key === 'show') return kspo ? seatCam(seatId) : CAMS.other.show;
+  if (key === 'end') return kspo ? CAMS.kspo.end : CAMS.other.end;
+  return kspo ? CAMS.kspo.outside : CAMS.other.outside;
+}
+function applyCam(key) {
+  mv.dataset.cam = key;            // 지금 어떤 시점인지 (테스트·접근성용 표시)
+  const c = camFor(key);
+  if (!mv.loaded) { pendingCam = key; return; }
+  mv.cameraOrbit = c.orbit; mv.cameraTarget = c.target || 'auto auto auto'; mv.fieldOfView = c.fov || 'auto';
+  mv.jumpCameraToGoal();
+  setShell(false);
+}
+function loadModel() {
+  const m = MODELS[state.venue];
+  $('ph').hidden = true; mv.hidden = false;
+  const kspo = state.venue === 'kspo-dome';
+  mv.minCameraOrbit = kspo ? 'auto auto 0.5m' : 'auto auto auto';
+  mv.maxCameraOrbit = kspo ? 'auto auto 400m' : 'auto auto auto';
+  mv.maxFieldOfView = kspo ? '90deg' : 'auto';
+  $('stage-tag').hidden = !kspo;
+  if (mv.getAttribute('src') !== m.src) { $('progress').hidden = false; $('progress-bar').style.width = '0%'; mv.setAttribute('src', m.src); }
+}
+function showViewer() {
+  const m = MODELS[state.venue];
+  if (m.heavy && IS_PHONE && !optIn && mv.getAttribute('src') !== m.src) {   // 휴대폰: 무거운 모델은 누를 때만
+    mv.hidden = true; $('progress').hidden = true; $('ph').hidden = false;
+    $('ph').replaceChildren(el('img', { src: m.poster, alt: venue().name + ' 객석 3D 미리보기 이미지' }),
+      el('button', { type: 'button', class: 'load', text: `3D 불러오기 (${m.size})`, onclick: () => { optIn = true; loadModel(); } }),
+      el('span', { class: 'note2', text: '원본 형상 그대로라 몇 초 걸릴 수 있어요' }));
+  } else loadModel();
+}
+mv.addEventListener('load', () => { setShell(false); const k = pendingCam || mv.dataset.cam; pendingCam = null; if (k) applyCam(k); });
+mv.addEventListener('progress', e => { const p = e.detail.totalProgress; $('progress-bar').style.width = Math.round(p * 100) + '%'; if (p >= 1) setTimeout(() => { $('progress').hidden = true; }, 300); });
+mv.addEventListener('error', () => { $('progress').hidden = true; $('ph').hidden = false; $('ph').replaceChildren(el('span', { class: 'note2', text: '3D를 불러오지 못했어요. 인터넷 연결을 확인하고 다시 열어 주세요.' })); });
+
+function dayStages(c) {
+  const a = c.advice, e = c.exit;
+  const arr = a.mode === 'car' ? a.arriveHour : state.startHour - 1;
+  const leave = e.endHour * 60 + e.endMinute + (e.showRatios ? e.wait.minutes : 0);
+  const hm = m => pad2(Math.floor(m / 60) % 24) + ':' + pad2(m % 60);
+  return [
+    { key: 'outside', name: '도착', time: pad2(arr) + ':00', chip: '도착 · 바깥에서 본 ' + venue().name },
+    { key: 'show', name: '공연', time: pad2(state.startHour) + ':00', chip: state.venue === 'kspo-dome' ? '공연 · ' + DATA.seats.views.find(v => v.id === seatId).label + ' 눈높이' : '공연 · ' + venue().name + ' 안' },
+    { key: 'end', name: '끝', time: e.endLabel.replace(' (다음 날)', ''), chip: state.venue === 'kspo-dome' ? '끝 · 객석 뒤쪽 출구 방향' : '끝 · 옆에서 본 ' + venue().name },
+    { key: 'outside', name: '출차', time: hm(leave), chip: (e.showRatios ? e.wait.minutes + '분 쉬었다 ' : '') + '나가기' },
+  ];
+}
+function dayCard(c, i) {
+  const a = c.advice, e = c.exit, box = [];
+  if (i === 0) {
+    box.push(a.mode === 'car'
+      ? el('div', { class: 'card ans' }, el('span', { class: 'k', text: '차로 온다면' }), el('span', { class: 'v big', text: `${pad2(a.arriveHour)}:00까지 도착` }),
+          el('span', { text: a.firstVeryBusyHour !== null ? `${a.firstVeryBusyHour}시부터 주차장이 평소의 2배를 넘어요.` : `그때 주차장은 평소의 ${times(a.indexAtArrive)} 정도예요.` }))
+      : el('div', { class: 'card ans' }, el('span', { class: 'k', text: '이날은' }), el('span', { class: 'v big', text: '지하철을 권해요' }),
+          el('span', { text: a.arriveHour !== null ? `차라면 ${pad2(a.arriveHour)}:00 전에 들어와야 해요.` : '시작 전 내내 주차장이 평소의 2배를 넘어요.' })));
+  } else if (i === 1) {
+    const s = DATA.seats.views.find(v => v.id === seatId);
+    box.push(state.venue === 'kspo-dome'
+      ? el('div', { class: 'card' }, el('span', { class: 'k', text: '내 자리 · ' + s.label }), el('span', { class: 'v big', text: `무대 쪽 끝까지 약 ${s.to_stage_m}m` }),
+          el('span', { text: '아래에서 자리를 바꾸면 3D가 그 자리 눈높이로 바뀌어요.' }))
+      : el('div', { class: 'card' }, el('span', { class: 'k', text: '공연 시작' }), el('span', { class: 'v big', text: `${pad2(state.startHour)}:00` }),
+          el('span', { text: `${venue().name} 3D를 끌어서 둘러보세요.` })));
+  } else if (i === 2) {
+    box.push(el('div', { class: 'card' }, el('span', { class: 'k', text: `${e.endLabel}쯤 끝나요 (공연 시간 중앙값 ${c.showMinutes}분)` }),
+      el('span', { class: 'v big', text: e.showRatios ? '끝나자마자 나가면 가장 몰리는 때' : '끝나는 시각에 출차가 몰려요' }),
+      el('span', { text: e.showRatios ? `${e.wait.minutes}분 쉬었다 나가면 같이 나가는 차가 ${Math.round(e.wait.ratio * 100)}%로 줄어요.` : '저녁 공연 기록만 있어 줄어드는 비율은 보여 드리지 않아요.' })));
+  } else {
+    box.push(el('div', { class: 'card ans' }, el('span', { class: 'k', text: e.showRatios ? `${e.wait.minutes}분만 쉬었다 나가면` : '나갈 때' }),
+      el('span', { class: 'v big', text: e.showRatios ? `같이 나가는 차 ${Math.round(e.wait.ratio * 100)}%` : '지금 주차장 상황 보기' }),
+      el('a', { href: '#exit', style: 'color: var(--field-ink); font-weight: 600', text: '나가기 안내와 20분 타이머 →' })));
+  }
+  return box;
+}
+function renderDay() {
+  const c = compute(), st = dayStages(c);
+  $('day-what').textContent = `${venue().name} · ${pad2(state.startHour)}:00 공연`;
+  $('day-stops').replaceChildren(...st.map((s, i) => el('button', { type: 'button', 'aria-pressed': String(i === dayStage), 'aria-label': `${s.name} ${s.time}`, onclick: () => { dayStage = i; renderDay(); } },
+    el('span', { class: 'dot', 'aria-hidden': 'true' }), el('span', { class: 't num', text: s.time }), el('span', { class: 'n', text: s.name }))));
+  $('day-card').replaceChildren(...dayCard(c, dayStage));
+  $('scene-chip').textContent = st[dayStage].chip;
+  $('seat-pick').hidden = !(dayStage === 1 && state.venue === 'kspo-dome');
+  if (!$('seat-pick').hidden) renderSeats();
+  $('day-prev').disabled = dayStage === 0; $('day-next').disabled = dayStage === 3;
+  applyCam(dayStage === 1 && state.venue === 'kspo-dome' ? 'seat:' + seatId : st[dayStage].key);
+}
+$('day-prev').onclick = () => { dayStage = Math.max(0, dayStage - 1); renderDay(); };
+$('day-next').onclick = () => { dayStage = Math.min(3, dayStage + 1); renderDay(); };
+
+// 객석 그림: 3D 모델에서 잰 위치(m)를 위에서 본 그림으로. 위쪽이 무대(+Z), 무대를 볼 때 왼쪽(+X)이 그림의 왼쪽.
+const MAP = { cx: 170, cy: 150, s: 2 };
+const mx = x => MAP.cx - x * MAP.s, my = z => MAP.cy - z * MAP.s;
+function renderSeatMap() {
+  const g = $('seat-map'); g.replaceChildren();
+  const ring = (r0, r1) => sv('circle', { cx: MAP.cx, cy: MAP.cy, r: (r0 + r1) / 2 * MAP.s, fill: 'none', stroke: 'var(--line-soft)', 'stroke-width': (r1 - r0) * MAP.s });
+  g.append(ring(46.5, 58.5), ring(25, 43),
+    sv('circle', { cx: MAP.cx, cy: MAP.cy, r: 24 * MAP.s, fill: 'var(--paper)', stroke: 'var(--line)', 'stroke-width': 1 }),
+    sv('rect', { x: mx(9), y: my(24), width: 18 * MAP.s, height: 4.5 * MAP.s, rx: 2, fill: 'var(--stroke)' }),
+    sv('text', { x: MAP.cx, y: my(24) - 6, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 600, fill: 'var(--ink)' }, '무대 (가정)'),
+    sv('text', { x: MAP.cx + 52.5 * MAP.s * 0.6, y: MAP.cy + 52.5 * MAP.s * 0.8 + 4, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 600, fill: 'var(--muted)' }, '2층'),
+    sv('text', { x: MAP.cx + 34 * MAP.s * 0.6, y: MAP.cy + 34 * MAP.s * 0.8 + 4, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 600, fill: 'var(--muted)' }, '1층'),
+    sv('line', { id: 'sight', stroke: 'var(--stroke)', 'stroke-width': 2, 'stroke-dasharray': '4 4' }));
+  for (const s of DATA.seats.views) g.append(sv('circle', { id: 'dot-' + s.id, cx: mx(s.eye_m[0]), cy: my(s.eye_m[2]), r: 5, fill: 'var(--surface)', stroke: 'var(--stroke)', 'stroke-width': 2 }));
+}
+function renderSeats() {
+  if (!$('seat-map').childElementCount) renderSeatMap();
+  const btn = s => el('button', { type: 'button', class: 'seat-btn', 'data-id': s.id, 'aria-pressed': String(s.id === seatId), text: s.label.replace(/^(플로어|[12]층) /, ''),
+    onclick: () => { seatId = s.id; renderDay(); } });
+  const by = t => DATA.seats.views.filter(s => s.tier === t).map(btn);
+  $('t-floor').replaceChildren(...by('플로어')); $('t-1').replaceChildren(...by('1층')); $('t-2').replaceChildren(...by('2층'));
+  const s = DATA.seats.views.find(x => x.id === seatId);
+  for (const v of DATA.seats.views) { const d = $('dot-' + v.id), on = v.id === seatId; d.setAttribute('r', on ? 9 : 5); d.setAttribute('fill', on ? 'var(--field)' : 'var(--surface)'); }
+  const l = $('sight'); l.setAttribute('x1', mx(s.eye_m[0])); l.setAttribute('y1', my(s.eye_m[2])); l.setAttribute('x2', MAP.cx); l.setAttribute('y2', my(22));
+  $('seat-now').replaceChildren(el('strong', { text: s.label }), ` · 무대 쪽 끝까지 약 ${s.to_stage_m}m` + (s.height_m > 0 ? `, 플로어보다 ${s.height_m}m 높아요` : ', 플로어와 같은 높이예요'));
+}
+
+/* ── 하루 일정표 · 캘린더 · 공유 ── */
+const PUBLIC_URL = 'https://tak7257-dot.github.io/kspo-report/';
+function renderPlan() {
+  const c = compute(), a = c.advice, e = c.exit, d = new Date(state.date + 'T00:00:00');
+  $('plan-what').textContent = `${d.getMonth() + 1}월 ${d.getDate()}일 (${WK[d.getDay()]}) · ${venue().name} · ${pad2(state.startHour)}:00 공연`;
+  const arr = a.mode === 'car' ? a.arriveHour : state.startHour - 1;
+  const EV = {};
+  const add = (h, ev) => { (EV[h] = EV[h] || []).push(ev); };
+  add(arr, a.mode === 'car' ? { t: pad2(arr) + ':00', b: '도착 · 주차', s: a.firstVeryBusyHour !== null ? `${a.firstVeryBusyHour}시부터 주차장이 매우 붐벼요.` : '주차장이 아직 덜 붐벼요.', key: true }
+    : { t: pad2(arr) + ':00', b: '지하철로 도착', s: '이날은 주차장이 일찍부터 매우 붐벼요.', key: true });
+  add(state.startHour, { t: pad2(state.startHour) + ':00', b: '공연 시작' + (state.venue === 'kspo-dome' ? ' · ' + DATA.seats.views.find(v => v.id === seatId).label : ''), s: '' });
+  add(e.endHour + (e.nextDay ? 24 : 0), { t: e.endLabel, b: `공연 끝 (약 ${c.showMinutes}분)`, s: e.showRatios ? '끝나자마자 나가면 출차가 가장 몰려요.' : '' });
+  if (a.mode === 'car' && e.showRatios) {
+    const m = e.endHour * 60 + e.endMinute + e.wait.minutes;
+    add(Math.floor(m / 60) + (e.nextDay ? 24 : 0), { t: pad2(Math.floor(m / 60) % 24) + ':' + pad2(m % 60), b: '출차', s: `${e.wait.minutes}분 쉬고 나가면 같이 나가는 차가 ${Math.round(e.wait.ratio * 100)}%로 줄어요.`, key: true });
+  }
+  const hours = Object.keys(EV).map(Number);
+  const rows = [];
+  for (let h = Math.min(...hours); h <= Math.max(...hours); h++) {
+    const v = c.idx[h % 24], lv = Logic.levelOf(v);
+    rows.push(el('li', {}, el('span', { class: 'h num', text: pad2(h % 24) + ':00' }),
+      el('span', { class: 'strip', role: 'img', 'aria-label': `${h % 24}시 주차장 ${lv === 'very' ? '매우 붐빔' : lv === 'busy' ? '붐빔' : '보통'}`, style: `background: var(--lv-${lv})` }),
+      el('span', { class: 'evs' }, ...(EV[h] || []).map(ev => el('span', { class: 'ev' + (ev.key ? ' key' : '') }, el('span', { class: 'num', text: ev.t }), el('b', { text: ev.b }), ev.s ? el('span', { text: ev.s }) : '')))));
+  }
+  $('sched').replaceChildren(...rows);
+  $('share-text').hidden = true; $('ics-note').hidden = true;
+}
+$('ics-btn').addEventListener('click', () => {
+  const c = compute();
+  const ics = Logic.buildIcs({ dateISO: state.date, venueName: venue().name, arriveHour: c.advice.arriveHour, startHour: state.startHour, startMinute: state.startMinute, showMinutes: c.showMinutes, mode: c.advice.mode });
+  const a = $('ics-link');
+  if (a.href.startsWith('blob:')) URL.revokeObjectURL(a.href);
+  a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' }));
+  a.download = `덜붐빌때_${state.date}.ics`;
+  $('ics-note').hidden = false;
+  try { a.click(); } catch (e) { }
+});
+$('share-btn').addEventListener('click', () => {
+  const c = compute();
+  const t = Logic.shareText({ dateISO: state.date, venueName: venue().name, startHour: state.startHour, startMinute: state.startMinute, advice: c.advice, exit: c.exit, url: PUBLIC_URL });
+  const box = $('share-text'); box.textContent = t; box.hidden = false;
+  if (navigator.clipboard) navigator.clipboard.writeText(t).then(() => { box.textContent = t + '  (복사했어요)'; }, () => {});
+});
+
 /* ── 사용법 ── */
 for (const b of document.querySelectorAll('.help-btn')) b.addEventListener('click', () => { const d = $('help'); d.showModal ? d.showModal() : d.setAttribute('open', ''); });
 $('help-x').onclick = () => $('help').close();
 $('help').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.close(); });
 
 /* ── 화면 전환 ── */
-const SCREENS = ['home', 'exit'];
+const SCREENS = ['home', 'exit', 'day', 'plan'];
 function route() {
   const h = location.hash.slice(1);
-  const name = SCREENS.includes(h) ? h : 'home';
+  const name = h === 'seat' ? 'day' : SCREENS.includes(h) ? h : 'home';   // #seat 은 하루 미리 보기의 '공연' 단계
   for (const s of SCREENS) $('s-' + s).hidden = s !== name;
   if (name === 'home') renderHome();
   if (name === 'exit') { renderExit(); Live.start(onLive); }
+  if (name === 'day') {
+    if (h === 'seat') dayStage = 1;
+    $('day-title').textContent = h === 'seat' ? '내 자리에서 보기' : '공연 날 하루';
+    showViewer(); renderDay();
+  }
+  if (name === 'plan') renderPlan();
   scrollTo(0, 0);
 }
 
