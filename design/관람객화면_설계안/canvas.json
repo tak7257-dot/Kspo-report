@@ -17,36 +17,36 @@
       "x": 940,
       "y": 0
     },
+    "V2Arrive.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "v2-2. 공연장 · 도착 시간",
+      "w": 390,
+      "x": 470,
+      "y": 1860
+    },
+    "V2Home.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "v2-1. 첫 화면 (날짜 먼저)",
+      "w": 390,
+      "x": 0,
+      "y": 1860
+    },
+    "V2Seat.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "v2-3. 공연장 · 내 자리",
+      "w": 390,
+      "x": 940,
+      "y": 1860
+    },
     "Venue.dc.html": {
       "h": 844,
       "title": "2. 공연장 3D",
       "w": 390,
       "x": 470,
       "y": 0
-    },
-    "V2Home.dc.html": {
-      "x": 0,
-      "y": 1860,
-      "w": 390,
-      "h": 844,
-      "title": "v2-1. 첫 화면 (날짜 먼저)",
-      "is_interactive": true
-    },
-    "V2Arrive.dc.html": {
-      "x": 470,
-      "y": 1860,
-      "w": 390,
-      "h": 844,
-      "title": "v2-2. 공연장 · 도착 시간",
-      "is_interactive": true
-    },
-    "V2Seat.dc.html": {
-      "x": 940,
-      "y": 1860,
-      "w": 390,
-      "h": 844,
-      "title": "v2-3. 공연장 · 내 자리",
-      "is_interactive": true
     }
   },
   "createdOnFiles": {
@@ -82,10 +82,11 @@
     },
     "title2": {
       "kind": "title1",
+      "maxW": 1330,
       "text": "v2 · 공연장 화면 하나에 3D와 시트",
+      "w": 240,
       "x": 0,
-      "y": 1560,
-      "maxW": 1330
+      "y": 1560
     }
   },
   "order": [

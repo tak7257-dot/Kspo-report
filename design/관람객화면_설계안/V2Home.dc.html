@@ -36,22 +36,6 @@ button:focus-visible,a:focus-visible{outline:3px solid #2F7A5D;outline-offset:3p
     </div>
   </section>
 
-  <section aria-label="이날 주차장 요약" style="margin: 14px 16px 0; background: #FFFFFF; border: 2px solid #2F7A5D; border-radius: 8px; overflow: hidden">
-    <div style="padding: 14px 14px 12px; display: flex; flex-direction: column; gap: 4px">
-      <p style="margin: 0; font-size: 13.5px; color: #4B635C">{{dateLine}}</p>
-      <p style="margin: 0; font-size: 25px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.25">{{headline}}</p>
-    </div>
-    <div aria-hidden="true" style="padding: 0 14px; display: flex; align-items: flex-end; gap: 3px; height: 52px">
-      <sc-for list="{{bars}}" as="b" hint-placeholder-count="14">
-        <span style="{{b.style}}"></span>
-      </sc-for>
-    </div>
-    <div aria-hidden="true" style="padding: 4px 14px 0; display: flex; justify-content: space-between; font-size: 11px; color: #4B635C; font-variant-numeric: tabular-nums">
-      <span>10시</span><span>14시</span><span>18시</span><span>22시</span>
-    </div>
-    <p style="margin: 10px 0 0; padding: 10px 14px 12px; background: #A9E4C3; color: #14332A; font-size: 14px; line-height: 1.5">{{advice}}</p>
-  </section>
-
   <section aria-labelledby="h-where" style="padding: 18px 16px 0; display: flex; flex-direction: column; gap: 8px; min-height: 0">
     <h2 id="h-where" style="margin: 0; font-size: 17px; font-weight: 600">어느 공연장이에요?</h2>
     <nav aria-label="공연장" style="display: flex; flex-direction: column; gap: 8px">
@@ -96,7 +80,23 @@ button:focus-visible,a:focus-visible{outline:3px solid #2F7A5D;outline-offset:3p
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4B635C" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
       </a>
     </nav>
+  </section><section aria-label="이날 주차장 요약" style="margin: 14px 16px 0; background: #FFFFFF; border: 2px solid #2F7A5D; border-radius: 8px; overflow: hidden">
+    <div style="padding: 14px 14px 12px; display: flex; flex-direction: column; gap: 4px">
+      <p style="margin: 0; font-size: 13.5px; color: #4B635C">{{dateLine}}</p>
+      <p style="margin: 0; font-size: 25px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.25">{{headline}}</p>
+    </div>
+    <div aria-hidden="true" style="padding: 0 14px; display: flex; align-items: flex-end; gap: 3px; height: 52px">
+      <sc-for list="{{bars}}" as="b" hint-placeholder-count="14">
+        <span style="{{b.style}}"></span>
+      </sc-for>
+    </div>
+    <div aria-hidden="true" style="padding: 4px 14px 0; display: flex; justify-content: space-between; font-size: 11px; color: #4B635C; font-variant-numeric: tabular-nums">
+      <span>10시</span><span>14시</span><span>18시</span><span>22시</span>
+    </div>
+    <p style="margin: 10px 0 0; padding: 10px 14px 12px; background: #A9E4C3; color: #14332A; font-size: 14px; line-height: 1.5">{{advice}}</p>
   </section>
+
+  
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
