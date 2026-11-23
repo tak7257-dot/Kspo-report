@@ -348,7 +348,7 @@ dialog.help::backdrop { background: rgba(10, 30, 24, .55); }
       <button type="button" id="ics-btn">캘린더에 넣기</button>
       <button type="button" id="share-btn">같이 갈 사람에게</button>
     </div>
-    <p class="small" id="ics-note" hidden style="margin-top: 8px">캘린더 파일을 만들었어요. 저장이 안 되면 공개 주소(tak7257-dot.github.io/kspo-report)에서 다시 눌러 주세요. <a id="ics-link" href="#plan">파일 받기</a></p>
+    <p class="small" id="ics-note" hidden style="margin-top: 8px">캘린더 파일을 만들었어요. 저장이 안 되면 공개 주소(tak7257-dot.github.io/Kspo-report)에서 다시 눌러 주세요. <a id="ics-link" href="#plan">파일 받기</a></p>
     <p class="share-text" id="share-text" hidden></p>
   </div>
 </section>
@@ -766,7 +766,7 @@ function renderSeats() {
 }
 
 /* ── 하루 일정표 · 캘린더 · 공유 ── */
-const PUBLIC_URL = 'https://tak7257-dot.github.io/kspo-report/';
+const PUBLIC_URL = 'https://tak7257-dot.github.io/Kspo-report/';
 function renderPlan() {
   const c = compute(), a = c.advice, e = c.exit, d = new Date(state.date + 'T00:00:00');
   $('plan-what').textContent = `${d.getMonth() + 1}월 ${d.getDate()}일 (${WK[d.getDay()]}) · ${venue().name} · ${pad2(state.startHour)}:00 공연`;
