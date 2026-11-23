@@ -48,7 +48,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .pick { display: flex; flex-direction: column; gap: 8px; padding-block: 10px 0; }
 .pick h2 { font-size: 15px; font-weight: 600; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.chip { min-height: 40px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); font-size: 14.5px; }
+.chip { min-height: 44px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); font-size: 14.5px; }
 .chip[aria-pressed="true"] { border: 2px solid var(--stroke); background: var(--field); color: var(--field-ink); font-weight: 700; }
 .dates { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
 .date { min-height: 56px; padding: 4px 0; border-radius: var(--r); border: 1px solid var(--line); background: var(--surface); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; }
@@ -60,7 +60,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .times { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
 .time { min-height: 44px; padding: 0; border-radius: var(--r); border: 1px solid var(--line); background: var(--surface); font-size: 14.5px; white-space: nowrap; }
 .time[aria-pressed="true"] { border: 2px solid var(--stroke); background: var(--stroke); color: var(--surface); font-weight: 700; }
-.check { display: flex; align-items: center; gap: 10px; min-height: 40px; font-size: 15px; cursor: pointer; }
+.check { display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: 15px; cursor: pointer; }
 .check input { width: 22px; height: 22px; accent-color: var(--stroke); margin: 0; flex: none; }
 
 /* 바꾸기 (처음엔 펼침, 고른 뒤엔 접힘) */
@@ -85,7 +85,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .live { font-size: 13px; color: var(--muted); margin-top: 4px; }
 .live b { color: var(--ink); }
 .maplinks { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
-.maplinks a { min-height: 40px; display: inline-flex; align-items: center; padding: 0 12px; border-radius: 999px; border: 1.5px solid var(--stroke); color: var(--stroke); text-decoration: none; font-size: 14px; font-weight: 600; }
+.maplinks a { min-height: 44px; display: inline-flex; align-items: center; padding: 0 12px; border-radius: 999px; border: 1.5px solid var(--stroke); color: var(--stroke); text-decoration: none; font-size: 14px; font-weight: 600; }
 .t-stub { position: relative; border-left: 2px dashed var(--stroke); border-radius: 0 12px 12px 0; background: var(--field); color: var(--field-ink); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 18px 6px; text-align: center; }
 .t-stub::before, .t-stub::after { content: ""; position: absolute; left: -13px; width: 22px; height: 22px; border-radius: 50%; background: var(--paper); border: 2px solid transparent; }
 .t-stub::before { top: -14px; border-bottom-color: var(--stroke); }
@@ -94,7 +94,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .s-v { font-size: 28px; letter-spacing: -0.03em; }
 .s-k2 { font-size: 12px; color: var(--field-sub); }
 .s-brand { margin-top: 10px; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; writing-mode: vertical-rl; color: var(--field-sub); }
-.exit-band { margin-top: 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 52px; padding: 8px 14px; border-radius: var(--r); background: var(--stroke); color: var(--surface); text-decoration: none; font-weight: 700; }
+.exit-band { margin-top: 10px; display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 52px; padding: 8px 14px; border-radius: var(--r); background: var(--stroke); color: var(--surface); text-decoration: none; font-weight: 700; }
 
 /* 시간대 막대 */
 .chart { margin-top: 18px; display: flex; flex-direction: column; gap: 6px; }
@@ -225,6 +225,7 @@ dialog.help::backdrop { background: rgba(10, 30, 24, .55); }
         <label class="check" for="rain"><input id="rain" type="checkbox">비가 온대요</label>
       </div>
     </details>
+    <a class="exit-band" id="exit-band" href="#exit" hidden>공연 끝났나요? 나가기 안내 보기 <span aria-hidden="true">→</span></a>
     <section class="ticket" aria-label="이날의 안내표">
       <div class="t-main">
         <div class="t-top"><span class="t-kind">공연 날 안내표</span><span class="t-no num" id="ticket-no"></span></div>
@@ -248,7 +249,6 @@ dialog.help::backdrop { background: rgba(10, 30, 24, .55); }
         <span class="s-brand" aria-hidden="true">덜붐빌때</span>
       </div>
     </section>
-    <a class="exit-band" id="exit-band" href="#exit" hidden>공연 끝났나요? 나가기 안내 보기 <span aria-hidden="true">→</span></a>
 
     <section class="chart" aria-labelledby="h-chart">
       <h2 id="h-chart">시간대별 주차장, 평소와 비교</h2>
@@ -290,9 +290,10 @@ dialog.help::backdrop { background: rgba(10, 30, 24, .55); }
     <div class="timer">
       <button type="button" id="timer-btn">20분 타이머 시작</button>
       <output id="timer-left" class="num big" aria-live="polite" hidden></output>
-      <p class="small">화면을 열어 둔 동안만 알려 드려요. 기다리는 동안 공원 밤길을 잠깐 걸어 보세요.</p>
+      <p class="small">화면을 열어 둔 동안만 알려 드려요. 화면이 꺼지면 소리가 안 날 수 있어요. 기다리는 동안 공원 밤길을 잠깐 걸어 보세요.</p>
     </div>
     <p class="small" id="exit-src" style="margin-top: 14px"></p>
+    <p class="small" style="margin-top: 6px">지금 주차장 대수: 「올림픽공원 실시간 주차현황」(동2·남2·북2문 주차장 합계). 장기 주차 차량은 출차가 안 찍혀 실제보다 많을 수 있어요.</p>
   </div>
 </section>
 
@@ -378,6 +379,7 @@ dialog.help::backdrop { background: rgba(10, 30, 24, .55); }
       <ul class="plain">
         <li id="help-days">2025년 공연 날 기록의 평균으로 본 예상이라 실제와 다를 수 있어요.</li>
         <li>주차장 기록은 올림픽공원 전체(동2·남2·북2문 주차장) 기준이에요. 주차장 한 곳의 상황은 아니에요.</li>
+        <li>"지금 주차장 N대"는 「실시간 주차현황」 값이에요. 장기 주차 차량은 출차가 안 찍혀 실제보다 많을 수 있어요. 공연 당일에만 보여요.</li>
         <li>지하철·버스 혼잡은 공공데이터에 없어서 알려 드리지 않아요. 길 찾기는 지도 앱으로 넘겨 드려요.</li>
       </ul>
     </section>
@@ -430,7 +432,12 @@ try {
   const saved = JSON.parse(localStorage.getItem(KEY) || 'null');
   if (saved) { Object.assign(state, saved); firstVisit = false; }
 } catch (e) { /* 개인 모드 등: 기억 없이 기본값 */ }
-if (state.date < today()) state.date = defaultDate();   // 지난 날짜면 새로
+// 지난 공연이면 새로 (단, 자정 넘겨 끝나는 공연은 나가기 안내가 끝날 때까지 그대로 둔다: 종료 + 90분)
+function showOver() {
+  const end = new Date(state.date + 'T00:00:00').getTime() + (state.startHour * 60 + state.startMinute + 120 + 90) * 60e3;
+  return Date.now() > end;
+}
+if (state.date < today() && showOver()) state.date = defaultDate();
 function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { } }
 const venue = () => VENUES.find(v => v.id === state.venue) || VENUES[0];
 
@@ -458,6 +465,13 @@ function renderPickers() {
       'aria-label': `${d.getMonth() + 1}월 ${d.getDate()}일 ${WK[d.getDay()]}요일${holiday ? ' 공휴일' : ''}`,
       onclick: () => { state.date = k; update(); } },
       el('span', { class: 'wk', text: i === 0 ? '오늘' : holiday ? '휴일' : WK[d.getDay()] }), el('span', { class: 'd num', text: String(d.getDate()) })));
+  }
+  if (state.date < today()) {   // 어젯밤 공연(자정 넘김)을 보고 있을 때는 그 날짜도 앞에 보여 준다
+    const d = new Date(state.date + 'T00:00:00');
+    days.unshift(el('button', { type: 'button', class: 'date' + (Logic.dayType(state.date) === 'weekend' ? ' weekend' : ''), 'data-date': state.date, 'aria-pressed': 'true',
+      'aria-label': `${d.getMonth() + 1}월 ${d.getDate()}일 ${WK[d.getDay()]}요일 (어제)` },
+      el('span', { class: 'wk', text: '어제' }), el('span', { class: 'd num', text: String(d.getDate()) })));
+    days.pop();
   }
   $('dates').replaceChildren(...days);
   $('times').replaceChildren(...STARTS.map(h => el('button', { type: 'button', class: 'time num', 'data-start': String(h), 'aria-pressed': String(h === state.startHour), text: h + ':00',
@@ -522,7 +536,7 @@ function renderHome() {
   const c = compute();
   renderPickers(); renderAnswer(c); renderBars(c);
   $('to-seat').hidden = state.venue !== 'kspo-dome';
-  $('exit-band').hidden = !exitActive(c);
+  renderBand(c);
   if (state.date === today()) Live.start(onLive); 
   renderLive();
 }
@@ -549,9 +563,13 @@ function renderLive() {
   ex.hidden = false; ex.innerHTML = '';
   ex.append('지금 주차장 ', el('b', { text: fmt(liveN) + '대' }), k !== null ? ` · 최근 10분 동안 ${fmt(k)}대 줄었어요` : '');
 }
-function onLive(n, samples) { liveN = n; liveSamples = samples; renderLive(); }
+function onLive(n, samples) { liveN = n; liveSamples = samples; renderLive(); renderBand(); }
 
 /* ── 나가기 안내 ── */
+// 첫 화면의 '공연 끝났나요?' 띠: 화면을 열어 둔 채 기다려도 때가 되면 뜨도록 1분마다·돌아올 때마다 다시 본다
+function renderBand(c) { if (DATA.show) $('exit-band').hidden = !exitActive(c || compute()); }
+setInterval(() => renderBand(), 60e3);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) renderBand(); });
 function exitActive(c) {
   return Logic.exitModeActive({ now: new Date(), showDateISO: state.date, startHour: state.startHour, startMinute: state.startMinute, showMinutes: c.showMinutes });
 }
@@ -582,7 +600,11 @@ function renderExit() {
   renderLive();
 }
 let timerEnd = null, timerTick = null;
+let audio = null, wake = null;
 $('timer-btn').addEventListener('click', () => {
+  // 소리는 버튼을 누르는 순간 준비해 둬야 나중에 울릴 수 있다 (브라우저 정책)
+  try { audio = audio || new (window.AudioContext || window.webkitAudioContext)(); audio.resume(); } catch (e) { audio = null; }
+  try { if (navigator.wakeLock) navigator.wakeLock.request('screen').then(w => { wake = w; }, () => {}); } catch (e) { }
   timerEnd = Date.now() + 20 * 60e3;
   const out = $('timer-left'); out.hidden = false;
   const tick = () => {
@@ -591,7 +613,8 @@ $('timer-btn').addEventListener('click', () => {
     if (left <= 0) {
       clearInterval(timerTick); timerTick = null;
       try { navigator.vibrate && navigator.vibrate([300, 150, 300]); } catch (e) { }
-      try { const a = new (window.AudioContext || window.webkitAudioContext)(), o = a.createOscillator(); o.connect(a.destination); o.frequency.value = 880; o.start(); o.stop(a.currentTime + 0.4); } catch (e) { }
+      try { if (audio) { const o = audio.createOscillator(); o.connect(audio.destination); o.frequency.value = 880; o.start(); o.stop(audio.currentTime + 0.6); } } catch (e) { }
+      try { if (wake) wake.release(); } catch (e) { }
     }
   };
   if (timerTick) clearInterval(timerTick);

@@ -154,6 +154,42 @@ const noSideScroll = page => page.evaluate(() => document.documentElement.scroll
       check('일정표: 페이지 오류 없음', page.errors.length === 0, page.errors.join(' | '));
       await page.context().close();
     }
+    // ── 최종 검토에서 나온 것 ──
+    {
+      // I1: 자정 넘긴 공연은 다음 날 새벽에 열어도 그 공연 그대로, 나가기 띠 표시
+      const page = await open(browser, devices['iPhone 13'], 'abort', '#home', false, new Date('2026-11-28T18:00:00+09:00'));
+      await page.click('button[data-date="2026-11-28"]');
+      await page.click('button[data-start="22"]');
+      await page.clock.setFixedTime(new Date('2026-11-29T00:10:00+09:00'));
+      await page.reload(); await page.waitForSelector('#answer-title:not(:empty)');
+      check('자정 넘김: 다음 날 00:10에도 11월 28일 공연', (await text(page, '#what')).includes('11. 28'));
+      check('자정 넘김: 나가기 띠 표시', await page.locator('#exit-band').isVisible());
+      await page.context().close();
+    }
+    {
+      // I2: 열어 둔 화면으로 돌아오면 나가기 띠가 저절로 뜸, 띠는 표 위에
+      const page = await open(browser, devices['iPhone 13'], 'abort', '#home', false, new Date('2026-11-23T19:30:00+09:00'));
+      await page.click('button[data-date="2026-11-23"]');
+      await page.click('button[data-start="18"]');
+      check('열어 둔 화면: 19:30엔 띠 없음', await page.locator('#exit-band').isHidden());
+      await page.clock.setFixedTime(new Date('2026-11-23T19:50:00+09:00'));
+      await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
+      check('열어 둔 화면: 19:50에 돌아오면 띠 표시', await page.locator('#exit-band').isVisible());
+      const [band, ticket] = await Promise.all([page.locator('#exit-band').boundingBox(), page.locator('.ticket').boundingBox()]);
+      check('나가기 띠는 표 위에', band && ticket && band.y < ticket.y);
+      check('터치 영역: 공연장 칩 44px 이상', (await page.locator('.chip').first().boundingBox()).height >= 44);
+      check('터치 영역: 비 체크 44px 이상', (await page.locator('label.check').boundingBox()).height >= 44);
+      await page.context().close();
+    }
+    {
+      const page = await open(browser, devices['iPhone 13'], '[{"parking_sum":1961}]', '#home', false, new Date('2026-11-23T19:50:00+09:00'));
+      await page.goto(page.url().replace('#home', '#exit'));
+      await page.waitForSelector('#s-exit:not([hidden])');
+      await page.waitForSelector('#exit-live:not([hidden])', { timeout: 10000 }).catch(() => {});
+      check('타이머: 화면이 꺼지면 소리가 안 날 수 있다고 안내', (await text(page, '#s-exit')).includes('화면이 꺼지면'));
+      check('실시간: 출처와 장기 주차 유의사항', (await text(page, '#s-exit')).includes('장기 주차'));
+      await page.context().close();
+    }
     // (다음 작업의 확인은 이 줄 위에 이어 붙인다)
   } finally {
     await browser.close();
