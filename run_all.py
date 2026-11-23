@@ -24,7 +24,7 @@ if "--fetch" in sys.argv:
         steps.append(["src/fetch_kscperf.py"])
 steps += [["src/clean.py"], ["src/metrics.py"]]
 if any(Path("data/raw/kcisa").glob("kcisa_p*.xml")):
-    steps += [["src/clean_kcisa.py"], ["src/metrics_2025.py"], ["src/export_web_data.py"], ["src/seat_views.py"], ["src/exit_profile.py"]]
+    steps += [["src/clean_kcisa.py"], ["src/metrics_2025.py"], ["src/export_web_data.py"], ["src/seat_views.py"], ["src/exit_profile.py"], ["src/live_baseline.py"]]
 steps.append(["src/report.py"])
 
 for step in steps:

@@ -68,3 +68,13 @@ test('outflow10: 10분 전 2000 → 지금 1860 = 140, 표본 부족이면 null'
   assert.equal(L.outflow10([{ t: t0, n: 2000 }, { t: t0 + 10 * 60e3, n: 1860 }]), 140);
   assert.equal(L.outflow10([{ t: t0, n: 2000 }, { t: t0 + 3 * 60e3, n: 1990 }]), null);
 });
+
+// ── Task 3: 실시간 비교 기준값 ──
+test('baseline: 있는 칸은 값, 8월·없는 달은 null', () => {
+  const wk = Array(24).fill(null); wk[18] = 4200;
+  const t = { show_day: { '11': { weekend: wk, weekday: Array(24).fill(null) } } };
+  assert.equal(L.baseline(t, 11, 'weekend', 18), 4200);
+  assert.equal(L.baseline(t, 8, 'weekend', 18), null);
+  assert.equal(L.baseline(t, 12, 'weekend', 18), null);
+  assert.equal(L.baseline(t, 11, 'weekday', 18), null);
+});

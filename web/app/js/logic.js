@@ -100,7 +100,15 @@
     return best === null ? null : Math.max(0, best.n - last.n);
   }
 
+  // 실시간 비교 기준값(2025년 공연 날 같은 달·요일유형·시각 중앙값). 없으면 null
+  function baseline(table, month, dayKind, hour) {
+    var m = table && table.show_day && table.show_day[String(month)];
+    var v = m && m[dayKind] ? m[dayKind][hour] : null;
+    return typeof v === 'number' ? v : null;
+  }
+
   return {
+    baseline: baseline,
     HOLIDAYS: HOLIDAYS, dayType: dayType, levelOf: levelOf, arrivalAdvice: arrivalAdvice,
     exitPlan: exitPlan, exitModeActive: exitModeActive, parseLive: parseLive, outflow10: outflow10
   };
