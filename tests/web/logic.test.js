@@ -108,3 +108,11 @@ test('shareText: 차 문구와 출차 안내', () => {
   assert.equal(L.shareText({ dateISO: '2026-11-30', venueName: 'KSPO DOME', startHour: 19, startMinute: 0, advice, exit, url: 'https://x.example/' }),
     '11월 30일(월) KSPO DOME 19:00 · 차는 18:00 전 도착, 끝나고 20분 뒤 출차 — 덜붐빌때 https://x.example/');
 });
+
+// ── 운영 기간(2028년)까지 공휴일 ──
+test('dayType: 2028 설날(1/26)·총선(4/12)·추석 대체공휴일(10/5)은 weekend, 2028-10-06 금은 weekday', () => {
+  assert.equal(L.dayType('2028-01-26'), 'weekend');
+  assert.equal(L.dayType('2028-04-12'), 'weekend');
+  assert.equal(L.dayType('2028-10-05'), 'weekend');
+  assert.equal(L.dayType('2028-10-06'), 'weekday');
+});
