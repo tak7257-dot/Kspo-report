@@ -3,7 +3,7 @@
     python run_all.py            # 이미 받은 원본으로 다시 만들기
     python run_all.py --fetch    # 원본부터 새로 받기
                                  #  (2025 연계 데이터 API는 환경변수 KCISA_KEY, 공연행사정보 API는 KSCPERF_KEY 가 있을 때만)
-                                 #  ※ 홈페이지 자료를 쓰는 단계(공연장 매칭 등)는 사전 협의 전까지 src/_보류/ 에 보관
+                                 #  ※ 공공데이터포털 자료만 쓴다 (홈페이지 자료는 쓰지 않음)
 """
 import os
 import subprocess
