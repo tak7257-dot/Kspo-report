@@ -117,13 +117,13 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12.5px; max-width: 80
 <script>
   // 3D 압축 해독기(Draco)를 페이지와 함께 올린 파일에서 읽게 한다 (외부 사이트 로딩은 막혀 있음)
   self.ModelViewerElement = self.ModelViewerElement || {};
-  self.ModelViewerElement.dracoDecoderLocation = new URL('draco/', location.href).href;
+  self.ModelViewerElement.dracoDecoderLocation = new URL('../app/draco/', location.href).href;
 </script>
 <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.0.0/dist/model-viewer.min.js"></script>
 <script>
 // 3D 파일(GLB)은 이 페이지 호스팅이 .glb 확장자를 내보내지 않아 '.glb.wasm' 이름으로 올렸다. 내용은 GLB 그대로이고, 뷰어는 파일 내용으로 형식을 판별한다.
 const VENUES = [
-  { id: 'kspo-dome', name: 'KSPO DOME', alias: '올림픽체조경기장', status: 'ready', src: 'models/kspodome.glb.wasm', origin: 'org', shell: '외부', heavy: true, poster: 'poster/kspo.png',
+  { id: 'kspo-dome', name: 'KSPO DOME', alias: '올림픽체조경기장', status: 'ready', src: '../app/models/kspodome.glb.wasm', origin: 'org', shell: '외부', heavy: true, poster: '../app/img/kspo_poster.png',
     file: { 원본: 'DAE 475MB (SketchUp)', 웹용: '11.7MB', 형상: '삼각형 263만 개, 단순화 없음', 재질: '86종, 텍스처 9장 원본 해상도' },
     cams: [
       { label: '객석 안에서', orbit: '0deg 82deg 28m', target: '0m 9m -8m', fov: '70deg', shell: false },
@@ -134,16 +134,16 @@ const VENUES = [
   { id: 'olympic-hall', name: '올림픽홀', alias: '', status: 'excluded', src: null, origin: 'own',
     file: { 원본: '홈페이지 공식 도면으로 자체 제작 (좌석 2,470석)', 상태: '사용 협의 전까지 제외' },
     notes: ['도면이 공공누리 표시가 없는 홈페이지 자료라, 기관 저작권정책에 따라 담당자와 협의한 뒤에만 쓸 수 있습니다.', '허락을 받으면 만들어 둔 모델(코드는 src/_보류/)을 바로 다시 넣습니다.'] },
-  { id: 'handball', name: 'SK핸드볼경기장', alias: '티켓링크 라이브 아레나', status: 'ready', src: 'models/handball.glb.wasm', origin: 'org',
+  { id: 'handball', name: 'SK핸드볼경기장', alias: '티켓링크 라이브 아레나', status: 'ready', src: '../app/models/handball.glb.wasm', origin: 'org',
     file: { 원본: 'GLB 56MB', 웹용: '2.7MB' },
     notes: ['화면에 아주 작게 보이던 문제를 고쳤습니다(압축 단계 오류). 화면에 꽉 차게 보이는지 확인해 주세요.'] },
-  { id: 'woori', name: '우리금융아트홀', alias: '올림픽역도경기장', status: 'ready', src: 'models/woori.glb.wasm', origin: 'org',
+  { id: 'woori', name: '우리금융아트홀', alias: '올림픽역도경기장', status: 'ready', src: '../app/models/woori.glb.wasm', origin: 'org',
     file: { 원본: 'GLB 170MB', 웹용: '5.9MB' },
     notes: ['건물 단면 안으로 객석과 무대가 보이는 형태입니다. 관람객이 보기에 충분한지 확인해 주세요.', '웹용 파일이 가장 커서 휴대폰 로딩 시간을 같이 봐 주세요.'] },
-  { id: 'jandi', name: '88잔디마당', alias: '야외', status: 'ready', src: 'models/88jandi.glb.wasm', origin: 'org',
+  { id: 'jandi', name: '88잔디마당', alias: '야외', status: 'ready', src: '../app/models/88jandi.glb.wasm', origin: 'org',
     file: { 원본: 'GLB 11MB', 웹용: '2.1MB' },
     notes: ['야외 공연장이라 실내 공연장과 다른 안내가 필요할 수 있습니다. 3D 미리보기만 넣을지 정해 주세요.'] },
-  { id: 'lakeside', name: '수변무대', alias: '야외', status: 'ready', src: 'models/lakeside.glb.wasm', origin: 'org',
+  { id: 'lakeside', name: '수변무대', alias: '야외', status: 'ready', src: '../app/models/lakeside.glb.wasm', origin: 'org',
     file: { 원본: 'GLB 25MB', 웹용: '3.9MB' },
     notes: ['야외 공연장입니다. 3D 미리보기만 넣을지 정해 주세요.'] },
 ];

@@ -1,0 +1,122 @@
+{
+ "설명": "KSPO DOME 3D 모델의 객석 구역별 시점. 무대는 +Z 끝 '끝 무대'로 가정",
+ "stage_m": [
+  0.0,
+  3.0,
+  20.0
+ ],
+ "views": [
+  {
+   "id": "floor-front",
+   "label": "플로어 앞쪽",
+   "tier": "플로어",
+   "eye_m": [
+    0.0,
+    2.3,
+    6.0
+   ],
+   "to_stage_m": 14,
+   "height_m": 0.0,
+   "orbit": "180.0deg 92.9deg 14.0m",
+   "target": "0.0m 3.0m 20.0m"
+  },
+  {
+   "id": "floor-back",
+   "label": "플로어 뒤쪽",
+   "tier": "플로어",
+   "eye_m": [
+    0.0,
+    2.3,
+    -16.0
+   ],
+   "to_stage_m": 36,
+   "height_m": 0.0,
+   "orbit": "180.0deg 91.1deg 36.0m",
+   "target": "0.0m 3.0m 20.0m"
+  },
+  {
+   "id": "l1-left",
+   "label": "1층 왼쪽",
+   "tier": "1층",
+   "eye_m": [
+    33.0,
+    4.5,
+    0.0
+   ],
+   "to_stage_m": 39,
+   "height_m": 2.6,
+   "orbit": "121.2deg 87.7deg 38.6m",
+   "target": "0.0m 3.0m 20.0m"
+  },
+  {
+   "id": "l1-center",
+   "label": "1층 정면",
+   "tier": "1층",
+   "eye_m": [
+    0.0,
+    4.5,
+    -33.0
+   ],
+   "to_stage_m": 53,
+   "height_m": 2.6,
+   "orbit": "180.0deg 88.3deg 53.0m",
+   "target": "0.0m 3.0m 20.0m"
+  },
+  {
+   "id": "l1-right",
+   "label": "1층 오른쪽",
+   "tier": "1층",
+   "eye_m": [
+    -33.0,
+    4.5,
+    -0.0
+   ],
+   "to_stage_m": 39,
+   "height_m": 2.6,
+   "orbit": "-121.2deg 87.7deg 38.6m",
+   "target": "0.0m 3.0m 20.0m"
+  },
+  {
+   "id": "l2-left",
+   "label": "2층 왼쪽",
+   "tier": "2층",
+   "eye_m": [
+    52.0,
+    10.1,
+    0.0
+   ],
+   "to_stage_m": 56,
+   "height_m": 8.2,
+   "orbit": "111.0deg 82.8deg 56.2m",
+   "target": "0.0m 3.0m 20.0m"
+  },
+  {
+   "id": "l2-center",
+   "label": "2층 정면",
+   "tier": "2층",
+   "eye_m": [
+    0.0,
+    10.1,
+    -52.0
+   ],
+   "to_stage_m": 72,
+   "height_m": 8.2,
+   "orbit": "180.0deg 84.4deg 72.3m",
+   "target": "0.0m 3.0m 20.0m"
+  },
+  {
+   "id": "l2-right",
+   "label": "2층 오른쪽",
+   "tier": "2층",
+   "eye_m": [
+    -52.0,
+    10.1,
+    -0.0
+   ],
+   "to_stage_m": 56,
+   "height_m": 8.2,
+   "orbit": "-111.0deg 82.8deg 56.2m",
+   "target": "0.0m 3.0m 20.0m"
+  }
+ ]
+}

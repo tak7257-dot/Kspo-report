@@ -1,0 +1,512 @@
+<title>덜붐빌때</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="올림픽공원 공연장을 3D로 미리 보고, 2025년 공연일 주차 기록으로 덜 붐빌 때 도착하세요.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+/* 레이아웃: 휴대폰 한 줄이 기본. 넓은 화면에서는 3D(왼쪽) | 안내(오른쪽) 두 칸.
+   색: 공원 잔디 같은 연녹색 한 가지(--field)를 '답'이 있는 자리에만 칠하고, 나머지는 흰 종이와 진녹색 선. 티켓(점선 절취선) 모양을 반복. */
+:root {
+  --paper: #F5F9F6; --surface: #FFFFFF; --ink: #15302A; --muted: #4B635C;
+  --field: #A9E4C3; --field-ink: #14332A; --field-sub: #2E5145;
+  --stroke: #2F7A5D; --line: #9CCDB8; --line-soft: #CFE9DA; --press: #D3EFDF;
+  --hatch-bg: #E3F5EA; --hatch: #7CC4A0; --stage: #15302A;
+  --font: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --r: 6px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #0E1C17; --surface: #142821; --ink: #E3F1E9; --muted: #A3BFB3;
+  --field: #A9E4C3; --field-ink: #14332A; --field-sub: #2E5145;
+  --stroke: #7FD0A6; --line: #2F5546; --line-soft: #234237; --press: #1E3B30;
+  --hatch-bg: #17332A; --hatch: #3F7D62; --stage: #0A1511; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --paper: #0E1C17; --surface: #142821; --ink: #E3F1E9; --muted: #A3BFB3;
+  --field: #A9E4C3; --field-ink: #14332A; --field-sub: #2E5145;
+  --stroke: #7FD0A6; --line: #2F5546; --line-soft: #234237; --press: #1E3B30;
+  --hatch-bg: #17332A; --hatch: #3F7D62; --stage: #0A1511; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font-family: var(--font); font-size: 15px; line-height: 1.55; -webkit-text-size-adjust: 100%; word-break: keep-all; overflow-wrap: break-word; }
+h1, h2, p { margin: 0; }
+h1, h2 { text-wrap: balance; }
+a { color: var(--stroke); }
+button { font: inherit; color: inherit; touch-action: manipulation; cursor: pointer; }
+button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid var(--stroke); outline-offset: 3px; }
+.gut { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.wrap { max-width: 1080px; margin: 0 auto; }
+.num { font-variant-numeric: tabular-nums; }
+.big { font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; }
+.foot { padding-block: 20px 28px; font-size: 12.5px; line-height: 1.55; color: var(--muted); max-width: 70ch; }
+
+/* 공통: 뒤로 가기 머리줄 */
+.bar { display: flex; align-items: center; gap: 12px; padding-block: 16px 14px; }
+.back { width: 44px; height: 44px; flex: none; display: grid; place-items: center; border-radius: var(--r); border: 2px solid var(--stroke); color: var(--stroke); text-decoration: none; }
+.back:active { background: var(--press); }
+.bar h1 { font-size: clamp(26px, 6vw, 34px); color: var(--stroke); }
+.bar .sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+/* ── 첫 화면 ───────────────────────────── */
+.hero { background: var(--field); color: var(--field-ink); margin-top: calc(-1 * env(safe-area-inset-top, 0px)); padding-top: env(safe-area-inset-top, 0px); }
+.hero .wrap { padding-block: 40px 30px; display: flex; flex-direction: column; gap: 14px; }
+.hero h1 { font-size: clamp(56px, 15vw, 96px); line-height: 0.95; }
+.hero p { max-width: 34ch; font-size: 16px; line-height: 1.6; }
+.home-main { padding-block: 22px 0; display: flex; flex-direction: column; gap: 10px; }
+.home-main h2 { font-size: 17px; font-weight: 600; margin: 0 4px 4px; }
+.tickets { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+@media (min-width: 760px) { .tickets { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.ticket { display: grid; grid-template-columns: 76px minmax(0, 1fr); min-height: 68px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); color: var(--ink); text-decoration: none; overflow: hidden; }
+.ticket:active { background: var(--press); }
+.ticket .stub { border-right: 1px dashed var(--line); }
+.ticket .txt { padding: 10px 14px; display: flex; flex-direction: column; justify-content: center; gap: 1px; min-width: 0; }
+.ticket .name { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; }
+.ticket .meta { font-size: 13px; color: var(--muted); }
+.ticket.lead { border: 2px solid var(--stroke); min-height: 76px; }
+.ticket.lead .stub { border-right: 2px dashed var(--stroke); }
+.ticket.lead .name { font-size: 24px; color: var(--stroke); }
+.ticket.lead .meta { color: var(--ink); }
+.duo { display: block; background: var(--field); }
+.duo img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1) contrast(1.6) brightness(1.05); mix-blend-mode: multiply; }
+.aside-note { margin: 2px 4px 0; font-size: 13px; color: var(--muted); }
+
+/* ── 공연장 화면 ───────────────────────── */
+.venue-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (min-width: 900px) { .venue-grid { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); } }
+@media (min-width: 900px) { .viewer { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); } }
+.viewer { background: var(--surface); border: 2px solid var(--stroke); border-radius: var(--r); overflow: hidden; }
+.viewer-box { position: relative; aspect-ratio: 5 / 4; max-width: 100%; background: var(--stage); }
+@media (min-width: 900px) { .viewer-box { aspect-ratio: 4 / 3; } }
+model-viewer { width: 100%; height: 100%; background: var(--stage); --poster-color: transparent; --progress-bar-color: transparent; }
+.ph { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 10px; padding: 20px; text-align: center; }
+.ph img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ph .load { position: relative; min-height: 52px; padding: 0 22px; border: 0; border-radius: var(--r); background: var(--field); color: var(--field-ink); font-size: 17px; font-weight: 700; }
+.ph .load:active { background: var(--press); color: var(--ink); }
+.ph .note { position: relative; font-size: 13px; padding: 4px 10px; border-radius: 4px; background: var(--surface); color: var(--ink); }
+.progress { position: absolute; left: 0; right: 0; bottom: 0; height: 6px; background: rgba(0,0,0,.35); }
+.progress span { display: block; height: 100%; width: 0; background: var(--field); transition: width 150ms linear; }
+.stage-tag { font: 600 12px/1 var(--font); padding: 5px 8px; border-radius: 4px; border: 0; background: var(--field); color: var(--field-ink); pointer-events: none; white-space: nowrap; }
+.cams { display: grid; grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); border-top: 2px solid var(--stroke); }
+.cams button { min-height: 48px; border: 0; border-left: 1px solid var(--line-soft); background: var(--surface); font-size: 14px; padding: 0 4px; }
+.cams button:first-child { border-left: 0; }
+.cams button[aria-pressed="true"] { background: var(--field); color: var(--field-ink); font-weight: 600; }
+.cams button:active { background: var(--press); }
+.hint { padding: 8px 14px 10px; font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line-soft); }
+.side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.fact { background: var(--field); color: var(--field-ink); border-radius: var(--r); padding: 20px 18px 18px; display: flex; flex-direction: column; gap: 10px; }
+.fact .big { font-size: clamp(26px, 7vw, 30px); line-height: 1.2; }
+.fact p:last-child { font-size: 13px; line-height: 1.55; color: var(--field-sub); }
+.cta { display: flex; align-items: center; justify-content: center; min-height: 56px; border: 2px solid var(--stroke); border-radius: var(--r); background: var(--surface); color: var(--stroke); font-size: 21px; font-weight: 700; letter-spacing: -0.02em; text-decoration: none; }
+.cta:active { background: var(--press); }
+
+/* 내 자리에서 보기 */
+.seats { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px 14px 14px; display: flex; flex-direction: column; gap: 12px; }
+.seats h2 { font-size: 19px; font-weight: 700; letter-spacing: -0.02em; }
+.seats .lede { font-size: 13.5px; color: var(--muted); }
+.seat-map { width: 100%; max-width: 340px; height: auto; align-self: center; display: block; }
+.tier { display: grid; grid-template-columns: 52px minmax(0, 1fr); align-items: center; gap: 8px; }
+.tier > span { font-size: 13px; font-weight: 600; color: var(--muted); }
+.tier .row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.tier .row.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.seat-btn { min-height: 44px; border: 1px solid var(--stroke); border-radius: var(--r); background: var(--surface); font-size: 14px; }
+.seat-btn[aria-pressed="true"] { background: var(--field); color: var(--field-ink); border-color: var(--field); font-weight: 600; }
+.seat-btn:active { background: var(--press); }
+.seat-now { min-height: 46px; padding: 10px 12px; border-left: 4px solid var(--stroke); background: var(--paper); font-size: 14px; }
+.seat-now strong { font-size: 16px; }
+.small { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+
+/* ── 언제 도착할까 ─────────────────────── */
+.plan-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (min-width: 900px) { .plan-grid { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); } }
+.ticket-card { background: var(--surface); border: 2px solid var(--stroke); border-radius: var(--r); display: flex; flex-direction: column; }
+.inputs { padding: 14px 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+.seg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border: 2px solid var(--stroke); border-radius: var(--r); overflow: hidden; }
+.seg button { min-height: 46px; border: 0; background: var(--surface); font-size: 15px; }
+.seg button + button { border-left: 1px solid var(--line-soft); }
+.seg button[aria-pressed="true"] { background: var(--field); color: var(--field-ink); font-weight: 600; }
+.stepper-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.stepper-row > span { font-size: 15px; font-weight: 500; }
+.stepper { display: flex; align-items: center; gap: 4px; }
+.stepper button { width: 44px; height: 44px; border-radius: var(--r); border: 2px solid var(--stroke); background: var(--surface); color: var(--stroke); font-size: 22px; font-weight: 600; line-height: 1; }
+.stepper button:disabled { opacity: .35; cursor: default; }
+.stepper output { min-width: 88px; text-align: center; font-size: 30px; font-weight: 700; letter-spacing: -0.02em; color: var(--stroke); }
+.check { display: flex; align-items: center; gap: 10px; min-height: 40px; font-size: 15px; cursor: pointer; }
+.check input { width: 22px; height: 22px; accent-color: var(--stroke); flex: none; margin: 0; }
+.perf { position: relative; height: 0; border-top: 2px dashed var(--stroke); margin: 0 14px; }
+.perf::before, .perf::after { content: ""; position: absolute; top: -12px; width: 22px; height: 22px; border-radius: 50%; background: var(--paper); }
+.perf::before { left: -27px; border-right: 2px solid var(--stroke); }
+.perf::after { right: -27px; border-left: 2px solid var(--stroke); }
+.answer { padding: 18px 16px; display: flex; flex-direction: column; gap: 4px; background: var(--field); color: var(--field-ink); border-radius: 0 0 4px 4px; }
+.answer .label { font-size: 14px; font-weight: 600; }
+.answer .big { font-size: 52px; line-height: 1; }
+.answer .detail { margin-top: 6px; font-size: 14px; line-height: 1.55; }
+.chart { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.chart h2 { font-size: 15px; font-weight: 600; }
+.chart svg { width: 100%; height: auto; display: block; overflow: visible; }
+.chart text { font-family: var(--font); }
+.exit { padding: 12px 14px; border-left: 4px solid var(--stroke); background: var(--surface); font-size: 14px; line-height: 1.55; }
+.err { padding: 14px; border: 2px solid var(--stroke); border-radius: var(--r); background: var(--surface); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<!-- 첫 화면: 공연장 고르기 -->
+<section id="s-home" hidden>
+  <header class="hero">
+    <div class="wrap gut">
+      <h1 class="big">덜붐빌때</h1>
+      <p>공연장을 미리 보고, 주차장이 덜 붐빌 때 도착하세요. 2025년 올림픽공원 공연일 기록으로 알려드려요.</p>
+    </div>
+  </header>
+  <main class="wrap gut home-main">
+    <h2>어느 공연장에 가세요?</h2>
+    <nav class="tickets" id="tickets" aria-label="공연장"></nav>
+    <p class="aside-note">올림픽홀 3D는 기관과 협의한 뒤 공개해요.</p>
+  </main>
+  <footer class="wrap gut foot">한국체육산업개발주식회사 공공데이터(공공데이터포털)로 만들었어요.</footer>
+</section>
+
+<!-- 공연장: 3D 미리보기 + 내 자리에서 보기 -->
+<section id="s-venue" hidden>
+  <div class="wrap gut">
+    <header class="bar">
+      <a class="back" href="#home" aria-label="공연장 목록으로"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg></a>
+      <div><h1 class="big" id="v-name"></h1><p class="sub" id="v-alias"></p></div>
+    </header>
+    <div class="venue-grid">
+      <section class="viewer" aria-label="3D 미리보기">
+        <div class="viewer-box">
+          <model-viewer id="mv" loading="eager" camera-controls interaction-prompt="none" shadow-intensity="0.6" exposure="1.05" alt="공연장 3D 모델. 끌어서 돌려 볼 수 있어요.">
+            <span slot="hotspot-stage" class="stage-tag" id="stage-tag" data-position="0m 6m 24m" data-normal="0m 1m 0m" hidden>무대 쪽</span>
+          </model-viewer>
+          <div class="ph" id="ph" hidden></div>
+          <div class="progress" id="progress" hidden><span id="progress-bar"></span></div>
+        </div>
+        <div class="cams" id="cams" role="group" aria-label="3D 보는 위치"></div>
+        <p class="hint">손가락으로 끌면 돌아가고, 두 손가락으로 확대돼요.</p>
+      </section>
+      <div class="side">
+        <section class="seats" id="seats" aria-labelledby="seats-h" hidden>
+          <h2 id="seats-h">내 자리에서 보기</h2>
+          <p class="lede">티켓의 층과 방향을 고르면, 그 자리에서 무대 쪽을 본 모습으로 바뀌어요.</p>
+          <svg class="seat-map" id="seat-map" viewBox="0 0 340 290" role="img" aria-label="KSPO DOME 객석 위치 그림. 위쪽이 무대."></svg>
+          <div class="tier"><span>플로어</span><div class="row two" id="t-floor"></div></div>
+          <div class="tier"><span>1층</span><div class="row" id="t-1"></div></div>
+          <div class="tier"><span>2층</span><div class="row" id="t-2"></div></div>
+          <p class="seat-now" id="seat-now" aria-live="polite"></p>
+          <p class="small">무대 위치와 객석 배치는 공연마다 달라요. 여기서는 무대가 한쪽 끝에 놓인 공연을 가정했고, 공식 구역 이름 대신 방향으로만 나눴어요. 거리는 3D 모델에서 잰 값이에요.</p>
+        </section>
+        <section class="fact" aria-label="공연 날 주차장">
+          <p class="big" id="fact-big"></p>
+          <p id="fact-sub">2025년 공연이 있던 주말을 같은 달 공연 없는 주말의 같은 시각과 비교했어요. 올림픽공원 전체 주차장 기준이에요.</p>
+        </section>
+        <a class="cta" id="to-plan" href="#home">언제 도착할지 정하기</a>
+      </div>
+    </div>
+  </div>
+  <footer class="wrap gut foot" id="v-foot">3D 모델: 한국체육산업개발 「올림픽공원 공연장 실감형 콘텐츠」(공공데이터포털), 원본 형상 그대로</footer>
+</section>
+
+<!-- 언제 도착할까 -->
+<section id="s-plan" hidden>
+  <div class="wrap gut">
+    <header class="bar">
+      <a class="back" id="p-back" href="#home" aria-label="공연장 미리보기로"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg></a>
+      <div><h1 class="big">언제 도착할까</h1><p class="sub" id="p-venue"></p></div>
+    </header>
+    <div class="plan-grid">
+      <section class="ticket-card" aria-label="관람 조건과 권장 도착">
+        <div class="inputs">
+          <div class="seg" role="group" aria-label="관람일">
+            <button type="button" id="d-weekday" aria-pressed="false">평일</button>
+            <button type="button" id="d-weekend" aria-pressed="true">주말·공휴일</button>
+          </div>
+          <div class="stepper-row">
+            <span id="start-l">티켓에 적힌 시작 시각</span>
+            <div class="stepper">
+              <button type="button" id="earlier" aria-label="1시간 앞당기기">−</button>
+              <output id="start" class="num" aria-labelledby="start-l" aria-live="polite">18:00</output>
+              <button type="button" id="later" aria-label="1시간 늦추기">+</button>
+            </div>
+          </div>
+          <label class="check" for="rain"><input id="rain" type="checkbox">비 오는 날이에요</label>
+        </div>
+        <div class="perf" aria-hidden="true"></div>
+        <div class="answer" aria-live="polite">
+          <p class="label">이때까지 도착하세요</p>
+          <p class="big num" id="arrive"></p>
+          <p class="detail" id="arrive-d"></p>
+        </div>
+      </section>
+      <div class="side">
+        <section class="chart" aria-labelledby="chart-h">
+          <h2 id="chart-h">시간대별 주차장, 평소와 비교하면</h2>
+          <svg id="chart" viewBox="0 0 358 162" role="img"></svg>
+          <p class="small">세로선은 공연 시작, 동그라미는 권장 도착이에요. 평소 = 같은 달 공연 없는 날의 같은 시각.</p>
+        </section>
+        <p class="exit" id="exit"></p>
+      </div>
+    </div>
+  </div>
+  <footer class="wrap gut foot" id="p-foot"></footer>
+</section>
+
+<script>
+  // 3D 압축 해독기(Draco)는 페이지와 함께 올린 파일에서 읽는다 (외부 사이트 로딩 불가)
+  self.ModelViewerElement = self.ModelViewerElement || {};
+  self.ModelViewerElement.dracoDecoderLocation = new URL('draco/', location.href).href;
+</script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.0.0/dist/model-viewer.min.js"></script>
+<script>
+// 3D 파일(GLB)은 호스팅이 .glb 확장자를 내보내지 않아 '.glb.wasm' 이름으로 올렸다. 내용은 GLB 그대로다.
+const VENUES = [
+  { id: 'kspo-dome', name: 'KSPO DOME', alias: '올림픽체조경기장', meta: '올림픽체조경기장, 내 자리에서 보기', img: 'img/kspo.png',
+    src: 'models/kspodome.glb.wasm', size: '11.7MB', heavy: true, poster: 'img/kspo_poster.png', shell: '외부', seats: true },
+  { id: 'handball', name: 'SK핸드볼경기장', alias: '티켓링크 라이브 아레나', meta: '티켓링크 라이브 아레나', img: 'img/handball.png', src: 'models/handball.glb.wasm', size: '2.7MB' },
+  { id: 'woori', name: '우리금융아트홀', alias: '올림픽역도경기장', meta: '올림픽역도경기장', img: 'img/woori.png', src: 'models/woori.glb.wasm', size: '5.7MB' },
+  { id: 'jandi', name: '88잔디마당', alias: '야외 공연장', meta: '야외 공연장', img: 'img/jandi.png', src: 'models/88jandi.glb.wasm', size: '2.1MB' },
+  { id: 'lakeside', name: '수변무대', alias: '야외 공연장', meta: '야외 공연장', img: 'img/lakeside.png', src: 'models/lakeside.glb.wasm', size: '3.8MB' },
+];
+const DEFAULT_CAMS = [
+  { label: '비스듬히', orbit: '30deg 60deg auto' }, { label: '위에서', orbit: '0deg 5deg auto' }, { label: '옆에서', orbit: '90deg 80deg auto' },
+];
+const KSPO_CAMS = [
+  { label: '객석에서', seat: 'l1-center' },
+  { label: '위에서', orbit: '0deg 1deg 250m', target: '0m 0m 0m', fov: '45deg' },
+  { label: '바깥에서', orbit: '30deg 62deg 260m', target: '0m 10m 0m', fov: '45deg' },
+];
+const IS_PHONE = matchMedia('(max-width: 760px), (pointer: coarse)').matches;
+const $ = id => document.getElementById(id);
+const mv = $('mv');
+const DATA = {};
+let venue = null, shellOn = false, seatId = 'l1-center', camLabel = null, pending = null;
+
+function el(tag, attrs, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (k === 'class') e.className = v; else if (k === 'text') e.textContent = v;
+    else if (k.startsWith('on')) e.addEventListener(k.slice(2), v); else e.setAttribute(k, v);
+  }
+  e.append(...kids); return e;
+}
+const SVGNS = 'http://www.w3.org/2000/svg';
+function sv(tag, attrs, text) { const e = document.createElementNS(SVGNS, tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); if (text != null) e.textContent = text; return e; }
+const hourWord = h => (h < 12 ? '오전 ' : h < 18 ? '오후 ' : '저녁 ') + (h > 12 ? h - 12 : h) + '시';
+const times = v => (v / 100).toFixed(1) + '배';
+
+/* ── 첫 화면 ── */
+function renderHome() {
+  $('tickets').replaceChildren(...VENUES.map((v, i) => el('a', { class: 'ticket' + (i === 0 ? ' lead' : ''), href: '#v-' + v.id },
+    el('span', { class: 'stub duo' }, el('img', { src: v.img, alt: '', 'aria-hidden': 'true' })),
+    el('span', { class: 'txt' }, el('span', { class: 'name', text: v.name }), el('span', { class: 'meta', text: v.meta })))));
+}
+
+/* ── 3D ── */
+function setShell(on) {   // KSPO DOME 바깥 외피를 투명/불투명으로
+  shellOn = on; if (!venue || !venue.shell || !mv.model) return;
+  for (const m of mv.model.materials) if (m.name === venue.shell) {
+    const c = m.pbrMetallicRoughness.baseColorFactor;
+    m.setAlphaMode(on ? 'OPAQUE' : 'BLEND'); m.pbrMetallicRoughness.setBaseColorFactor([c[0], c[1], c[2], on ? 1 : 0]);
+  }
+}
+function seatCam(id) {
+  const s = DATA.seats.views.find(x => x.id === id);
+  return { orbit: s.orbit, target: s.target, fov: IS_PHONE && innerWidth < innerHeight ? '80deg' : '62deg', shell: false };
+}
+function applyCam(c) {
+  if (c.seat) c = seatCam(c.seat);
+  if (!mv.loaded) { pending = c; return; }
+  mv.cameraOrbit = c.orbit; mv.cameraTarget = c.target || 'auto auto auto'; mv.fieldOfView = c.fov || 'auto';
+  mv.jumpCameraToGoal();   // 건물 벽을 뚫고 지나가는 이동 대신 바로 그 자리로
+  if (c.shell !== undefined) setShell(c.shell);
+}
+function renderCams() {
+  const list = venue.seats ? KSPO_CAMS : DEFAULT_CAMS;
+  const box = $('cams'); box.replaceChildren();
+  const btns = list.map(c => el('button', { type: 'button', 'aria-pressed': String(c.label === camLabel), text: c.label, onclick: () => {
+    camLabel = c.label; if (c.seat) pickSeat(c.seat, true); else { applyCam(c); markSeat(null); }
+    renderCams();
+  } }));
+  if (venue.shell) btns.push(el('button', { type: 'button', 'aria-pressed': String(shellOn), text: '외벽', onclick: () => { setShell(!shellOn); renderCams(); } }));
+  box.style.setProperty('--n', btns.length); box.append(...btns);
+}
+function loadModel() {
+  $('ph').hidden = true; mv.hidden = false;
+  $('progress').hidden = false; $('progress-bar').style.width = '0%';
+  if (mv.getAttribute('src') !== venue.src) mv.setAttribute('src', venue.src); else { $('progress').hidden = true; if (pending) { const p = pending; pending = null; applyCam(p); } }
+}
+function showVenue(v) {
+  const changed = venue !== v; venue = v;
+  $('v-name').textContent = v.name; $('v-alias').textContent = v.alias;
+  $('to-plan').href = '#p-' + v.id;
+  $('stage-tag').hidden = !v.seats;
+  mv.minCameraOrbit = v.shell ? 'auto auto 0.5m' : 'auto auto auto';   // 큰 공연장은 카메라가 건물 안으로 들어갈 수 있게
+  mv.maxCameraOrbit = v.shell ? 'auto auto 400m' : 'auto auto auto';
+  mv.maxFieldOfView = v.shell ? '90deg' : 'auto';
+  if (changed) { camLabel = (v.seats ? KSPO_CAMS : DEFAULT_CAMS)[0].label; shellOn = false; }
+  $('seats').hidden = !v.seats;
+  if (v.seats) renderSeats();
+  renderCams();
+  if (changed) {
+    pending = v.seats ? seatCam(seatId) : DEFAULT_CAMS[0];
+    if (mv.getAttribute('src') !== v.src) { mv.removeAttribute('src'); }
+  }
+  if (v.heavy && IS_PHONE && !v.optIn) {   // 휴대폰: 무거운 모델은 누를 때만 불러오기
+    mv.hidden = true; $('progress').hidden = true;
+    $('ph').hidden = false;
+    $('ph').replaceChildren(
+      el('img', { src: v.poster, alt: v.name + ' 객석 3D 미리보기 이미지' }),
+      el('button', { type: 'button', class: 'load', text: `3D 불러오기 (${v.size})`, onclick: () => { v.optIn = true; loadModel(); } }),
+      el('span', { class: 'note', text: '원본 형상 그대로라 몇 초 걸릴 수 있어요' }));
+  } else loadModel();
+  renderFact();
+}
+mv.addEventListener('load', () => {
+  if (venue && venue.shell) setShell(shellOn);
+  if (pending) { const p = pending; pending = null; applyCam(p); }
+});
+mv.addEventListener('progress', e => {
+  const p = e.detail.totalProgress; $('progress-bar').style.width = Math.round(p * 100) + '%';
+  if (p >= 1) setTimeout(() => { $('progress').hidden = true; }, 300);
+});
+mv.addEventListener('error', () => {
+  $('progress').hidden = true; $('ph').hidden = false;
+  $('ph').replaceChildren(el('span', { class: 'note', text: '3D를 불러오지 못했어요. 인터넷 연결을 확인하고 다시 열어 주세요.' }));
+});
+
+/* ── 내 자리에서 보기 ── */
+// 객석 그림: 3D 모델에서 잰 위치(m)를 위에서 내려다본 그림으로. 위쪽이 무대(+Z), 관객이 무대를 볼 때 왼쪽(+X)이 그림의 왼쪽.
+const MAP = { cx: 170, cy: 150, s: 2 };
+const mx = x => MAP.cx - x * MAP.s, my = z => MAP.cy - z * MAP.s;
+function renderSeatMap() {
+  const g = $('seat-map'); g.replaceChildren();
+  const ring = (r0, r1, cls) => sv('circle', { cx: MAP.cx, cy: MAP.cy, r: (r0 + r1) / 2 * MAP.s, fill: 'none', stroke: cls, 'stroke-width': (r1 - r0) * MAP.s });
+  g.append(
+    ring(46.5, 58.5, 'var(--line-soft)'), ring(25, 43, 'var(--line-soft)'),
+    sv('circle', { cx: MAP.cx, cy: MAP.cy, r: 24 * MAP.s, fill: 'var(--paper)', stroke: 'var(--line)', 'stroke-width': 1 }),
+    sv('rect', { x: mx(9), y: my(24), width: 18 * MAP.s, height: 4.5 * MAP.s, rx: 2, fill: 'var(--stroke)' }),
+    sv('text', { x: MAP.cx, y: my(24) - 6, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 600, fill: 'var(--ink)' }, '무대 (가정)'),
+    // 층 이름은 표시점과 겹치지 않게 비스듬한 아래쪽(관객 기준 오른쪽 뒤)에
+    sv('text', { x: MAP.cx + 52.5 * MAP.s * 0.6, y: MAP.cy + 52.5 * MAP.s * 0.8 + 4, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 600, fill: 'var(--muted)' }, '2층'),
+    sv('text', { x: MAP.cx + 34 * MAP.s * 0.6, y: MAP.cy + 34 * MAP.s * 0.8 + 4, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 600, fill: 'var(--muted)' }, '1층'),
+    sv('line', { id: 'sight', stroke: 'var(--stroke)', 'stroke-width': 2, 'stroke-dasharray': '4 4' }));
+  for (const s of DATA.seats.views) {
+    g.append(sv('circle', { id: 'dot-' + s.id, cx: mx(s.eye_m[0]), cy: my(s.eye_m[2]), r: 5, fill: 'var(--surface)', stroke: 'var(--stroke)', 'stroke-width': 2 }));
+  }
+}
+function markSeat(id) {
+  for (const s of DATA.seats.views) {
+    const d = $('dot-' + s.id); if (!d) continue;
+    const on = s.id === id; d.setAttribute('r', on ? 9 : 5); d.setAttribute('fill', on ? 'var(--field)' : 'var(--surface)');
+    if (on) { const l = $('sight'); l.setAttribute('x1', mx(s.eye_m[0])); l.setAttribute('y1', my(s.eye_m[2])); l.setAttribute('x2', MAP.cx); l.setAttribute('y2', my(22)); }
+  }
+  $('sight').style.display = id ? '' : 'none';
+  document.querySelectorAll('.seat-btn').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.id === id)));
+  const s = DATA.seats.views.find(x => x.id === id);
+  $('seat-now').replaceChildren(...(s
+    ? [el('strong', { text: s.label }), ` · 무대 쪽 끝까지 약 ${s.to_stage_m}m` + (s.height_m > 0 ? `, 플로어보다 ${s.height_m}m 높아요` : ', 플로어와 같은 높이예요')]
+    : ['아래 버튼에서 내 자리를 고르세요.']));
+}
+function pickSeat(id, fromCam) {
+  seatId = id;
+  if (!fromCam) { camLabel = '객석에서'; renderCams(); }
+  if (venue.heavy && IS_PHONE && !venue.optIn) { venue.optIn = true; pending = seatCam(id); loadModel(); }
+  else applyCam({ seat: id });
+  markSeat(id);
+}
+function renderSeats() {
+  if (!$('seat-map').childElementCount) renderSeatMap();
+  const btn = s => el('button', { type: 'button', class: 'seat-btn', 'data-id': s.id, 'aria-pressed': 'false', text: s.label.replace(/^(플로어|[12]층) /, ''), onclick: () => pickSeat(s.id) });
+  const by = t => DATA.seats.views.filter(s => s.tier === t).map(btn);
+  $('t-floor').replaceChildren(...by('플로어')); $('t-1').replaceChildren(...by('1층')); $('t-2').replaceChildren(...by('2층'));
+  markSeat(camLabel === '객석에서' ? seatId : null);
+}
+
+/* ── 공통 사실 카드 ── */
+function renderFact() {
+  const p = DATA.show.profile.weekend; let h = 0;
+  for (let i = 12; i < 24; i++) if (p[i] > p[h]) h = i;
+  $('fact-big').replaceChildren(`주말 공연날 ${hourWord(h)},`, el('br'), `주차장 차가 평소의 ${times(p[h])}`);
+}
+
+/* ── 언제 도착할까 ── */
+const plan = { day: 'weekend', start: 18, rain: false };
+function renderPlan() {
+  const D = DATA.show, VB = D.levels.very_busy;
+  const f = plan.rain ? D.rain_factor : 1;
+  const idx = D.profile[plan.day].map(v => v * f);
+  $('d-weekday').setAttribute('aria-pressed', String(plan.day === 'weekday'));
+  $('d-weekend').setAttribute('aria-pressed', String(plan.day === 'weekend'));
+  $('start').textContent = plan.start + ':00';
+  $('earlier').disabled = plan.start <= 11; $('later').disabled = plan.start >= 22;
+  $('rain').checked = plan.rain;
+
+  // 시작 직전부터 거슬러 올라가며, 평소의 2배 아래인 마지막 시각을 권장 도착으로
+  let arrive = null;
+  for (let a = plan.start - 1; a >= 10; a--) if (idx[a] < VB) { arrive = a; break; }
+  const before = idx[plan.start - 1];
+  if (arrive === plan.start - 1) {
+    $('arrive').textContent = arrive + ':00';
+    $('arrive-d').textContent = `시작 1시간 전에도 주차장은 평소의 ${times(before)} 정도예요. 여유 있게 들어갈 수 있어요.`;
+  } else if (arrive !== null) {
+    $('arrive').textContent = arrive + ':00';
+    $('arrive-d').textContent = `${arrive + 1}시부터 평소의 2배를 넘어요. 이보다 늦는다면 지하철이 편해요.`;
+  } else {
+    $('arrive').textContent = '지하철';
+    $('arrive-d').textContent = '시작 전 내내 평소의 2배를 넘어요. 차보다 지하철을 권해요.';
+  }
+  $('exit').textContent = `공연이 2시간쯤이면 ${plan.start + 2}시 넘어 차가 한꺼번에 빠져요. 바로 나가기보다 30분쯤 기다리면 덜 막혀요.`;
+  $('p-foot').textContent = (plan.rain ? `비 온 시간엔 차가 약 ${Math.round((1 - D.rain_factor) * 100)}% 적었던 기록을 반영했어요. ` : '')
+    + `${D.기간} 공연 날 ${D.공연일수}일의 평균으로 본 예상이라 실제와 다를 수 있어요. 한국체육산업개발 「올림픽공원 차량입출차, 공연, 날씨정보 등 연계 데이터」(공공데이터포털) 기준.`;
+  drawChart(idx, arrive, before);
+}
+function drawChart(idx, arrive, before) {
+  const X0 = 34, X1 = 350, Y0 = 136, Y1 = 10, H0 = 10, H1 = 23, V0 = 80, V1 = 260;
+  const x = h => X0 + (h - H0) * (X1 - X0) / (H1 - H0);
+  const y = v => Y0 - (Math.min(Math.max(v, V0), V1) - V0) * (Y0 - Y1) / (V1 - V0);
+  const pts = []; for (let h = H0; h <= H1; h++) pts.push(x(h).toFixed(1) + ' ' + y(idx[h]).toFixed(1));
+  const line = 'M ' + pts.join(' L ');
+  const g = $('chart'); g.replaceChildren();
+  const defs = sv('defs', {}), pat = sv('pattern', { id: 'busy', width: 6, height: 6, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)' });
+  pat.append(sv('rect', { width: 6, height: 6, fill: 'var(--hatch-bg)' }), sv('line', { x1: 0, y1: 0, x2: 0, y2: 6, stroke: 'var(--hatch)', 'stroke-width': 2 }));
+  defs.append(pat); g.append(defs);
+  const vb = DATA.show.levels.very_busy;
+  g.append(
+    sv('rect', { x: X0, y: Y1, width: X1 - X0, height: (y(vb) - Y1).toFixed(1), fill: 'url(#busy)' }),
+    // 시작 세로선과 겹치지 않는 쪽에 이름표
+    x(plan.start) > (X0 + X1) / 2
+      ? sv('text', { x: X0 + 6, y: Y1 + 14, 'font-size': 11, 'font-weight': 600, fill: 'var(--ink)' }, '평소의 2배 넘음')
+      : sv('text', { x: X1 - 6, y: Y1 + 14, 'text-anchor': 'end', 'font-size': 11, 'font-weight': 600, fill: 'var(--ink)' }, '평소의 2배 넘음'),
+    sv('line', { x1: X0, y1: y(100), x2: X1, y2: y(100), stroke: 'var(--line)', 'stroke-width': 1 }),
+    sv('text', { x: X0 - 4, y: y(100) + 4, 'text-anchor': 'end', 'font-size': 11, fill: 'var(--muted)' }, '평소'),
+    sv('text', { x: X0 - 4, y: y(vb) + 4, 'text-anchor': 'end', 'font-size': 11, fill: 'var(--muted)' }, '2배'),
+    sv('path', { d: line + ` L ${X1} ${Y0} L ${X0} ${Y0} Z`, fill: 'var(--field)', 'fill-opacity': 0.75 }),
+    sv('path', { d: line, fill: 'none', stroke: 'var(--stroke)', 'stroke-width': 3, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }),
+    sv('line', { x1: x(plan.start), y1: Y1, x2: x(plan.start), y2: Y0, stroke: 'var(--ink)', 'stroke-width': 2 }),
+    sv('line', { x1: X0, y1: Y0, x2: X1, y2: Y0, stroke: 'var(--line)', 'stroke-width': 1 }));
+  if (arrive !== null) g.append(sv('circle', { cx: x(arrive), cy: y(idx[arrive]), r: 7, fill: 'var(--surface)', stroke: 'var(--stroke)', 'stroke-width': 3.5 }));
+  for (let t = 10; t <= 22; t += 2) g.append(sv('text', { x: x(t), y: 154, 'text-anchor': 'middle', 'font-size': 11, fill: 'var(--muted)' }, t + '시'));
+  g.setAttribute('aria-label', `${plan.day === 'weekend' ? '주말·공휴일' : '평일'} 공연 날 10시부터 23시까지 주차장 혼잡. ${plan.start}시 시작, 시작 1시간 전은 평소의 ${times(before)}.`);
+}
+$('d-weekday').onclick = () => { plan.day = 'weekday'; plan.start = 19; renderPlan(); };
+$('d-weekend').onclick = () => { plan.day = 'weekend'; plan.start = 18; renderPlan(); };
+$('earlier').onclick = () => { plan.start = Math.max(11, plan.start - 1); renderPlan(); };
+$('later').onclick = () => { plan.start = Math.min(22, plan.start + 1); renderPlan(); };
+$('rain').onchange = e => { plan.rain = e.target.checked; renderPlan(); };
+
+/* ── 화면 전환: #home, #v-공연장, #p-공연장 ── */
+function route() {
+  const h = location.hash.slice(1);
+  const v = VENUES.find(x => h === 'v-' + x.id || h === 'p-' + x.id);
+  const screen = !v ? 'home' : h.startsWith('p-') ? 'plan' : 'venue';
+  for (const s of ['home', 'venue', 'plan']) $('s-' + s).hidden = s !== screen;
+  if (screen === 'home') { document.title = '덜붐빌때'; }
+  if (screen === 'venue') { document.title = v.name + ' · 덜붐빌때'; showVenue(v); }
+  if (screen === 'plan') { document.title = '언제 도착할까 · 덜붐빌때'; $('p-venue').textContent = v.name + ' 공연 날'; $('p-back').href = '#v-' + v.id; renderPlan(); }
+  scrollTo(0, 0);
+}
+
+Promise.all([fetch('data/show_profile.json').then(r => r.json()), fetch('data/seat_views.json').then(r => r.json())])
+  .then(([show, seats]) => { DATA.show = show; DATA.seats = seats; renderHome(); route(); addEventListener('hashchange', route); })
+  .catch(() => {
+    $('s-home').hidden = false; renderHome();
+    $('tickets').after(el('p', { class: 'err', text: '데이터 파일을 읽지 못했어요. 페이지를 새로 고쳐 주세요.' }));
+  });
+</script>
