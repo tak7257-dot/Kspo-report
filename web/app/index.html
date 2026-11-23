@@ -103,6 +103,24 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .note { margin-top: 14px; padding: 10px 12px; border-left: 4px solid var(--stroke); background: var(--surface); font-size: 13.5px; }
 .foot { padding-block: 18px 6px; font-size: 12.5px; color: var(--muted); line-height: 1.55; }
 
+/* 나가기 */
+.bar { display: flex; align-items: center; gap: 12px; padding-block: 14px 8px; }
+.bar h1 { font-size: 26px; color: var(--stroke); }
+.bar .sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.bar .help-btn { margin-left: auto; }
+.choice { display: grid; gap: 8px; margin-top: 10px; }
+.opt { padding: 14px; border-radius: var(--r); background: var(--surface); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 2px; }
+.opt .k { font-size: 13.5px; font-weight: 600; color: var(--muted); }
+.opt .v { font-size: 22px; }
+.opt.pick-me { background: var(--field); color: var(--field-ink); border: 2px solid var(--stroke); }
+.opt.pick-me .k { color: var(--field-sub); }
+.decay { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; align-items: end; height: 96px; margin-top: 6px; }
+.decay span { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 3px; height: 100%; font-size: 12px; }
+.decay i { width: 100%; border-radius: 3px 3px 0 0; display: block; }
+.timer { margin-top: 14px; display: flex; flex-direction: column; gap: 6px; }
+.timer button { min-height: 56px; border-radius: var(--r); border: 2px solid var(--stroke); background: var(--stroke); color: var(--surface); font-size: 18px; font-weight: 700; }
+.timer output { font-size: 40px; text-align: center; color: var(--stroke); }
+
 /* 사용법 */
 dialog.help { width: min(600px, 100%); max-width: 100%; max-height: min(88vh, 900px); margin: auto auto 0; padding: 0; border: 0; border-radius: 14px 14px 0 0; background: var(--paper); color: var(--ink); overflow: hidden; }
 @media (min-width: 700px) { dialog.help { margin: auto; border-radius: 10px; border: 2px solid var(--stroke); } }
@@ -179,6 +197,7 @@ dialog.help::backdrop { background: rgba(10, 30, 24, .55); }
     <nav class="more" aria-label="더 보기">
       <a id="to-day" href="#day"><span><strong>처음이라면: 공연 날 하루 미리 보기</strong><br><span>도착부터 출차까지 3D로</span></span><span aria-hidden="true">→</span></a>
       <a id="to-seat" href="#seat"><span><strong>내 자리에서 보기</strong><br><span>KSPO DOME 객석 눈높이 3D</span></span><span aria-hidden="true">→</span></a>
+      <a id="to-exit" href="#exit"><span><strong>끝나고 언제 나갈까</strong><br><span>출차가 몰리는 때 피하기</span></span><span aria-hidden="true">→</span></a>
       <a id="to-plan" href="#plan"><span><strong>하루 일정표 · 캘린더에 넣기</strong><br><span>같이 갈 사람에게 보내기</span></span><span aria-hidden="true">→</span></a>
     </nav>
 
@@ -186,6 +205,25 @@ dialog.help::backdrop { background: rgba(10, 30, 24, .55); }
       공연 날짜와 시작 시각은 <a href="https://www.ksponco.or.kr/olympicpark/eventInfo/eventInfoList?mid=a20301010100" target="_blank" rel="noopener">올림픽공원 홈페이지 공연 일정</a>에서 확인하세요.<br>
       데이터: 한국체육산업개발주식회사 「올림픽공원 차량입출차, 공연, 날씨정보 등 연계 데이터」「올림픽공원 입출차 정보」「실시간 주차현황」「공연정보」「공연장 실감형 콘텐츠」(공공데이터포털). 과거 기록으로 본 예상이라 실제와 다를 수 있어요.
     </p>
+  </div>
+</section>
+
+<!-- 나가기 안내 -->
+<section class="screen" id="s-exit" hidden>
+  <div class="wrap">
+    <header class="bar">
+      <a class="icon-btn" href="#home" aria-label="첫 화면으로"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg></a>
+      <div><h1 class="big">나가기 안내</h1><p class="sub" id="exit-what"></p></div>
+      <button type="button" class="icon-btn help-btn" aria-label="사용법 보기" aria-haspopup="dialog">?</button>
+    </header>
+    <div id="exit-wait" aria-live="polite"></div>
+    <p class="live" id="exit-live" aria-live="polite" style="margin-top: 12px"></p>
+    <div class="timer">
+      <button type="button" id="timer-btn">20분 타이머 시작</button>
+      <output id="timer-left" class="num big" aria-live="polite" hidden></output>
+      <p class="small">화면을 열어 둔 동안만 알려 드려요. 기다리는 동안 공원 밤길을 잠깐 걸어 보세요.</p>
+    </div>
+    <p class="small" id="exit-src" style="margin-top: 14px"></p>
   </div>
 </section>
 
@@ -222,6 +260,7 @@ dialog.help::backdrop { background: rgba(10, 30, 24, .55); }
 </dialog>
 
 <script src="js/logic.js"></script>
+<script src="js/live.js"></script>
 <script>
 const VENUES = [
   { id: 'kspo-dome', name: 'KSPO DOME' },
@@ -337,9 +376,82 @@ function renderHome() {
   const c = compute();
   renderPickers(); renderAnswer(c); renderBars(c);
   $('to-seat').hidden = state.venue !== 'kspo-dome';
+  $('exit-band').hidden = !exitActive(c);
+  if (state.date === today()) Live.start(onLive); 
+  renderLive();
 }
 function update() { save(); renderHome(); }
 $('rain').addEventListener('change', e => { state.rain = e.target.checked; update(); });
+
+/* ── 실시간 줄 ── */
+const fmt = n => n.toLocaleString('ko-KR');
+let liveN = null, liveSamples = [];
+function liveBaselineText() {
+  const now = new Date(), kind = Logic.dayType(today());
+  const m = Logic.baseline(DATA.base, now.getMonth() + 1, kind, now.getHours());
+  if (m !== null) return ` · 2025년 이맘때 공연 날 이 시각 ${fmt(m)}대`;
+  const y = Logic.baseline(DATA.base, 'all', kind, now.getHours());
+  return y !== null ? ` · 2025년 공연 날 이 시각 ${fmt(y)}대` : '';
+}
+function renderLive() {
+  const line = $('live-line');
+  if (liveN === null || state.date !== today()) { line.hidden = true; }
+  else { line.hidden = false; line.innerHTML = ''; line.append('지금 주차장 ', el('b', { text: fmt(liveN) + '대' }), liveBaselineText()); }
+  const ex = $('exit-live');
+  if (liveN === null) { ex.hidden = true; return; }
+  const k = Logic.outflow10(liveSamples);
+  ex.hidden = false; ex.innerHTML = '';
+  ex.append('지금 주차장 ', el('b', { text: fmt(liveN) + '대' }), k !== null ? ` · 최근 10분 동안 ${fmt(k)}대 줄었어요` : '');
+}
+function onLive(n, samples) { liveN = n; liveSamples = samples; renderLive(); }
+
+/* ── 나가기 안내 ── */
+function exitActive(c) {
+  return Logic.exitModeActive({ now: new Date(), showDateISO: state.date, startHour: state.startHour, startMinute: state.startMinute, showMinutes: c.showMinutes });
+}
+function renderExit() {
+  const c = compute(), e = c.exit, sm = DATA.exit.show_minutes[state.venue] || {};
+  $('exit-what').textContent = `${venue().name} · ${pad2(state.startHour)}:00 공연 · ${e.endLabel}쯤 끝나요`;
+  const box = $('exit-wait'); box.replaceChildren();
+  if (e.showRatios) {
+    const D = DATA.exit.exit_decay;
+    const pct = Math.round(e.wait.ratio * 100);
+    box.append(el('div', { class: 'choice' },
+      el('div', { class: 'opt' }, el('span', { class: 'k', text: '끝나자마자 나가면' }), el('span', { class: 'v big', text: '출차가 가장 몰리는 때' })),
+      el('div', { class: 'opt pick-me' }, el('span', { class: 'k', text: `${e.wait.minutes}분 쉬었다 나가면 (추천)` }), el('span', { class: 'v big', text: `같이 나가는 차가 ${pct}%로` }))));
+    const bars = el('div', { class: 'decay', role: 'img', 'aria-label': `출차 몰림: 가장 몰린 10분을 100이라 하면 ` + D.offsets_min.slice(1, 4).map((m, i) => `${m}분 뒤 ${Math.round(D.ratio[i + 1] * 100)}`).join(', ') });
+    D.offsets_min.slice(0, 4).forEach((m, i) => {
+      const r = D.ratio[i];
+      bars.append(el('span', {}, el('b', { class: 'num', text: Math.round(r * 100) + '%' }),
+        el('i', { style: `height: ${Math.round(r * 60)}px; background: var(--lv-${i === 0 ? 'very' : i === 1 ? 'busy' : 'normal'})${m === e.wait.minutes ? '; outline: 3px solid var(--ink); outline-offset: 2px' : ''}` }),
+        el('span', { class: 'small', text: i === 0 ? '바로' : m + '분 뒤' })));
+    });
+    box.append(bars);
+    $('exit-src').textContent = `끝나는 시각: 「공연정보」의 ${venue().name} 공연 ${sm.n || ''}편 공연 시간 중앙값 ${c.showMinutes}분으로 계산. ` +
+      `출차 몰림: 「올림픽공원 입출차 정보」 2024년 7월, 저녁에 출차가 몰린 ${D.저녁수}일을 모아 가장 몰린 10분 기준으로 본 모양이에요.`;
+  } else {
+    box.append(el('p', { class: 'note', text: '출차 몰림 기록은 저녁(20시 이후) 공연 것이라, 이 공연엔 비율을 보여 드리지 않아요. 아래 지금 주차장 상황을 참고하세요.' }));
+    $('exit-src').textContent = `끝나는 시각: 「공연정보」 공연 시간 중앙값 ${c.showMinutes}분으로 계산.`;
+  }
+  renderLive();
+}
+let timerEnd = null, timerTick = null;
+$('timer-btn').addEventListener('click', () => {
+  timerEnd = Date.now() + 20 * 60e3;
+  const out = $('timer-left'); out.hidden = false;
+  const tick = () => {
+    const left = Math.max(0, timerEnd - Date.now()), m = Math.floor(left / 60e3), s2 = Math.floor(left % 60e3 / 1000);
+    out.textContent = left > 0 ? `${pad2(m)}:${pad2(s2)}` : '이제 나가셔도 돼요';
+    if (left <= 0) {
+      clearInterval(timerTick); timerTick = null;
+      try { navigator.vibrate && navigator.vibrate([300, 150, 300]); } catch (e) { }
+      try { const a = new (window.AudioContext || window.webkitAudioContext)(), o = a.createOscillator(); o.connect(a.destination); o.frequency.value = 880; o.start(); o.stop(a.currentTime + 0.4); } catch (e) { }
+    }
+  };
+  if (timerTick) clearInterval(timerTick);
+  tick(); timerTick = setInterval(tick, 1000);
+  $('timer-btn').textContent = '타이머 다시 시작';
+});
 
 /* ── 사용법 ── */
 for (const b of document.querySelectorAll('.help-btn')) b.addEventListener('click', () => { const d = $('help'); d.showModal ? d.showModal() : d.setAttribute('open', ''); });
@@ -347,12 +459,13 @@ $('help-x').onclick = () => $('help').close();
 $('help').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.close(); });
 
 /* ── 화면 전환 ── */
-const SCREENS = ['home'];
+const SCREENS = ['home', 'exit'];
 function route() {
   const h = location.hash.slice(1);
   const name = SCREENS.includes(h) ? h : 'home';
   for (const s of SCREENS) $('s-' + s).hidden = s !== name;
   if (name === 'home') renderHome();
+  if (name === 'exit') { renderExit(); Live.start(onLive); }
   scrollTo(0, 0);
 }
 

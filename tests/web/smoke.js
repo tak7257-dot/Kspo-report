@@ -19,11 +19,11 @@ function serveDir() {
   return dir;
 }
 
-async function open(browser, opts, live = 'abort', hash = '#home', blockStorage = false) {
+async function open(browser, opts, live = 'abort', hash = '#home', blockStorage = false, now = NOW) {
   const ctx = await browser.newContext({ timezoneId: 'Asia/Seoul', ...opts });
   if (blockStorage) await ctx.addInitScript(() => { Object.defineProperty(window, 'localStorage', { get() { throw new Error('blocked'); } }); });
   const page = await ctx.newPage();
-  await page.clock.setFixedTime(NOW);
+  await page.clock.setFixedTime(now);
   page.errors = [];
   page.on('pageerror', e => page.errors.push(e.message));
   await page.route('**/parkingorsApi.do*', r => live === 'abort' ? r.abort() : r.fulfill({ status: 200, contentType: 'text/html', body: live }));
@@ -70,6 +70,45 @@ const noSideScroll = page => page.evaluate(() => document.documentElement.scroll
       await page.waitForSelector('#answer-title:not(:empty)');
       check('다시 열면 바꾸기 접힘(답부터 보임)', await page.evaluate(() => !document.getElementById('change').open));
       check('다시 열면 고른 날짜·시각 기억', (await text(page, '#answer-sub')).includes('18:00') || (await text(page, '#answer-title')).includes('18:00'));
+      await page.context().close();
+    }
+    // ── Task 6: 실시간 줄과 나가기 모드 ──
+    {
+      const page = await open(browser, devices['iPhone 13'], '[{"parking_sum":1961}]');
+      await page.click('button[data-date="2026-11-23"]');
+      await page.waitForSelector('#live-line:not([hidden])', { timeout: 10000 }).catch(() => {});
+      check('실시간: 오늘 고르면 지금 대수 표시', (await page.locator('#live-line').isVisible()) && (await text(page, '#live-line')).includes('1,961'));
+      await page.click('button[data-date="2026-11-28"]');
+      check('실시간: 다른 날 고르면 줄 숨김', await page.locator('#live-line').isHidden());
+      await page.context().close();
+    }
+    {
+      const page = await open(browser, devices['iPhone 13'], '9999');
+      await page.click('button[data-date="2026-11-23"]');
+      await page.waitForTimeout(1500);
+      check('실시간: 점검 응답(9999)이면 줄 숨김', await page.locator('#live-line').isHidden());
+      check('실시간: 점검 응답에도 페이지 오류 없음', page.errors.length === 0, page.errors.join(' | '));
+      await page.context().close();
+    }
+    {
+      const page = await open(browser, devices['iPhone 13'], '[{"parking_sum":1961}]', '#home', false, new Date('2026-11-23T19:50:00+09:00'));
+      await page.click('button[data-date="2026-11-23"]');
+      await page.click('button[data-start="18"]');
+      check('나가기: 끝날 무렵 첫 화면에 안내 띠', await page.locator('#exit-band').isVisible());
+      await page.click('#exit-band');
+      await page.waitForSelector('#s-exit:not([hidden])');
+      check('나가기: 18시 공연은 20분 뒤 42%', (await text(page, '#exit-wait')).includes('42%'));
+      check('나가기: 실시간 대수', (await text(page, '#exit-live')).includes('1,961'));
+      await page.click('#timer-btn');
+      check('나가기: 타이머 남은 시간 표시', (await text(page, '#timer-left')).includes('20:00'));
+      check('나가기: 가로 스크롤 없음', await noSideScroll(page));
+      check('나가기: 페이지 오류 없음', page.errors.length === 0, page.errors.join(' | '));
+      await page.goto(page.url().replace('#exit', '#home'));
+      await page.waitForSelector('#answer-title:not(:empty)');
+      await page.click('button[data-start="14"]').catch(async () => { await page.click('#change summary'); await page.click('button[data-start="14"]'); });
+      await page.goto(page.url().replace('#home', '#exit'));
+      await page.waitForSelector('#s-exit:not([hidden])');
+      check('나가기: 14시 공연은 비율 숨김', !(await text(page, '#exit-wait')).includes('42%'));
       await page.context().close();
     }
     // (다음 작업의 확인은 이 줄 위에 이어 붙인다)
