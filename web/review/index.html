@@ -131,9 +131,6 @@ const VENUES = [
       { label: '바깥에서', orbit: '30deg 62deg 260m', shell: false },
     ],
     notes: ['원본 형상을 줄이지 않고 옮겼습니다. 바꾼 것은 단위(인치 → m), 위쪽 축, 재질별로 부품을 합친 것뿐입니다.', '건물을 감싼 외피(원본의 단순한 원통 덩어리)는 지우지 않았고, 위 버튼으로 켜고 끌 수 있습니다. 외벽 패널과 지붕이 보이도록 기본은 꺼 둡니다.', 'SketchUp 방위 표시(N·S·E·W 글자, 211×247m)는 건물이 아니라서 뺐습니다.', '삼각형이 많아 휴대폰에서 로딩·회전이 느린지 꼭 봐 주세요.'] },
-  { id: 'olympic-hall', name: '올림픽홀', alias: '', status: 'excluded', src: null, origin: 'own',
-    file: { 원본: '홈페이지 공식 도면으로 자체 제작 (좌석 2,470석)', 상태: '사용 협의 전까지 제외' },
-    notes: ['도면이 공공누리 표시가 없는 홈페이지 자료라, 기관 저작권정책에 따라 담당자와 협의한 뒤에만 쓸 수 있습니다.', '허락을 받으면 만들어 둔 모델(코드는 src/_보류/)을 바로 다시 넣습니다.'] },
   { id: 'handball', name: 'SK핸드볼경기장', alias: '티켓링크 라이브 아레나', status: 'ready', src: '../app/models/handball.glb.wasm', origin: 'org',
     file: { 원본: 'GLB 56MB', 웹용: '2.7MB' },
     notes: ['화면에 아주 작게 보이던 문제를 고쳤습니다(압축 단계 오류). 화면에 꽉 차게 보이는지 확인해 주세요.'] },
@@ -187,7 +184,7 @@ function renderList(currentId) {
     nav.append(b);
   }
   const ready = VENUES.filter(v => v.status === 'ready').length;
-  $('count').textContent = `${VENUES.length}곳 중 ${ready}곳 준비됨 (올림픽홀 협의 대기)`;
+  $('count').textContent = `${VENUES.length}곳 중 ${ready}곳 준비됨`;
 }
 
 function show(id) {
