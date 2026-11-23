@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>덜붐빌때 v2 첫 화면</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2F7A5D}a:hover{color:#15302A}
+button:active,a.row:active{background:#D3EFDF}
+button:focus-visible,a:focus-visible{outline:3px solid #2F7A5D;outline-offset:3px}
+.duo{background:#A9E4C3}
+.duo img{filter:grayscale(1) contrast(1.6) brightness(1.05);mix-blend-mode:multiply}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F5F9F6; color: #15302A; font-family: 'IBM Plex Sans KR', 'Apple SD Gothic Neo', sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <header style="padding: 14px 16px 10px; display: flex; align-items: center; gap: 12px">
+    <h1 style="margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.03em; color: #2F7A5D">덜붐빌때</h1>
+    <button type="button" aria-label="사용법 보기" style="margin-left: auto; width: 44px; height: 44px; border-radius: 50%; border: 2px solid #2F7A5D; background: #FFFFFF; color: #2F7A5D; font: inherit; font-size: 21px; font-weight: 700">?</button>
+  </header>
+
+  <section aria-labelledby="h-when" style="padding: 6px 16px 0; display: flex; flex-direction: column; gap: 10px">
+    <h2 id="h-when" style="margin: 0; font-size: 17px; font-weight: 600">언제 공연 보러 가세요?</h2>
+    <div role="group" aria-label="날짜" style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px">
+      <sc-for list="{{days}}" as="d" hint-placeholder-count="7">
+        <button type="button" aria-pressed="{{d.on}}" aria-label="{{d.aria}}" onClick="{{d.pick}}" style="{{d.style}}">
+          <span style="{{d.wkStyle}}">{{d.wk}}</span>
+          <span style="font-size: 19px; font-weight: 700; font-variant-numeric: tabular-nums">{{d.n}}</span>
+        </button>
+      </sc-for>
+    </div>
+  </section>
+
+  <section aria-label="이날 주차장 요약" style="margin: 14px 16px 0; background: #FFFFFF; border: 2px solid #2F7A5D; border-radius: 8px; overflow: hidden">
+    <div style="padding: 14px 14px 12px; display: flex; flex-direction: column; gap: 4px">
+      <p style="margin: 0; font-size: 13.5px; color: #4B635C">{{dateLine}}</p>
+      <p style="margin: 0; font-size: 25px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.25">{{headline}}</p>
+    </div>
+    <div aria-hidden="true" style="padding: 0 14px; display: flex; align-items: flex-end; gap: 3px; height: 52px">
+      <sc-for list="{{bars}}" as="b" hint-placeholder-count="14">
+        <span style="{{b.style}}"></span>
+      </sc-for>
+    </div>
+    <div aria-hidden="true" style="padding: 4px 14px 0; display: flex; justify-content: space-between; font-size: 11px; color: #4B635C; font-variant-numeric: tabular-nums">
+      <span>10시</span><span>14시</span><span>18시</span><span>22시</span>
+    </div>
+    <p style="margin: 10px 0 0; padding: 10px 14px 12px; background: #A9E4C3; color: #14332A; font-size: 14px; line-height: 1.5">{{advice}}</p>
+  </section>
+
+  <section aria-labelledby="h-where" style="padding: 18px 16px 0; display: flex; flex-direction: column; gap: 8px; min-height: 0">
+    <h2 id="h-where" style="margin: 0; font-size: 17px; font-weight: 600">어느 공연장이에요?</h2>
+    <nav aria-label="공연장" style="display: flex; flex-direction: column; gap: 8px">
+      <a class="row" href="V2Arrive.dc.html" style="display: grid; grid-template-columns: 60px minmax(0, 1fr) 24px; align-items: center; height: 60px; background: #FFFFFF; border: 2px solid #2F7A5D; border-radius: 8px; overflow: hidden; color: #15302A; text-decoration: none">
+        <span class="duo" style="display: block; height: 100%; border-right: 2px dashed #2F7A5D"><img src="/_blob/4b5295b492b15d3d1b5e11cff9b13fab" alt="" aria-hidden="true" style="width: 100%; height: 100%; object-fit: cover; display: block"></span>
+        <span style="padding: 0 12px; display: flex; flex-direction: column; gap: 1px; min-width: 0">
+          <span style="font-size: 18px; font-weight: 700; letter-spacing: -0.02em; color: #2F7A5D">KSPO DOME</span>
+          <span style="font-size: 12.5px">3D · 내 자리에서 보기</span>
+        </span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2F7A5D" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+      </a>
+      <a class="row" href="V2Arrive.dc.html" style="display: grid; grid-template-columns: 60px minmax(0, 1fr) 24px; align-items: center; height: 56px; background: #FFFFFF; border: 1px solid #9CCDB8; border-radius: 8px; overflow: hidden; color: #15302A; text-decoration: none">
+        <span class="duo" style="display: block; height: 100%; border-right: 1px dashed #9CCDB8"><img src="/_blob/b597e2e31abbf340c57f3bf8a3b64698" alt="" aria-hidden="true" style="width: 100%; height: 100%; object-fit: cover; display: block"></span>
+        <span style="padding: 0 12px; display: flex; flex-direction: column; gap: 1px; min-width: 0">
+          <span style="font-size: 17px; font-weight: 700; letter-spacing: -0.02em">SK핸드볼경기장</span>
+          <span style="font-size: 12.5px; color: #4B635C">3D</span>
+        </span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4B635C" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+      </a>
+      <a class="row" href="V2Arrive.dc.html" style="display: grid; grid-template-columns: 60px minmax(0, 1fr) 24px; align-items: center; height: 56px; background: #FFFFFF; border: 1px solid #9CCDB8; border-radius: 8px; overflow: hidden; color: #15302A; text-decoration: none">
+        <span class="duo" style="display: block; height: 100%; border-right: 1px dashed #9CCDB8"><img src="/_blob/1ebcc0b5fb18e3914b43476844855d8d" alt="" aria-hidden="true" style="width: 100%; height: 100%; object-fit: cover; display: block"></span>
+        <span style="padding: 0 12px; display: flex; flex-direction: column; gap: 1px; min-width: 0">
+          <span style="font-size: 17px; font-weight: 700; letter-spacing: -0.02em">우리금융아트홀</span>
+          <span style="font-size: 12.5px; color: #4B635C">3D</span>
+        </span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4B635C" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+      </a>
+      <a class="row" href="V2Arrive.dc.html" style="display: grid; grid-template-columns: 60px minmax(0, 1fr) 24px; align-items: center; height: 56px; background: #FFFFFF; border: 1px solid #9CCDB8; border-radius: 8px; overflow: hidden; color: #15302A; text-decoration: none">
+        <span class="duo" style="display: block; height: 100%; border-right: 1px dashed #9CCDB8"><img src="/_blob/9079d4bd488d5f5be5942b90499ebeb8" alt="" aria-hidden="true" style="width: 100%; height: 100%; object-fit: cover; display: block"></span>
+        <span style="padding: 0 12px; display: flex; flex-direction: column; gap: 1px; min-width: 0">
+          <span style="font-size: 17px; font-weight: 700; letter-spacing: -0.02em">88잔디마당</span>
+          <span style="font-size: 12.5px; color: #4B635C">야외 · 3D</span>
+        </span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4B635C" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+      </a>
+      <a class="row" href="V2Arrive.dc.html" style="display: grid; grid-template-columns: 60px minmax(0, 1fr) 24px; align-items: center; height: 56px; background: #FFFFFF; border: 1px solid #9CCDB8; border-radius: 8px; overflow: hidden; color: #15302A; text-decoration: none">
+        <span class="duo" style="display: block; height: 100%; border-right: 1px dashed #9CCDB8"><img src="/_blob/9dce49a19538ab58027d7cb70f4fe5f4" alt="" aria-hidden="true" style="width: 100%; height: 100%; object-fit: cover; display: block"></span>
+        <span style="padding: 0 12px; display: flex; flex-direction: column; gap: 1px; min-width: 0">
+          <span style="font-size: 17px; font-weight: 700; letter-spacing: -0.02em">수변무대</span>
+          <span style="font-size: 12.5px; color: #4B635C">야외 · 3D</span>
+        </span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4B635C" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+      </a>
+    </nav>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { pick: 5 };
+  }
+  renderVals() {
+    // 2025년 공연일 시간대별 주차 지수 (같은 달·같은 요일유형·같은 시각의 공연 없는 날 = 100)
+    var PROFILE = {
+      weekend: [99, 99, 100, 102, 102, 104, 113, 129, 136, 146, 150, 155, 159, 158, 164, 184, 204, 226, 252, 246, 197, 148, 115, 108],
+      weekday: [108, 108, 107, 107, 106, 99, 97, 97, 96, 98, 100, 101, 102, 103, 105, 107, 111, 119, 140, 145, 153, 186, 183, 116]
+    };
+    var WK = ['월', '화', '수', '목', '금', '토', '일'];
+    var self = this, sel = this.state.pick;
+    var days = [];
+    for (var i = 0; i < 7; i++) {
+      var on = i === sel, weekend = i >= 5;
+      days.push({
+        wk: i === 0 ? '오늘' : WK[i], n: 23 + i, on: on ? 'true' : 'false',
+        aria: '11월 ' + (23 + i) + '일 ' + WK[i] + '요일',
+        style: 'font: inherit; height: 60px; padding: 0; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; ' +
+          (on ? 'border: 2px solid #2F7A5D; background: #A9E4C3; color: #14332A' : 'border: 1px solid #9CCDB8; background: #FFFFFF; color: #15302A'),
+        wkStyle: 'font-size: 12px; font-weight: 600; color: ' + (on ? '#14332A' : weekend ? '#2F7A5D' : '#4B635C'),
+        pick: (function (k) { return function () { self.setState({ pick: k }); }; })(i)
+      });
+    }
+    var dayType = sel >= 5 ? 'weekend' : 'weekday';
+    var idx = PROFILE[dayType];
+    var bars = [];
+    for (var h = 10; h <= 23; h++) {
+      var v = idx[h];
+      var c = v >= 200 ? '#1F5E46' : v >= 130 ? '#6DBB95' : '#CDEFDC';
+      bars.push({ style: 'flex: 1; border-radius: 3px 3px 0 0; background: ' + c + '; height: ' + Math.max(6, Math.round((v - 80) / 180 * 52)) + 'px' });
+    }
+    var peak = 10;
+    for (var p = 10; p <= 23; p++) if (idx[p] > idx[peak]) peak = p;
+    var first2 = null;
+    for (var q = 10; q <= 23; q++) if (idx[q] >= 200) { first2 = q; break; }
+    var word = function (x) { return x < 12 ? '오전 ' + x + '시' : x < 18 ? '오후 ' + (x - 12) + '시' : '저녁 ' + (x - 12) + '시'; };
+    return {
+      days: days, bars: bars,
+      dateLine: '11월 ' + (23 + sel) + '일 (' + WK[sel] + ') · ' + (dayType === 'weekend' ? '주말 공연 날 기준' : '평일 공연 날 기준'),
+      headline: word(peak) + '쯤 가장 붐벼요',
+      advice: first2 !== null
+        ? word(first2) + '부터 주차장이 평소의 2배를 넘어요. 차로 간다면 그 전에 도착하세요.'
+        : '평일 공연 날은 평소의 2배까지는 잘 안 가요. 공연 끝날 때가 더 막혀요.'
+    };
+  }
+}
+</script>
+</body>
+</html>

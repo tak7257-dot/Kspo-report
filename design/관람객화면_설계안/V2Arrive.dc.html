@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>덜붐빌때 v2 공연장 도착 시간</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2F7A5D}a:hover{color:#15302A}
+button:focus-visible,a:focus-visible{outline:3px solid #2F7A5D;outline-offset:3px}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #15302A; color: #15302A; font-family: 'IBM Plex Sans KR', 'Apple SD Gothic Neo', sans-serif; position: relative; overflow: hidden">
+  <section aria-label="KSPO DOME 3D 미리보기" style="position: absolute; left: 0; top: 0; width: 390px; height: 360px">
+    <img src="/_blob/4b5295b492b15d3d1b5e11cff9b13fab" alt="KSPO DOME 객석에서 무대 쪽을 본 3D 화면. 끌어서 돌려 볼 수 있어요." style="width: 100%; height: 100%; object-fit: cover; display: block">
+    <div style="position: absolute; left: 12px; right: 12px; top: 12px; display: flex; align-items: center; gap: 10px">
+      <a href="V2Home.dc.html" aria-label="첫 화면으로" style="width: 44px; height: 44px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #FFFFFF; color: #2F7A5D">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
+      </a>
+      <h1 style="margin: 0; padding: 7px 14px; border-radius: 999px; background: #FFFFFF; font-size: 18px; font-weight: 700; letter-spacing: -0.02em; color: #2F7A5D">KSPO DOME</h1>
+      <button type="button" aria-label="사용법 보기" style="margin-left: auto; width: 44px; height: 44px; border-radius: 50%; border: 0; background: #FFFFFF; color: #2F7A5D; font: inherit; font-size: 21px; font-weight: 700">?</button>
+    </div>
+    <div role="group" aria-label="3D 보는 위치" style="position: absolute; left: 12px; bottom: 34px; display: flex; gap: 6px">
+      <button type="button" aria-pressed="true" style="font: inherit; font-size: 13px; font-weight: 600; min-height: 36px; padding: 0 12px; border-radius: 999px; border: 0; background: #A9E4C3; color: #14332A">객석에서</button>
+      <button type="button" aria-pressed="false" style="font: inherit; font-size: 13px; min-height: 36px; padding: 0 12px; border-radius: 999px; border: 0; background: rgba(255,255,255,0.92); color: #15302A">위에서</button>
+      <button type="button" aria-pressed="false" style="font: inherit; font-size: 13px; min-height: 36px; padding: 0 12px; border-radius: 999px; border: 0; background: rgba(255,255,255,0.92); color: #15302A">바깥에서</button>
+      <button type="button" aria-pressed="false" style="font: inherit; font-size: 13px; min-height: 36px; padding: 0 12px; border-radius: 999px; border: 0; background: rgba(255,255,255,0.92); color: #15302A">외벽</button>
+    </div>
+  </section>
+
+  <section aria-label="방문 안내" style="position: absolute; left: 0; right: 0; top: 340px; bottom: 0; background: #F5F9F6; border-radius: 18px 18px 0 0; display: flex; flex-direction: column">
+    <span aria-hidden="true" style="align-self: center; width: 40px; height: 4px; border-radius: 2px; background: #9CCDB8; margin-top: 8px"></span>
+    <div role="tablist" aria-label="안내 종류" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 4px 16px 0; border-bottom: 1px solid #CFE9DA">
+      <button type="button" role="tab" aria-selected="true" style="font: inherit; font-size: 16px; font-weight: 700; min-height: 46px; border: 0; border-bottom: 3px solid #2F7A5D; background: transparent; color: #2F7A5D">도착 시간</button>
+      <a href="V2Seat.dc.html" role="tab" aria-selected="false" style="display: flex; align-items: center; justify-content: center; font-size: 16px; min-height: 46px; color: #4B635C; text-decoration: none; border-bottom: 3px solid transparent">내 자리에서 보기</a>
+    </div>
+
+    <div style="padding: 12px 16px 0; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; align-items: center; justify-content: space-between">
+        <p style="margin: 0; font-size: 15px; font-weight: 600">11월 28일 (토) · 주말</p>
+        <a href="V2Home.dc.html" style="font-size: 14px; min-height: 32px; display: flex; align-items: center">날짜 바꾸기</a>
+      </div>
+      <div role="group" aria-label="티켓에 적힌 시작 시각" style="display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 13px; color: #4B635C">티켓에 적힌 시작 시각</span>
+        <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px">
+          <sc-for list="{{starts}}" as="t" hint-placeholder-count="5">
+            <button type="button" aria-pressed="{{t.on}}" onClick="{{t.pick}}" style="{{t.style}}">{{t.label}}</button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div aria-live="polite" style="margin: 14px 16px 0; padding: 12px 14px; border-radius: 8px; background: #A9E4C3; color: #14332A; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap">
+      <span style="font-size: 36px; font-weight: 700; letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums">{{arriveTitle}}</span>
+      <span style="font-size: 17px; font-weight: 700">{{arriveTail}}</span>
+      <span style="flex-basis: 100%; font-size: 13.5px; line-height: 1.5; color: #2E5145">{{arriveDetail}}</span>
+    </div>
+
+    <figure style="margin: 14px 16px 0; display: flex; flex-direction: column; gap: 6px">
+      <figcaption style="font-size: 14px; font-weight: 600">시간대별 주차장, 평소와 비교</figcaption>
+      <div role="img" aria-label="{{chartLabel}}" style="display: flex; align-items: flex-end; gap: 4px; height: 104px">
+        <sc-for list="{{bars}}" as="b" hint-placeholder-count="14">
+          <span style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px">
+            <span style="{{b.tagStyle}}">{{b.tag}}</span>
+            <span style="{{b.style}}"></span>
+          </span>
+        </sc-for>
+      </div>
+      <div aria-hidden="true" style="display: flex; gap: 4px; font-size: 11px; color: #4B635C; font-variant-numeric: tabular-nums">
+        <sc-for list="{{bars}}" as="b" hint-placeholder-count="14">
+          <span style="flex: 1; text-align: center">{{b.hour}}</span>
+        </sc-for>
+      </div>
+      <div style="display: flex; gap: 14px; font-size: 12px; color: #15302A; margin-top: 2px">
+        <span style="display: flex; align-items: center; gap: 5px"><span style="width: 12px; height: 12px; border-radius: 2px; background: #CDEFDC; border: 1px solid #9CCDB8"></span>보통</span>
+        <span style="display: flex; align-items: center; gap: 5px"><span style="width: 12px; height: 12px; border-radius: 2px; background: #6DBB95"></span>붐빔 (1.3배↑)</span>
+        <span style="display: flex; align-items: center; gap: 5px"><span style="width: 12px; height: 12px; border-radius: 2px; background: #1F5E46"></span>매우 붐빔 (2배↑)</span>
+      </div>
+    </figure>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { start: 18 };
+  }
+  renderVals() {
+    // 2025년 주말·공휴일 공연일 시간대별 주차 지수 (같은 달·같은 시각의 공연 없는 날 = 100)
+    var idx = [99, 99, 100, 102, 102, 104, 113, 129, 136, 146, 150, 155, 159, 158, 164, 184, 204, 226, 252, 246, 197, 148, 115, 108];
+    var self = this, s = this.state.start;
+    var starts = [];
+    for (var h = 16; h <= 20; h++) {
+      var on = h === s;
+      starts.push({
+        label: h + ':00', on: on ? 'true' : 'false',
+        style: 'font: inherit; font-size: 15px; min-height: 44px; border-radius: 8px; font-variant-numeric: tabular-nums; ' +
+          (on ? 'border: 2px solid #2F7A5D; background: #2F7A5D; color: #FFFFFF; font-weight: 700' : 'border: 1px solid #9CCDB8; background: #FFFFFF; color: #15302A'),
+        pick: (function (k) { return function () { self.setState({ start: k }); }; })(h)
+      });
+    }
+    var arrive = null;
+    for (var a = s - 1; a >= 10; a--) if (idx[a] < 200) { arrive = a; break; }
+    var bars = [];
+    for (var t = 10; t <= 23; t++) {
+      var v = idx[t];
+      var c = v >= 200 ? '#1F5E46' : v >= 130 ? '#6DBB95' : '#CDEFDC';
+      var mark = t === arrive ? '도착' : t === s ? '시작' : '';
+      var ring = t === arrive ? '; outline: 3px solid #15302A; outline-offset: 2px' : t === s ? '; outline: 2px dashed #15302A; outline-offset: 2px' : '';
+      bars.push({
+        hour: t % 2 === 0 ? t : '',
+        tag: mark,
+        tagStyle: 'font-size: 11px; font-weight: 700; height: 14px; line-height: 14px; white-space: nowrap; color: #15302A',
+        style: 'width: 100%; border-radius: 3px 3px 0 0; background: ' + c + '; height: ' + Math.max(6, Math.round((v - 80) / 180 * 80)) + 'px' + ring
+      });
+    }
+    var x = function (v) { return (v / 100).toFixed(1) + '배'; };
+    var title, tail, detail;
+    if (arrive === s - 1) { title = arrive + ':00'; tail = '까지 도착'; detail = '시작 1시간 전에도 평소의 ' + x(idx[s - 1]) + ' 정도라 여유 있어요.'; }
+    else if (arrive !== null) { title = arrive + ':00'; tail = '까지 도착'; detail = (arrive + 1) + '시부터 매우 붐벼요(평소의 2배 넘음). 이보다 늦으면 지하철이 편해요.'; }
+    else { title = '지하철'; tail = '추천'; detail = '시작 전 내내 매우 붐벼요. 차보다 지하철을 권해요.'; }
+    return {
+      starts: starts, bars: bars, arriveTitle: title, arriveTail: tail, arriveDetail: detail,
+      chartLabel: '주말 공연 날 10시부터 23시까지 주차장 혼잡. ' + s + '시 시작, 권장 도착 ' + (arrive !== null ? arrive + '시' : '없음')
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>덜붐빌때 v2 내 자리에서 보기</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2F7A5D}a:hover{color:#15302A}
+button:focus-visible,a:focus-visible{outline:3px solid #2F7A5D;outline-offset:3px}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #15302A; color: #15302A; font-family: 'IBM Plex Sans KR', 'Apple SD Gothic Neo', sans-serif; position: relative; overflow: hidden">
+  <section aria-label="KSPO DOME 3D 미리보기" style="position: absolute; left: 0; top: 0; width: 390px; height: 280px">
+    <img src="/_blob/4b5295b492b15d3d1b5e11cff9b13fab" alt="{{imgAlt}}" style="width: 100%; height: 100%; object-fit: cover; display: block">
+    <div style="position: absolute; left: 12px; right: 12px; top: 12px; display: flex; align-items: center; gap: 10px">
+      <a href="V2Home.dc.html" aria-label="첫 화면으로" style="width: 44px; height: 44px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #FFFFFF; color: #2F7A5D">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
+      </a>
+      <h1 style="margin: 0; padding: 7px 14px; border-radius: 999px; background: #FFFFFF; font-size: 18px; font-weight: 700; letter-spacing: -0.02em; color: #2F7A5D">KSPO DOME</h1>
+      <button type="button" aria-label="사용법 보기" style="margin-left: auto; width: 44px; height: 44px; border-radius: 50%; border: 0; background: #FFFFFF; color: #2F7A5D; font: inherit; font-size: 21px; font-weight: 700">?</button>
+    </div>
+    <p style="position: absolute; left: 12px; bottom: 32px; margin: 0; padding: 6px 12px; border-radius: 999px; background: #A9E4C3; color: #14332A; font-size: 13.5px; font-weight: 600">{{eyeChip}}</p>
+  </section>
+
+  <section aria-label="내 자리에서 보기" style="position: absolute; left: 0; right: 0; top: 260px; bottom: 0; background: #F5F9F6; border-radius: 18px 18px 0 0; display: flex; flex-direction: column">
+    <span aria-hidden="true" style="align-self: center; width: 40px; height: 4px; border-radius: 2px; background: #9CCDB8; margin-top: 8px"></span>
+    <div role="tablist" aria-label="안내 종류" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 4px 16px 0; border-bottom: 1px solid #CFE9DA">
+      <a href="V2Arrive.dc.html" role="tab" aria-selected="false" style="display: flex; align-items: center; justify-content: center; font-size: 16px; min-height: 46px; color: #4B635C; text-decoration: none; border-bottom: 3px solid transparent">도착 시간</a>
+      <button type="button" role="tab" aria-selected="true" style="font: inherit; font-size: 16px; font-weight: 700; min-height: 46px; border: 0; border-bottom: 3px solid #2F7A5D; background: transparent; color: #2F7A5D">내 자리에서 보기</button>
+    </div>
+    <p style="margin: 10px 16px 0; font-size: 14px; color: #4B635C">티켓의 층과 방향을 눌러 보세요. 위쪽이 무대예요.</p>
+
+    <div style="position: relative; width: 358px; height: 350px; margin: 6px 16px 0">
+      <svg width="358" height="350" viewBox="0 0 358 350" aria-hidden="true" style="position: absolute; left: 0; top: 0; display: block">
+        <circle cx="179" cy="175" r="152" fill="none" stroke="#CFE9DA" stroke-width="35"></circle>
+        <circle cx="179" cy="175" r="98.6" fill="none" stroke="#CFE9DA" stroke-width="52"></circle>
+        <circle cx="179" cy="175" r="69.6" fill="#FFFFFF" stroke="#9CCDB8" stroke-width="1"></circle>
+        <text x="286" y="286" text-anchor="middle" font-size="12" font-weight="600" fill="#4B635C">2층</text>
+        <text x="249" y="249" text-anchor="middle" font-size="12" font-weight="600" fill="#4B635C">1층</text>
+        <text x="179" y="92" text-anchor="middle" font-size="12" font-weight="700" fill="#15302A">무대 (가정)</text>
+        <rect x="153" y="99" width="52" height="13" rx="2" fill="#2F7A5D"></rect>
+        <line x1="{{sx}}" y1="{{sy}}" x2="179" y2="112" stroke="#2F7A5D" stroke-width="2.5" stroke-dasharray="5 4"></line>
+      </svg>
+      <sc-for list="{{zones}}" as="z" hint-placeholder-count="8">
+        <button type="button" aria-pressed="{{z.on}}" aria-label="{{z.aria}}" onClick="{{z.pick}}" style="{{z.style}}">
+          <span style="font-size: 10.5px; line-height: 1.1">{{z.top}}</span>
+          <span style="font-size: 12.5px; line-height: 1.15; font-weight: 700">{{z.bottom}}</span>
+        </button>
+      </sc-for>
+    </div>
+
+    <div aria-live="polite" style="margin: 12px 16px 0; padding: 12px 14px; border-radius: 8px; background: #FFFFFF; border: 2px solid #2F7A5D; display: flex; flex-direction: column; gap: 4px">
+      <p style="margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.02em">{{label}}</p>
+      <p style="margin: 0; font-size: 14px; line-height: 1.5">{{detail}}</p>
+    </div>
+    <p style="margin: 8px 16px 0; font-size: 12px; line-height: 1.5; color: #4B635C">무대 위치와 객석 배치는 공연마다 달라요. 공식 구역 이름 대신 방향으로 나눴고, 거리는 3D 모델에서 잰 값이에요.</p>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { zone: 'l1-center' };
+  }
+  renderVals() {
+    // 3D 모델에서 잰 객석 위치(위에서 본 그림 좌표, 1m = 2.9px) — web/app/data/seat_views.json 과 같은 값
+    var Z = [
+      { id: 'floor-front', top: '플로어', bottom: '앞', name: '플로어 앞쪽', x: 179, y: 157.6, dist: 14, h: 0 },
+      { id: 'floor-back', top: '플로어', bottom: '뒤', name: '플로어 뒤쪽', x: 179, y: 221.4, dist: 36, h: 0 },
+      { id: 'l1-left', top: '1층', bottom: '왼쪽', name: '1층 왼쪽', x: 83.3, y: 175, dist: 39, h: 2.6 },
+      { id: 'l1-center', top: '1층', bottom: '정면', name: '1층 정면', x: 179, y: 270.7, dist: 53, h: 2.6 },
+      { id: 'l1-right', top: '1층', bottom: '오른쪽', name: '1층 오른쪽', x: 274.7, y: 175, dist: 39, h: 2.6 },
+      { id: 'l2-left', top: '2층', bottom: '왼쪽', name: '2층 왼쪽', x: 28.2, y: 175, dist: 56, h: 8.2 },
+      { id: 'l2-center', top: '2층', bottom: '정면', name: '2층 정면', x: 179, y: 325.8, dist: 72, h: 8.2 },
+      { id: 'l2-right', top: '2층', bottom: '오른쪽', name: '2층 오른쪽', x: 329.8, y: 175, dist: 56, h: 8.2 }
+    ];
+    var self = this, cur = null;
+    var zones = Z.map(function (z) {
+      var on = z.id === self.state.zone;
+      if (on) cur = z;
+      return {
+        top: z.top, bottom: z.bottom, on: on ? 'true' : 'false', aria: z.name,
+        style: 'position: absolute; left: ' + (z.x - 26).toFixed(1) + 'px; top: ' + (z.y - 22).toFixed(1) + 'px; width: 52px; height: 44px; padding: 0; ' +
+          'font: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 8px; ' +
+          (on ? 'border: 2px solid #15302A; background: #2F7A5D; color: #FFFFFF' : 'border: 1.5px solid #2F7A5D; background: #FFFFFF; color: #15302A'),
+        pick: function () { self.setState({ zone: z.id }); }
+      };
+    });
+    return {
+      zones: zones, sx: cur.x, sy: cur.y, label: cur.name,
+      eyeChip: cur.name + ' 눈높이로 보는 중',
+      imgAlt: 'KSPO DOME ' + cur.name + ' 자리에서 무대 쪽을 본 3D 화면',
+      detail: '무대 쪽 끝까지 약 ' + cur.dist + 'm · ' + (cur.h > 0 ? '플로어보다 ' + cur.h + 'm 높아요' : '플로어와 같은 높이예요') + '. 위 3D가 이 자리 눈높이로 바뀌어요.'
+    };
+  }
+}
+</script>
+</body>
+</html>
