@@ -47,6 +47,22 @@
       "w": 390,
       "x": 470,
       "y": 0
+    },
+    "V3Day.dc.html": {
+      "x": 0,
+      "y": 3200,
+      "w": 390,
+      "h": 844,
+      "title": "v3-1. 공연 날 하루 (시간 막대)",
+      "is_interactive": true
+    },
+    "V3Plan.dc.html": {
+      "x": 470,
+      "y": 3200,
+      "w": 390,
+      "h": 844,
+      "title": "v3-2. 하루 일정표 · 저장/공유",
+      "is_interactive": true
     }
   },
   "createdOnFiles": {
@@ -60,7 +76,8 @@
   "noteOrder": [
     "title",
     "image-1acg53",
-    "title2"
+    "title2",
+    "title3"
   ],
   "notes": {
     "image-1acg53": {
@@ -87,6 +104,13 @@
       "w": 240,
       "x": 0,
       "y": 1560
+    },
+    "title3": {
+      "kind": "title1",
+      "text": "v3 · 공연 날 하루 미리 살아보기 (도착부터 출차까지)",
+      "x": 0,
+      "y": 2900,
+      "maxW": 1330
     }
   },
   "order": [
@@ -95,7 +119,9 @@
     "Plan.dc.html",
     "V2Home.dc.html",
     "V2Arrive.dc.html",
-    "V2Seat.dc.html"
+    "V2Seat.dc.html",
+    "V3Day.dc.html",
+    "V3Plan.dc.html"
   ],
   "pages": [],
   "title": "관람객 화면 설계안"

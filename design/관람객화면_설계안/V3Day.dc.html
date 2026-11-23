@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>덜붐빌때 v3 공연 날 하루</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2F7A5D}a:hover{color:#15302A}
+button:focus-visible,a:focus-visible{outline:3px solid #2F7A5D;outline-offset:3px}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #15302A; color: #15302A; font-family: 'IBM Plex Sans KR', 'Apple SD Gothic Neo', sans-serif; position: relative; overflow: hidden">
+  <section aria-label="KSPO DOME 3D" style="position: absolute; left: 0; top: 0; width: 390px; height: 318px; background: #CFE3D8">
+    <img src="{{sceneSrc}}" alt="{{sceneAlt}}" style="width: 100%; height: 100%; object-fit: cover; display: block">
+    <div style="position: absolute; left: 12px; right: 12px; top: 12px; display: flex; align-items: center; gap: 10px">
+      <a href="V2Home.dc.html" aria-label="첫 화면으로" style="width: 44px; height: 44px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #FFFFFF; color: #2F7A5D">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
+      </a>
+      <div style="padding: 5px 14px 6px; border-radius: 14px; background: #FFFFFF; display: flex; flex-direction: column">
+        <h1 style="margin: 0; font-size: 17px; font-weight: 700; letter-spacing: -0.02em; color: #2F7A5D; line-height: 1.2">KSPO DOME</h1>
+        <span style="font-size: 12px; color: #4B635C">11월 28일 (토) 18:00 공연</span>
+      </div>
+      <button type="button" aria-label="사용법 보기" style="margin-left: auto; width: 44px; height: 44px; border-radius: 50%; border: 0; background: #FFFFFF; color: #2F7A5D; font: inherit; font-size: 21px; font-weight: 700">?</button>
+    </div>
+    <p style="position: absolute; left: 12px; bottom: 30px; margin: 0; padding: 6px 12px; border-radius: 999px; background: #15302A; color: #FFFFFF; font-size: 13px; font-weight: 600">{{sceneChip}}</p>
+  </section>
+
+  <section aria-label="공연 날 하루" style="position: absolute; left: 0; right: 0; top: 298px; bottom: 0; background: #F5F9F6; border-radius: 18px 18px 0 0; display: flex; flex-direction: column">
+    <span aria-hidden="true" style="align-self: center; width: 40px; height: 4px; border-radius: 2px; background: #9CCDB8; margin-top: 8px"></span>
+
+    <div style="padding: 10px 16px 0; display: flex; align-items: baseline; justify-content: space-between">
+      <h2 style="margin: 0; font-size: 18px; font-weight: 700; letter-spacing: -0.02em">공연 날 하루 미리 보기</h2>
+      <a href="V3Plan.dc.html" style="font-size: 14px; min-height: 32px; display: flex; align-items: center">일정표로 보기</a>
+    </div>
+
+    <div role="group" aria-label="하루 단계" style="position: relative; margin: 12px 16px 0; height: 74px">
+      <span aria-hidden="true" style="position: absolute; left: 22px; right: 22px; top: 21px; height: 4px; border-radius: 2px; background: #CFE9DA"></span>
+      <span aria-hidden="true" style="{{fillStyle}}"></span>
+      <div style="position: absolute; inset: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr))">
+        <sc-for list="{{stops}}" as="s" hint-placeholder-count="4">
+          <button type="button" aria-pressed="{{s.on}}" aria-label="{{s.aria}}" onClick="{{s.pick}}" style="font: inherit; border: 0; background: transparent; padding: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; min-height: 74px; color: #15302A">
+            <span style="{{s.dot}}"></span>
+            <span style="{{s.timeStyle}}">{{s.time}}</span>
+            <span style="font-size: 12px; color: #4B635C">{{s.name}}</span>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div aria-live="polite" style="margin: 10px 16px 0; display: flex; flex-direction: column; gap: 10px">
+      <sc-if value="{{isArrive}}" hint-placeholder-val="{{true}}">
+        <div style="background: #A9E4C3; color: #14332A; border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 4px">
+          <p style="margin: 0; font-size: 13px; font-weight: 600">차로 온다면</p>
+          <p style="margin: 0; font-size: 30px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1">15:00까지 도착</p>
+          <p style="margin: 0; font-size: 14px; line-height: 1.5">16시부터 주차장이 평소의 2배를 넘어요. 그 뒤로 오면 지하철이 편해요.</p>
+        </div>
+        <p style="margin: 0; font-size: 13.5px; line-height: 1.55; color: #4B635C">일찍 도착해 남는 3시간은 공원에서. 2025년 주말 공연 날 15시 주차장은 평소의 1.6배였어요.</p>
+      </sc-if>
+      <sc-if value="{{isShow}}" hint-placeholder-val="{{false}}">
+        <div style="background: #FFFFFF; border: 2px solid #2F7A5D; border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 4px">
+          <p style="margin: 0; font-size: 13px; font-weight: 600; color: #4B635C">내 자리 · 1층 정면</p>
+          <p style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.02em">무대 쪽 끝까지 약 53m</p>
+          <p style="margin: 0; font-size: 14px; line-height: 1.5">플로어보다 2.6m 높은 자리예요. 위 3D가 이 자리 눈높이예요.</p>
+          <a href="V2Seat.dc.html" style="font-size: 14px; min-height: 36px; display: flex; align-items: center">자리 바꾸기</a>
+        </div>
+        <p style="margin: 0; font-size: 13.5px; line-height: 1.55; color: #4B635C">이 시각 주차장은 평소의 2.5배로 하루 중 가장 붐벼요.</p>
+      </sc-if>
+      <sc-if value="{{isEnd}}" hint-placeholder-val="{{false}}">
+        <div style="background: #FFFFFF; border: 2px solid #2F7A5D; border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 8px">
+          <p style="margin: 0; font-size: 13px; font-weight: 600; color: #4B635C">20:00쯤 끝나요 (KSPO DOME 공연 228편의 공연 시간 중앙값 2시간)</p>
+          <p style="margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.3">끝나자마자 나가면<br>10분 동안 차 113대와 같이 나가요</p>
+          <div role="img" aria-label="출차 몰림. 가장 몰린 10분을 100이라 하면 10분 뒤 68, 20분 뒤 42, 30분 뒤 41" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; align-items: end; height: 92px">
+            <sc-for list="{{decay}}" as="d" hint-placeholder-count="4">
+              <span style="display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 3px; height: 100%">
+                <span style="font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums">{{d.pct}}</span>
+                <span style="{{d.style}}"></span>
+                <span style="font-size: 11.5px; color: #4B635C">{{d.label}}</span>
+              </span>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{isLeave}}" hint-placeholder-val="{{false}}">
+        <div style="background: #A9E4C3; color: #14332A; border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 4px">
+          <p style="margin: 0; font-size: 13px; font-weight: 600">20분만 쉬었다 나가면</p>
+          <p style="margin: 0; font-size: 30px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1">20:20 출차</p>
+          <p style="margin: 0; font-size: 14px; line-height: 1.5">같이 나가는 차가 절반 아래(42%)로 줄어요. 공원 밤길을 잠깐 걷고 나오세요.</p>
+        </div>
+        <p style="margin: 0; font-size: 13.5px; line-height: 1.55; color: #4B635C">2024년 7월, 저녁에 출차가 몰린 27일을 모아 본 모양이에요. 한 사람이 20분씩만 늦춰도 출구 정체가 줄어요.</p>
+      </sc-if>
+    </div>
+
+    <div style="margin: auto 16px 14px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+      <button type="button" onClick="{{prev}}" disabled="{{atStart}}" style="font: inherit; font-size: 15px; min-height: 48px; border-radius: 8px; border: 2px solid #2F7A5D; background: #FFFFFF; color: #2F7A5D">이전 단계</button>
+      <button type="button" onClick="{{next}}" disabled="{{atEnd}}" style="font: inherit; font-size: 15px; font-weight: 700; min-height: 48px; border-radius: 8px; border: 2px solid #2F7A5D; background: #2F7A5D; color: #FFFFFF">다음 단계</button>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { stage: 0 };
+  }
+  renderVals() {
+    var S = [
+      { name: '도착', time: '15:00', src: '/_blob/24839664ed8fac826776b9590748910b', chip: '도착 · 바깥에서 본 KSPO DOME', alt: 'KSPO DOME을 바깥 위에서 본 3D 화면' },
+      { name: '공연', time: '18:00', src: '/_blob/4b5295b492b15d3d1b5e11cff9b13fab', chip: '공연 · 1층 정면 눈높이', alt: 'KSPO DOME 1층 정면 자리에서 무대 쪽을 본 3D 화면' },
+      { name: '끝', time: '20:00', src: '/_blob/6f04e386db7dd7c766c1fde03ab0160f', chip: '끝 · 객석 뒤쪽 출구 방향', alt: 'KSPO DOME 플로어에서 객석 뒤쪽을 본 3D 화면' },
+      { name: '출차', time: '20:20', src: '/_blob/24839664ed8fac826776b9590748910b', chip: '출차 · 20분 쉬었다 나가기', alt: 'KSPO DOME을 바깥 위에서 본 3D 화면' }
+    ];
+    var self = this, k = this.state.stage, cur = S[k];
+    var stops = S.map(function (s, i) {
+      var on = i === k, past = i < k;
+      return {
+        name: s.name, time: s.time, on: on ? 'true' : 'false', aria: s.name + ' ' + s.time,
+        dot: 'width: ' + (on ? 22 : 14) + 'px; height: ' + (on ? 22 : 14) + 'px; margin-top: ' + (on ? 12 : 16) + 'px; border-radius: 50%; box-sizing: border-box; ' +
+          (on ? 'background: #2F7A5D; border: 4px solid #A9E4C3; box-shadow: 0 0 0 2px #2F7A5D' : past ? 'background: #2F7A5D; border: 0' : 'background: #FFFFFF; border: 2px solid #2F7A5D'),
+        timeStyle: 'font-size: 15px; font-variant-numeric: tabular-nums; font-weight: ' + (on ? 700 : 500) + '; color: ' + (on ? '#15302A' : '#4B635C'),
+        pick: function () { self.setState({ stage: i }); }
+      };
+    });
+    var ratios = [1, 0.68, 0.42, 0.41];
+    var decay = ratios.map(function (r, i) {
+      var hl = (k === 3 && i === 2) || (k === 2 && i === 0);
+      return {
+        pct: Math.round(r * 100) + '%', label: i === 0 ? '바로' : (i * 10) + '분 뒤',
+        style: 'width: 100%; border-radius: 3px 3px 0 0; height: ' + Math.round(r * 52) + 'px; background: ' + (i === 0 ? '#1F5E46' : i === 1 ? '#6DBB95' : '#CDEFDC') + (hl ? '; outline: 3px solid #15302A; outline-offset: 2px' : '')
+      };
+    });
+    var pct = k / 3;
+    return {
+      stops: stops, decay: decay,
+      sceneSrc: cur.src, sceneAlt: cur.alt, sceneChip: cur.chip,
+      fillStyle: 'position: absolute; left: 22px; top: 21px; height: 4px; border-radius: 2px; background: #2F7A5D; width: calc((100% - 44px) * ' + pct.toFixed(3) + ')',
+      isArrive: k === 0, isShow: k === 1, isEnd: k === 2, isLeave: k === 3,
+      atStart: k === 0, atEnd: k === 3,
+      prev: function () { self.setState({ stage: Math.max(0, k - 1) }); },
+      next: function () { self.setState({ stage: Math.min(3, k + 1) }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

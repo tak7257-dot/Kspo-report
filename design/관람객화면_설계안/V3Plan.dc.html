@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>덜붐빌때 v3 하루 일정표</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2F7A5D}a:hover{color:#15302A}
+button:focus-visible,a:focus-visible{outline:3px solid #2F7A5D;outline-offset:3px}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F5F9F6; color: #15302A; font-family: 'IBM Plex Sans KR', 'Apple SD Gothic Neo', sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <header style="padding: 14px 16px 8px; display: flex; align-items: center; gap: 12px">
+    <a href="V3Day.dc.html" aria-label="하루 미리 보기로" style="width: 44px; height: 44px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 2px solid #2F7A5D; color: #2F7A5D">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
+    </a>
+    <div style="min-width: 0">
+      <h1 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; color: #2F7A5D; line-height: 1.15">하루 일정표</h1>
+      <p style="margin: 2px 0 0; font-size: 13px; color: #4B635C">11월 28일 (토) · KSPO DOME · 18:00 공연</p>
+    </div>
+    <button type="button" aria-label="사용법 보기" style="margin-left: auto; width: 44px; height: 44px; flex: none; border-radius: 50%; border: 2px solid #2F7A5D; background: #FFFFFF; color: #2F7A5D; font: inherit; font-size: 21px; font-weight: 700">?</button>
+  </header>
+
+  <div style="padding: 4px 16px 6px; display: flex; gap: 12px; font-size: 12px; align-items: center">
+    <span style="color: #4B635C">주차장</span>
+    <span style="display: flex; align-items: center; gap: 5px"><span style="width: 12px; height: 12px; border-radius: 2px; background: #CDEFDC; border: 1px solid #9CCDB8"></span>보통</span>
+    <span style="display: flex; align-items: center; gap: 5px"><span style="width: 12px; height: 12px; border-radius: 2px; background: #6DBB95"></span>붐빔</span>
+    <span style="display: flex; align-items: center; gap: 5px"><span style="width: 12px; height: 12px; border-radius: 2px; background: #1F5E46"></span>매우 붐빔</span>
+  </div>
+
+  <ol aria-label="시간대별 일정" style="list-style: none; margin: 0; padding: 0 16px; display: flex; flex-direction: column">
+    <sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
+      <li style="display: grid; grid-template-columns: 44px 14px minmax(0, 1fr); gap: 0 12px; min-height: 66px">
+        <span style="font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; padding-top: 2px; color: #4B635C">{{r.hour}}</span>
+        <span aria-label="{{r.levelText}}" role="img" style="{{r.strip}}"></span>
+        <span style="display: flex; flex-direction: column; gap: 6px; padding: 0 0 8px">
+          <sc-for list="{{r.events}}" as="e" hint-placeholder-count="1">
+            <span style="{{e.box}}">
+              <span style="font-size: 12.5px; font-variant-numeric: tabular-nums; font-weight: 600">{{e.time}}</span>
+              <span style="font-size: 15px; font-weight: 700; letter-spacing: -0.01em">{{e.title}}</span>
+              <span style="font-size: 12.5px; line-height: 1.45">{{e.note}}</span>
+            </span>
+          </sc-for>
+        </span>
+      </li>
+    </sc-for>
+  </ol>
+
+  <div style="margin-top: auto; padding: 10px 16px 16px; display: flex; flex-direction: column; gap: 8px; background: #F5F9F6; border-top: 1px solid #CFE9DA">
+    <sc-if value="{{saved}}" hint-placeholder-val="{{false}}">
+      <p role="status" style="margin: 0; font-size: 13.5px; color: #15302A">캘린더 파일을 만들었어요. 도착 30분 전에 알림이 울려요.</p>
+    </sc-if>
+    <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 8px">
+      <button type="button" onClick="{{save}}" style="font: inherit; font-size: 16px; font-weight: 700; min-height: 52px; border-radius: 8px; border: 2px solid #2F7A5D; background: #2F7A5D; color: #FFFFFF">캘린더에 넣기</button>
+      <button type="button" style="font: inherit; font-size: 16px; min-height: 52px; border-radius: 8px; border: 2px solid #2F7A5D; background: #FFFFFF; color: #2F7A5D">같이 갈 사람에게</button>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { saved: false };
+  }
+  renderVals() {
+    // 2025년 주말 공연 날 시간대별 주차 지수 (평소 = 100)
+    var idx = { 14: 164, 15: 184, 16: 204, 17: 226, 18: 252, 19: 246, 20: 197, 21: 148 };
+    var EV = {
+      15: [{ time: '15:00', title: '도착 · 주차', note: '16시부터 주차장이 매우 붐벼요. 그 전에 들어오세요.', key: true }],
+      16: [{ time: '16:00', title: '공원에서 쉬기', note: '산책, 식사. 공연장 입장 시간은 티켓을 확인하세요.' }],
+      18: [{ time: '18:00', title: '공연 시작 · 1층 정면', note: '무대 쪽 끝까지 약 53m' }],
+      20: [{ time: '20:00', title: '공연 끝 (약 2시간)', note: '끝나자마자 10분 동안 차 113대가 몰려요.' },
+           { time: '20:20', title: '출차', note: '20분 쉬고 나가면 같이 나가는 차가 42%로 줄어요.', key: true }]
+    };
+    var rows = [];
+    for (var h = 14; h <= 21; h++) {
+      var v = idx[h];
+      var c = v >= 200 ? '#1F5E46' : v >= 130 ? '#6DBB95' : '#CDEFDC';
+      var lv = v >= 200 ? '매우 붐빔' : v >= 130 ? '붐빔' : '보통';
+      rows.push({
+        hour: h + ':00',
+        levelText: h + '시 주차장 ' + lv + ', 평소의 ' + (v / 100).toFixed(1) + '배',
+        strip: 'display: block; background: ' + c + (h === 14 ? '; border-radius: 7px 7px 0 0' : h === 21 ? '; border-radius: 0 0 7px 7px' : ''),
+        events: (EV[h] || []).map(function (e) {
+          return {
+            time: e.time, title: e.title, note: e.note,
+            box: 'display: flex; flex-direction: column; gap: 1px; padding: 8px 10px; border-radius: 8px; ' +
+              (e.key ? 'background: #A9E4C3; color: #14332A' : 'background: #FFFFFF; border: 1px solid #9CCDB8; color: #15302A')
+          };
+        })
+      });
+    }
+    var self = this;
+    return { rows: rows, saved: this.state.saved, save: function () { self.setState({ saved: true }); } };
+  }
+}
+</script>
+</body>
+</html>
