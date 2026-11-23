@@ -5,7 +5,7 @@ name: 웹 공개 (GitHub Pages)
 on:
   push:
     branches: [main]
-    paths: ["web/app/**", ".github/workflows/pages.yml"]
+    paths: ["web/app/**", "tools/build_site.sh", ".github/workflows/pages.yml"]
   workflow_dispatch:
 
 permissions:
@@ -26,8 +26,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
+      - run: sh tools/build_site.sh _site   # 문서 머리말(doctype·viewport)을 붙인 공개용 폴더
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: web/app
+          path: _site
       - id: deployment
         uses: actions/deploy-pages@v4

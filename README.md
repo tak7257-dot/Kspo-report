@@ -16,6 +16,12 @@ python run_all.py --fetch
 | 3 지표 | `src/metrics.py` | 일별 입차, 요일×시간 히트맵, 시간대별 재차 대수, KPI |
 | 4 보고서 | `src/report.py` | Plotly 차트 + 숫자 기반 자동 해설 → `output/report.html` |
 
+## 관람객 웹 「덜붐빌때」 (`web/app/`)
+공연 날 "차를 가져가도 될까?"부터 답하는 주차 비서. 첫 화면 답 카드(차/지하철, 권장 도착), 공연 끝날 무렵 나가기 안내(20분 타이머),
+실시간 주차 줄, 공연 날 하루 미리 보기(3D)·내 자리에서 보기, 하루 일정표·캘린더(.ics)·공유 문구.
+- 공개 주소: https://tak7257-dot.github.io/kspo-report/ (저장소 공개 + Settings → Pages → Source "GitHub Actions" 후 자동 배포)
+- 테스트: `node --test tests/web/*.test.js` (판단 로직), `python -m unittest discover tests` (파이프라인), `node tests/web/smoke.js` (화면, Playwright)
+
 ## 사용 데이터와 이용 조건 (출처 표시)
 모두 공공데이터포털(data.go.kr)에서 제공하는 한국체육산업개발주식회사 개방 데이터이며, 이용허락범위를 확인했다 (2026-11-17).
 
@@ -27,6 +33,7 @@ python run_all.py --fetch
 | 월별주차현황 (15131671) | CSV | 제한 없음 |
 | 올림픽공원 공연장 실감형 콘텐츠 (15127487) | GLB/DAE | 제한 없음 |
 | 올림픽공원 공연정보 (3037877, 공연행사정보 API) | API | 공공누리 제1유형(출처표시) |
+| 올림픽공원 실시간 주차현황 (15168686, 2026-09 개방) | API (웹이 직접 호출) | 제한 없음 |
 
 출처: 한국체육산업개발주식회사, 공공데이터포털(www.data.go.kr)
 
