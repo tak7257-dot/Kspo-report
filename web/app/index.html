@@ -63,27 +63,36 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .check input { width: 22px; height: 22px; accent-color: var(--stroke); margin: 0; flex: none; }
 
 /* 바꾸기 (처음엔 펼침, 고른 뒤엔 접힘) */
-.change { padding: 0 14px 14px; }
+.change { margin-top: 2px; }
 .change summary { min-height: 44px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14.5px; font-weight: 600; color: var(--stroke); list-style: none; }
 .change summary::-webkit-details-marker { display: none; }
 .change summary::before { content: "+"; width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--stroke); display: grid; place-items: center; font-weight: 700; line-height: 1; }
 .change[open] summary::before { content: "−"; }
+.change[open] { padding-bottom: 6px; }
 
-/* 답 카드 (티켓) */
-.ticket { margin-top: 6px; background: var(--surface); border: 2px solid var(--stroke); border-radius: var(--r); display: flex; flex-direction: column; }
-.ticket-head { padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; }
-.ticket-head .what { font-size: 14px; font-weight: 600; }
-.live { font-size: 13.5px; color: var(--muted); }
+/* 안내표: 본문 | 절취선 | 꼬리표. 공연 티켓처럼 */
+.ticket { margin-top: 10px; display: grid; grid-template-columns: minmax(0, 1fr) 104px; background: var(--surface); border: 2px solid var(--stroke); border-radius: 14px; }
+.t-main { padding: 14px 14px 14px 16px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.t-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; color: var(--muted); }
+.t-no { letter-spacing: 0.02em; }
+.t-venue { font-size: 24px; color: var(--stroke); margin-top: 2px; }
+.ticket .what { font-size: 13.5px; font-weight: 500; padding-bottom: 10px; border-bottom: 1px dashed var(--line); }
+.t-answer { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.t-icon { flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--field); color: var(--field-ink); }
+.t-answer h3 { font-size: clamp(24px, 7vw, 30px); }
+.ticket .sub { font-size: 14.5px; line-height: 1.5; }
+.live { font-size: 13px; color: var(--muted); margin-top: 4px; }
 .live b { color: var(--ink); }
-.perf { position: relative; height: 0; border-top: 2px dashed var(--stroke); margin: 0 14px; }
-.perf::before, .perf::after { content: ""; position: absolute; top: -12px; width: 22px; height: 22px; border-radius: 50%; background: var(--paper); }
-.perf::before { left: -27px; border-right: 2px solid var(--stroke); }
-.perf::after { right: -27px; border-left: 2px solid var(--stroke); }
-.answer { padding: 16px 14px 14px; background: var(--field); color: var(--field-ink); border-radius: 0 0 6px 6px; display: flex; flex-direction: column; gap: 6px; }
-.answer h3 { font-size: clamp(28px, 8vw, 36px); }
-.answer .sub { font-size: 15px; line-height: 1.5; }
 .maplinks { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
-.maplinks a { min-height: 40px; display: inline-flex; align-items: center; padding: 0 12px; border-radius: 999px; border: 1.5px solid var(--field-ink); color: var(--field-ink); text-decoration: none; font-size: 14px; font-weight: 600; }
+.maplinks a { min-height: 40px; display: inline-flex; align-items: center; padding: 0 12px; border-radius: 999px; border: 1.5px solid var(--stroke); color: var(--stroke); text-decoration: none; font-size: 14px; font-weight: 600; }
+.t-stub { position: relative; border-left: 2px dashed var(--stroke); border-radius: 0 12px 12px 0; background: var(--field); color: var(--field-ink); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 18px 6px; text-align: center; }
+.t-stub::before, .t-stub::after { content: ""; position: absolute; left: -13px; width: 22px; height: 22px; border-radius: 50%; background: var(--paper); border: 2px solid transparent; }
+.t-stub::before { top: -14px; border-bottom-color: var(--stroke); }
+.t-stub::after { bottom: -14px; border-top-color: var(--stroke); }
+.s-k { font-size: 12px; font-weight: 600; }
+.s-v { font-size: 28px; letter-spacing: -0.03em; }
+.s-k2 { font-size: 12px; color: var(--field-sub); }
+.s-brand { margin-top: 10px; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; writing-mode: vertical-rl; color: var(--field-sub); }
 .exit-band { margin-top: 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 52px; padding: 8px 14px; border-radius: var(--r); background: var(--stroke); color: var(--surface); text-decoration: none; font-weight: 700; }
 
 /* 시간대 막대 */
@@ -199,36 +208,43 @@ dialog.help::backdrop { background: rgba(10, 30, 24, .55); }
       <button type="button" class="icon-btn help-btn" aria-label="사용법 보기" aria-haspopup="dialog">?</button>
     </header>
 
-    <section class="ticket" aria-label="이날의 답">
-      <div class="ticket-head">
-        <p class="what" id="what"></p>
-        <p class="live" id="live-line" aria-live="polite" hidden></p>
+    <details class="change" id="change">
+      <summary>공연장·날짜·시각 바꾸기</summary>
+      <div class="pick">
+        <h2 id="h-venue">어느 공연장이에요?</h2>
+        <div class="chips" id="venues" role="group" aria-labelledby="h-venue"></div>
       </div>
-      <details class="change" id="change">
-        <summary>공연장·날짜·시각 바꾸기</summary>
-        <div class="pick">
-          <h2 id="h-venue">어느 공연장이에요?</h2>
-          <div class="chips" id="venues" role="group" aria-labelledby="h-venue"></div>
+      <div class="pick">
+        <h2 id="h-date">언제 가세요?</h2>
+        <div class="dates" id="dates" role="group" aria-labelledby="h-date"></div>
+      </div>
+      <div class="pick">
+        <h2 id="h-start">티켓에 적힌 시작 시각</h2>
+        <div class="times" id="times" role="group" aria-labelledby="h-start"></div>
+        <label class="check" for="rain"><input id="rain" type="checkbox">비가 온대요</label>
+      </div>
+    </details>
+    <section class="ticket" aria-label="이날의 안내표">
+      <div class="t-main">
+        <div class="t-top"><span class="t-kind">공연 날 안내표</span><span class="t-no num" id="ticket-no"></span></div>
+        <p class="t-venue big" id="t-venue"></p>
+        <p class="what num" id="what"></p>
+        <div class="t-answer" aria-live="polite">
+          <span class="t-icon" id="t-icon" aria-hidden="true"></span>
+          <h3 class="big" id="answer-title"></h3>
         </div>
-        <div class="pick">
-          <h2 id="h-date">언제 가세요?</h2>
-          <div class="dates" id="dates" role="group" aria-labelledby="h-date"></div>
-        </div>
-        <div class="pick">
-          <h2 id="h-start">티켓에 적힌 시작 시각</h2>
-          <div class="times" id="times" role="group" aria-labelledby="h-start"></div>
-          <label class="check" for="rain"><input id="rain" type="checkbox">비가 온대요</label>
-        </div>
-
-      </details>
-      <div class="perf" aria-hidden="true"></div>
-      <div class="answer" aria-live="polite">
-        <h3 class="big" id="answer-title"></h3>
         <p class="sub" id="answer-sub"></p>
         <div class="maplinks" id="maplinks" hidden>
-          <a href="https://map.naver.com/p/search/%EC%98%AC%EB%A6%BC%ED%94%BD%EA%B3%B5%EC%9B%90%EC%97%AD" target="_blank" rel="noopener">네이버 지도 길 찾기 ↗</a>
-          <a href="https://map.kakao.com/?q=%EC%98%AC%EB%A6%BC%ED%94%BD%EA%B3%B5%EC%9B%90%EC%97%AD" target="_blank" rel="noopener">카카오맵 길 찾기 ↗</a>
+          <a href="https://map.naver.com/p/search/%EC%98%AC%EB%A6%BC%ED%94%BD%EA%B3%B5%EC%9B%90%EC%97%AD" target="_blank" rel="noopener">네이버 지도 ↗</a>
+          <a href="https://map.kakao.com/?q=%EC%98%AC%EB%A6%BC%ED%94%BD%EA%B3%B5%EC%9B%90%EC%97%AD" target="_blank" rel="noopener">카카오맵 ↗</a>
         </div>
+        <p class="live" id="live-line" aria-live="polite" hidden></p>
+      </div>
+      <div class="t-stub" id="stub">
+        <span class="s-k" id="stub-k"></span>
+        <span class="s-v big num" id="stub-v"></span>
+        <span class="s-k2 num" id="stub-k2"></span>
+        <span class="s-brand" aria-hidden="true">덜붐빌때</span>
       </div>
     </section>
     <a class="exit-band" id="exit-band" href="#exit" hidden>공연 끝났나요? 나가기 안내 보기 <span aria-hidden="true">→</span></a>
@@ -447,20 +463,35 @@ function renderPickers() {
     onclick: () => { state.startHour = h; state.startMinute = 0; update(); } })));
   $('rain').checked = state.rain;
 }
+const ICONS = {   // 차·지하철 그림 (선 아이콘)
+  car: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M3 13l2-6h14l2 6v4H3z"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/></svg>',
+  subway: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 11h14M9 21l-2-4M15 21l2-4"/><circle cx="9" cy="14" r="0.8"/><circle cx="15" cy="14" r="0.8"/></svg>',
+};
 function renderAnswer(c) {
-  const a = c.advice, d = new Date(state.date + 'T00:00:00');
-  $('what').textContent = `${d.getMonth() + 1}월 ${d.getDate()}일 (${WK[d.getDay()]}) · ${venue().name} · ${pad2(state.startHour)}:00 공연`;
+  const a = c.advice, e = c.exit, d = new Date(state.date + 'T00:00:00');
+  $('ticket-no').textContent = `No. ${pad2(d.getMonth() + 1)}${pad2(d.getDate())}-${pad2(state.startHour)}${pad2(state.startMinute)}`;
+  $('t-venue').textContent = venue().name;
+  $('what').textContent = `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()} (${WK[d.getDay()]}) · ${pad2(state.startHour)}:00 공연`;
+  $('t-icon').innerHTML = ICONS[a.mode];
   const busyFrom = a.firstVeryBusyHour !== null ? `${a.firstVeryBusyHour}시부터 주차장이 평소의 2배를 넘어요.` : '';
+  const leaveMin = e.endHour * 60 + e.endMinute + e.wait.minutes;
   if (a.mode === 'car') {
     $('answer-title').textContent = '차로 와도 돼요';
     $('answer-sub').textContent = `${pad2(a.arriveHour)}:00 전에 들어오세요. ` +
       (busyFrom || `시작 1시간 전 주차장은 평소의 ${times(c.idx[state.startHour - 1])} 정도예요.`);
+    $('stub-k').textContent = '도착';
+    $('stub-v').textContent = pad2(a.arriveHour) + ':00';
+    $('stub-k2').textContent = e.showRatios ? `출차 ${pad2(Math.floor(leaveMin / 60) % 24)}:${pad2(leaveMin % 60)}` : `끝 ${e.endLabel.replace(' (다음 날)', '')}`;
   } else {
     $('answer-title').textContent = '지하철을 권해요';
     $('answer-sub').textContent = a.arriveHour !== null
       ? `그래도 차로 온다면 ${pad2(a.arriveHour)}:00 전에 들어오세요. ${busyFrom}`
       : '시작 전 내내 주차장이 평소의 2배를 넘어요.';
+    $('stub-k').textContent = '차라면 도착';
+    $('stub-v').textContent = a.arriveHour !== null ? pad2(a.arriveHour) + ':00' : '—';
+    $('stub-k2').textContent = '지하철 추천';
   }
+  $('stub').setAttribute('aria-label', `${$('stub-k').textContent} ${$('stub-v').textContent}, ${$('stub-k2').textContent}`);
   $('maplinks').hidden = a.mode !== 'subway';
 }
 function renderBars(c) {

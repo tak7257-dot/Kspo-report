@@ -48,6 +48,8 @@ const noSideScroll = page => page.evaluate(() => document.documentElement.scroll
       await page.click('button[data-start="18"]');
       check(`${name}: 주말 18시 → 지하철`, (await text(page, '#answer-title')).includes('지하철'));
       check(`${name}: 차라면 15:00`, (await text(page, '#answer-sub')).includes('15:00'));
+      check(`${name}: 꼬리표에 도착 15:00`, (await text(page, '#stub')).includes('15:00'));
+      check(`${name}: 표 번호는 날짜·시각`, (await text(page, '#ticket-no')).includes('1128-1800'));
       await page.click('button[data-start="16"]');
       check(`${name}: 주말 16시 → 차`, (await text(page, '#answer-title')).includes('차'));
       check(`${name}: 가로 스크롤 없음`, await noSideScroll(page));
