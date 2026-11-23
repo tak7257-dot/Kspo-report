@@ -691,7 +691,7 @@ function dayCard(c, i) {
           el('span', { text: `${venue().name} 3D를 끌어서 둘러보세요.` })));
   } else if (i === 2) {
     box.push(el('div', { class: 'card' }, el('span', { class: 'k', text: `${e.endLabel}쯤 끝나요 (공연 시간 중앙값 ${c.showMinutes}분)` }),
-      el('span', { class: 'v big', text: e.showRatios ? '끝나자마자 나가면 가장 몰리는 때' : '끝나는 시각에 출차가 몰려요' }),
+      el('span', { class: 'v big', text: e.showRatios ? '끝나자마자 나가면 가장 몰리는 때' : '공연이 끝나요' }),
       el('span', { text: e.showRatios ? `${e.wait.minutes}분 쉬었다 나가면 같이 나가는 차가 ${Math.round(e.wait.ratio * 100)}%로 줄어요.` : '저녁 공연 기록만 있어 줄어드는 비율은 보여 드리지 않아요.' })));
   } else {
     box.push(el('div', { class: 'card ans' }, el('span', { class: 'k', text: e.showRatios ? `${e.wait.minutes}분만 쉬었다 나가면` : '나갈 때' }),
@@ -750,7 +750,7 @@ function renderPlan() {
   const arr = a.mode === 'car' ? a.arriveHour : state.startHour - 1;
   const EV = {};
   const add = (h, ev) => { (EV[h] = EV[h] || []).push(ev); };
-  add(arr, a.mode === 'car' ? { t: pad2(arr) + ':00', b: '도착 · 주차', s: a.firstVeryBusyHour !== null ? `${a.firstVeryBusyHour}시부터 주차장이 매우 붐벼요.` : '주차장이 아직 덜 붐벼요.', key: true }
+  add(arr, a.mode === 'car' ? { t: pad2(arr) + ':00', b: '도착 · 주차', s: a.firstVeryBusyHour !== null ? `${a.firstVeryBusyHour}시부터 주차장이 매우 붐벼요.` : `그때 주차장은 평소의 ${times(a.indexAtArrive)} 정도예요.`, key: true }
     : { t: pad2(arr) + ':00', b: '지하철로 도착', s: '이날은 주차장이 일찍부터 매우 붐벼요.', key: true });
   add(state.startHour, { t: pad2(state.startHour) + ':00', b: '공연 시작' + (state.venue === 'kspo-dome' ? ' · ' + DATA.seats.views.find(v => v.id === seatId).label : ''), s: '' });
   add(e.endHour + (e.nextDay ? 24 : 0), { t: e.endLabel, b: `공연 끝 (약 ${c.showMinutes}분)`, s: e.showRatios ? '끝나자마자 나가면 출차가 가장 몰려요.' : '' });
@@ -771,7 +771,7 @@ function renderPlan() {
 }
 $('ics-btn').addEventListener('click', () => {
   const c = compute();
-  const ics = Logic.buildIcs({ dateISO: state.date, venueName: venue().name, arriveHour: c.advice.arriveHour, startHour: state.startHour, startMinute: state.startMinute, showMinutes: c.showMinutes, mode: c.advice.mode });
+  const ics = Logic.buildIcs({ dateISO: state.date, venueName: venue().name, arriveHour: c.advice.arriveHour, startHour: state.startHour, startMinute: state.startMinute, showMinutes: c.showMinutes, mode: c.advice.mode, showRatios: c.exit.showRatios });
   const a = $('ics-link');
   if (a.href.startsWith('blob:')) URL.revokeObjectURL(a.href);
   a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' }));

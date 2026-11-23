@@ -43,8 +43,9 @@
     for (var h = o.startHour - 1; h >= EARLIEST_HOUR; h--) {
       if (idx[h] < VERY_BUSY) { arrive = h; break; }
     }
+    // 권장 도착 뒤(도착 시각이 없으면 10시부터) 시작 전까지, 처음으로 평소의 2배를 넘는 시각
     var firstVery = null;
-    for (var k = EARLIEST_HOUR; k < o.startHour; k++) {
+    for (var k = (arrive === null ? EARLIEST_HOUR : arrive + 1); k < o.startHour; k++) {
       if (idx[k] >= VERY_BUSY) { firstVery = k; break; }
     }
     var lead = arrive === null ? null : o.startHour - arrive;
@@ -123,7 +124,7 @@
     var from = (o.mode === 'car' && o.arriveHour !== null) ? o.arriveHour * 60 : start - 60;
     var now = (o.now || new Date()).toISOString().replace(/[-:]/g, '').replace(/\.\d+Z$/, 'Z');
     var note = o.mode === 'car'
-      ? '차는 ' + pad2(o.arriveHour) + ':00 전 도착. 끝나고 20분 쉬었다 나가면 덜 막혀요.'
+      ? '차는 ' + pad2(o.arriveHour) + ':00 전 도착.' + (o.showRatios ? ' 끝나고 20분 쉬었다 나가면 덜 막혀요.' : '')
       : '이날은 지하철을 권해요.';
     var lines = [
       'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//deolbumbilttae//KO', 'CALSCALE:GREGORIAN',

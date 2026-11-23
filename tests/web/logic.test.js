@@ -116,3 +116,14 @@ test('dayType: 2028 설날(1/26)·총선(4/12)·추석 대체공휴일(10/5)은 
   assert.equal(L.dayType('2028-10-05'), 'weekend');
   assert.equal(L.dayType('2028-10-06'), 'weekday');
 });
+
+// ── 최종 검토에서 나온 것 ──
+test('주말 21시: 권장 도착 20시 뒤엔 매우 붐비는 시각이 없음 (16시 문장이 붙지 않게)', () => {
+  const r = adv(P.weekend, 21);
+  assert.deepEqual([r.mode, r.arriveHour, r.firstVeryBusyHour], ['car', 20, null]);
+});
+test('buildIcs: 낮 공연(비율 없음)엔 20분 출차 안내를 넣지 않음', () => {
+  const s = L.buildIcs({ ...ICS_BASE, startHour: 14, arriveHour: 13, mode: 'car', showRatios: false });
+  assert.ok(!s.includes('20분'));
+  assert.ok(L.buildIcs({ ...ICS_BASE, arriveHour: 15, mode: 'car', showRatios: true }).includes('20분'));
+});
