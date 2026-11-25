@@ -192,6 +192,28 @@ const noSideScroll = page => page.evaluate(() => document.documentElement.scroll
       check('실시간: 출처와 장기 주차 유의사항', (await text(page, '#s-exit')).includes('장기 주차'));
       await page.context().close();
     }
+    // ── 오늘 예보 (실시간 보정) ──
+    {
+      // 토 14:10, 지금 1,800대 → 2025년 공연 날 이 시각(약 2,160대)보다 적음 → 18시 공연이어도 17:00 전 도착이면 차 가능
+      const page = await open(browser, devices['iPhone 13'], '[{"parking_sum":1800}]', '#home', false, new Date('2026-11-28T14:10:00+09:00'));
+      await page.click('button[data-date="2026-11-28"]');
+      await page.click('button[data-start="18"]');
+      await page.waitForSelector('#today:not([hidden])', { timeout: 10000 }).catch(() => {});
+      const t = await page.locator('#today').innerText().catch(() => '');
+      check('오늘 예보: 줄 표시', await page.locator('#today').isVisible(), t);
+      check('오늘 예보: 평소보다 적다는 % 표시', /\d+% 적어요/.test(t), t);
+      check('오늘 예보: 오늘 기준 권장 도착 17:00', t.includes('17:00'), t);
+      check('오늘 예보: 페이지 오류 없음', page.errors.length === 0, page.errors.join(' | '));
+      await page.context().close();
+    }
+    {
+      // 오전에는 예보를 내지 않음 (13시 전)
+      const page = await open(browser, devices['iPhone 13'], '[{"parking_sum":1800}]', '#home', false, new Date('2026-11-28T11:00:00+09:00'));
+      await page.click('button[data-date="2026-11-28"]');
+      await page.waitForTimeout(1500);
+      check('오늘 예보: 13시 전엔 숨김', await page.locator('#today').isHidden());
+      await page.context().close();
+    }
     // (다음 작업의 확인은 이 줄 위에 이어 붙인다)
   } finally {
     await browser.close();

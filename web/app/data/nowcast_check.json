@@ -1,0 +1,91 @@
+{
+ "설명": "2025년 공연 날로 되짚어 본 오늘 예보 오차(중앙값). err_past = 과거 중앙값만, err_corrected = 실시간 편차로 보정",
+ "weekday": [
+  {
+   "now": 13,
+   "target": 17,
+   "days": 24,
+   "err_past": 0.085,
+   "err_corrected": 0.06
+  },
+  {
+   "now": 14,
+   "target": 18,
+   "days": 24,
+   "err_past": 0.156,
+   "err_corrected": 0.106
+  },
+  {
+   "now": 15,
+   "target": 18,
+   "days": 24,
+   "err_past": 0.156,
+   "err_corrected": 0.078
+  },
+  {
+   "now": 16,
+   "target": 19,
+   "days": 24,
+   "err_past": 0.198,
+   "err_corrected": 0.064
+  },
+  {
+   "now": 17,
+   "target": 20,
+   "days": 24,
+   "err_past": 0.207,
+   "err_corrected": 0.053
+  },
+  {
+   "now": 12,
+   "target": 18,
+   "days": 24,
+   "err_past": 0.156,
+   "err_corrected": 0.123
+  }
+ ],
+ "weekend": [
+  {
+   "now": 13,
+   "target": 17,
+   "days": 74,
+   "err_past": 0.172,
+   "err_corrected": 0.159
+  },
+  {
+   "now": 14,
+   "target": 18,
+   "days": 74,
+   "err_past": 0.193,
+   "err_corrected": 0.174
+  },
+  {
+   "now": 15,
+   "target": 18,
+   "days": 74,
+   "err_past": 0.193,
+   "err_corrected": 0.134
+  },
+  {
+   "now": 16,
+   "target": 19,
+   "days": 74,
+   "err_past": 0.256,
+   "err_corrected": 0.156
+  },
+  {
+   "now": 17,
+   "target": 20,
+   "days": 74,
+   "err_past": 0.38,
+   "err_corrected": 0.214
+  },
+  {
+   "now": 12,
+   "target": 18,
+   "days": 74,
+   "err_past": 0.193,
+   "err_corrected": 0.209
+  }
+ ]
+}
