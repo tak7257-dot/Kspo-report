@@ -45,9 +45,11 @@ const noSideScroll = page => page.evaluate(() => document.documentElement.scroll
       check(`${name}: 주말 18시 → 지하철`, (await text(page, '#answer-title')).includes('지하철'));
       check(`${name}: 차라면 15:00`, (await text(page, '#answer-sub')).includes('15:00'));
       check(`${name}: 꼬리표에 도착 15:00`, (await text(page, '#stub')).includes('15:00'));
+      check(`${name}: 차라면 주차비 19,200원 (15:00~20:20)`, (await text(page, '#fee')).includes('19,200원'));
       check(`${name}: 표 번호는 날짜·시각`, (await text(page, '#ticket-no')).includes('1128-1800'));
       await page.click('button[data-start="16"]');
       check(`${name}: 주말 16시 → 차`, (await text(page, '#answer-title')).includes('차'));
+      check(`${name}: 16시 공연 주차비 10,800원 (15:00~18:00)`, (await text(page, '#fee')).includes('10,800원'));
       check(`${name}: 가로 스크롤 없음`, await noSideScroll(page));
       check(`${name}: 차 답이면 지도 링크 숨김`, await page.locator('#maplinks').isHidden());
       check(`${name}: 공연 날이 아니면 나가기 띠 숨김`, await page.locator('#exit-band').isHidden());

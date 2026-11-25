@@ -82,6 +82,8 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .t-icon { flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--field); color: var(--field-ink); }
 .t-answer h3 { font-size: clamp(24px, 7vw, 30px); }
 .ticket .sub { font-size: 14.5px; line-height: 1.5; }
+.fee { margin-top: 2px; font-size: 13.5px; color: var(--muted); }
+.fee b { color: var(--ink); font-size: 15px; }
 .live { font-size: 13px; color: var(--muted); margin-top: 4px; }
 .live b { color: var(--ink); }
 .maplinks { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
@@ -236,6 +238,7 @@ dialog.help::backdrop { background: rgba(10, 30, 24, .55); }
           <h3 class="big" id="answer-title"></h3>
         </div>
         <p class="sub" id="answer-sub"></p>
+        <p class="fee num" id="fee" hidden></p>
         <div class="maplinks" id="maplinks" hidden>
           <a href="https://map.naver.com/p/search/%EC%98%AC%EB%A6%BC%ED%94%BD%EA%B3%B5%EC%9B%90%EC%97%AD" target="_blank" rel="noopener">네이버 지도 ↗</a>
           <a href="https://map.kakao.com/?q=%EC%98%AC%EB%A6%BC%ED%94%BD%EA%B3%B5%EC%9B%90%EC%97%AD" target="_blank" rel="noopener">카카오맵 ↗</a>
@@ -374,6 +377,11 @@ dialog.help::backdrop { background: rgba(10, 30, 24, .55); }
         <li>평소: 같은 달, 같은 요일 유형(평일 또는 주말·공휴일), 같은 시각에 공연이 없던 날.</li>
       </ul>
     </section>
+    <section id="facts-sec" hidden>
+      <h3>주차장 기본 정보</h3>
+      <ul class="plain" id="facts"></ul>
+      <p class="small" style="margin-top: 6px">출처: 한국체육산업개발 「자주 묻는 질문정보」(공공데이터포털)</p>
+    </section>
     <section>
       <h3>알아 두세요</h3>
       <ul class="plain">
@@ -506,8 +514,19 @@ function renderAnswer(c) {
     $('stub-v').textContent = a.arriveHour !== null ? pad2(a.arriveHour) + ':00' : '—';
     $('stub-k2').textContent = '지하철 추천';
   }
+  renderFee(c);
   $('stub').setAttribute('aria-label', `${$('stub-k').textContent} ${$('stub-v').textContent}, ${$('stub-k2').textContent}`);
   $('maplinks').hidden = a.mode !== 'subway';
+}
+// 주차비 예상: 「자주 묻는 질문정보」의 요금(10분당 600원)으로 도착~출차 시간을 계산
+function renderFee(c) {
+  const F = DATA.facts || {}, a = c.advice, e = c.exit, box = $('fee');
+  if (!F.fee_per_10min || a.arriveHour === null) { box.hidden = true; return; }
+  const end = e.endHour * 60 + e.endMinute + (e.nextDay ? 1440 : 0);
+  const out = end + (e.showRatios ? e.wait.minutes : 0);
+  const fee = Logic.parkingFee({ inMinute: a.arriveHour * 60, outMinute: out, feePer10: F.fee_per_10min });
+  box.hidden = false; box.replaceChildren(a.mode === 'car' ? '주차비 약 ' : '차라면 주차비 약 ', el('b', { text: fmt(fee) + '원' }),
+    ` · 10분 ${fmt(F.fee_per_10min)}원` + (F.discount_pct ? `, 경차·장애인 등 ${F.discount_pct}% 할인` : ''));
 }
 function renderBars(c) {
   const g = $('bars'); g.replaceChildren();
@@ -809,6 +828,17 @@ $('share-btn').addEventListener('click', () => {
   if (navigator.clipboard) navigator.clipboard.writeText(t).then(() => { box.textContent = t + '  (복사했어요)'; }, () => {});
 });
 
+function renderFacts(F) {   // 사용법 안 '주차장 기본 정보' — FAQ에서 찾은 값만 보여 준다
+  const li = [];
+  if (F.capacity) li.push(`주차장은 약 ${fmt(F.capacity)}대 규모예요.` + (F.booths && F.booths.length ? ` 주차 매표소: ${F.booths.join(', ')}.` : ''));
+  if (F.fee_per_10min) li.push(`요금은 나갈 때 내는 후불제, 10분당 ${fmt(F.fee_per_10min)}원. ${F.discount_who ? F.discount_who + ' 차량은 ' + F.discount_pct + '% 할인.' : ''}`);
+  if (F.car_open !== null && F.car_open !== undefined) li.push(`차량 출입은 ${F.car_open}시~${F.car_close}시예요 (야간 행사 날은 예외).`);
+  if (F.spare_minutes) li.push(`공연 시작이 가까우면 공원 주변이 막혀요. ${F.spare_minutes / 60}시간쯤 여유를 두세요.`);
+  if (F.walk_minutes) li.push(`주차 후 공연장까지 걸어서 ${F.walk_minutes}분 정도예요.`);
+  $('facts').replaceChildren(...li.map(t => el('li', { text: t })));
+  $('facts-sec').hidden = li.length === 0;
+}
+
 /* ── 사용법 ── */
 for (const b of document.querySelectorAll('.help-btn')) b.addEventListener('click', () => { const d = $('help'); d.showModal ? d.showModal() : d.setAttribute('open', ''); });
 $('help-x').onclick = () => $('help').close();
@@ -832,9 +862,10 @@ function route() {
 }
 
 const load = f => fetch('data/' + f).then(r => { if (!r.ok) throw new Error(f); return r.json(); });
-Promise.all([load('show_profile.json'), load('exit_profile.json'), load('live_baseline.json'), load('seat_views.json')])
-  .then(([show, exit, base, seats]) => {
-    Object.assign(DATA, { show, exit, base, seats });
+Promise.all([load('show_profile.json'), load('exit_profile.json'), load('live_baseline.json'), load('seat_views.json'), load('park_facts.json').catch(() => ({}))])
+  .then(([show, exit, base, seats, facts]) => {
+    Object.assign(DATA, { show, exit, base, seats, facts });
+    renderFacts(facts);
     $('help-days').textContent = `2025년 공연 날 ${show.공연일수}일 기록의 평균으로 본 예상이라 실제와 다를 수 있어요.`;
     $('change').open = firstVisit;   // 처음 온 사람은 고르기부터, 다시 온 사람은 답부터
     route(); addEventListener('hashchange', route);
