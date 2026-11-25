@@ -214,6 +214,22 @@ const noSideScroll = page => page.evaluate(() => document.documentElement.scroll
       check('오늘 예보: 13시 전엔 숨김', await page.locator('#today').isHidden());
       await page.context().close();
     }
+    // ── 막대 눌러 그 시각에 도착하면? ──
+    {
+      const page = await open(browser, devices['iPhone 13']);
+      await page.click('button[data-date="2026-11-28"]');
+      await page.click('button[data-start="18"]');
+      check('막대: 시각마다 누를 수 있는 버튼', (await page.locator('#bar-hits button').count()) === 14);
+      await page.click('#bar-hits button[data-hour="16"]');
+      const t = await text(page, '#bar-detail');
+      check('막대: 16시 도착 → 2.0배·매우 붐빔', t.includes('16:00') && t.includes('2.0배') && t.includes('매우 붐빔'), t);
+      check('막대: 권장보다 1시간 늦음', t.includes('1시간 늦'), t);
+      check('막대: 주차비 15,600원', t.includes('15,600원'), t);
+      check('막대: 고른 막대 표시', (await page.locator('#bar-hits button[data-hour="16"]').getAttribute('aria-pressed')) === 'true');
+      check('막대: 가로 스크롤 없음', await noSideScroll(page));
+      check('막대: 페이지 오류 없음', page.errors.length === 0, page.errors.join(' | '));
+      await page.context().close();
+    }
     // (다음 작업의 확인은 이 줄 위에 이어 붙인다)
   } finally {
     await browser.close();

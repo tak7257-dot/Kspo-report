@@ -161,3 +161,18 @@ test('nowcast: 13시 전, 4시간보다 먼 예보, 시작 이후, 기준 없음
   assert.equal(L.nowcast({ ...o, nowHour: 18, startHour: 18 }), null);
   assert.equal(L.nowcast({ ...o, nowHour: 14, startHour: 18, base: { show_day: {} } }), null);
 });
+
+// ── 막대 눌러 "그 시각에 도착하면?" ──
+test('whatIf: 주말 18시 공연, 16시 도착 → 2.0배 매우 붐빔, 권장(15시)보다 1시간 늦음, 주차비 15,600원(16:00~20:20)', () => {
+  const advice = L.arrivalAdvice({ profile: P.weekend, startHour: 18, rain: false, rainFactor: 0.907 });
+  const exit = L.exitPlan({ startHour: 18, startMinute: 0, showMinutes: 120, decay: D });
+  const w = L.whatIf({ profile: P.weekend, rain: false, rainFactor: 0.907, hour: 16, startHour: 18, advice, exit, feePer10: 600 });
+  assert.deepEqual([w.index, w.level, w.lateHours, w.afterStart, w.fee], [204, 'very', 1, false, 15600]);
+});
+test('whatIf: 권장보다 이르면 lateHours 음수, 시작 이후 시각은 afterStart', () => {
+  const advice = L.arrivalAdvice({ profile: P.weekend, startHour: 18, rain: false, rainFactor: 0.907 });
+  const exit = L.exitPlan({ startHour: 18, startMinute: 0, showMinutes: 120, decay: D });
+  const o = { profile: P.weekend, rain: false, rainFactor: 0.907, startHour: 18, advice, exit, feePer10: 600 };
+  assert.equal(L.whatIf({ ...o, hour: 13 }).lateHours, -2);
+  assert.equal(L.whatIf({ ...o, hour: 19 }).afterStart, true);
+});

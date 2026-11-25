@@ -184,7 +184,22 @@
     };
   }
 
+  // 막대를 눌러 고른 시각에 도착한다면: 그때 혼잡 지수·단계, 권장 도착과의 차이(시간), 출차까지 주차비
+  function whatIf(o) {
+    var v = o.profile[o.hour] * (o.rain ? o.rainFactor : 1);
+    var e = o.exit;
+    var out = e.endHour * 60 + e.endMinute + (e.nextDay ? 1440 : 0) + (e.showRatios ? e.wait.minutes : 0);
+    return {
+      index: Math.round(v),
+      level: levelOf(v),
+      lateHours: o.advice.arriveHour === null ? null : o.hour - o.advice.arriveHour,
+      afterStart: o.hour >= o.startHour,
+      fee: o.feePer10 ? parkingFee({ inMinute: o.hour * 60, outMinute: out, feePer10: o.feePer10 }) : null
+    };
+  }
+
   return {
+    whatIf: whatIf,
     nowcast: nowcast,
     parkingFee: parkingFee,
     buildIcs: buildIcs, shareText: shareText,

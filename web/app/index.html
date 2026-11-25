@@ -109,6 +109,14 @@ button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visibl
 .chart { margin-top: 12px; padding: 20px; background: var(--surface); border-radius: var(--r-lg); display: flex; flex-direction: column; gap: 10px; }
 .chart h2 { font-size: 18px; font-weight: 700; }
 .chart svg { width: 100%; height: auto; display: block; }
+.bars-box { position: relative; }
+.bar-hits { position: absolute; top: 0; bottom: 12%; left: 9.5%; right: 1.7%; display: grid; grid-template-columns: repeat(14, minmax(0, 1fr)); }
+.bar-hits button { border: 0; background: transparent; padding: 0; min-height: 44px; border-radius: 6px; }
+.bar-hits button:active { background: rgba(127, 127, 127, .12); }
+.bar-detail { padding: 14px 16px; border-radius: 12px; background: var(--fill); display: flex; flex-direction: column; gap: 4px; font-size: 14px; color: var(--sub); }
+.bar-detail strong { font-size: 16px; color: var(--ink); }
+.bar-detail .lv { display: inline-flex; align-items: center; gap: 6px; color: var(--ink); font-weight: 600; }
+.bar-detail .lv i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
 .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--sub); }
 .legend span { display: inline-flex; align-items: center; gap: 6px; }
 .legend i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
@@ -262,12 +270,17 @@ dialog.help::backdrop { background: rgba(0, 0, 0, .45); }
 
     <section class="chart" aria-labelledby="h-chart">
       <h2 id="h-chart">시간대별 주차장, 평소와 비교</h2>
-      <svg id="bars" viewBox="0 0 358 150" role="img"></svg>
+      <p class="small">막대를 누르면 그 시각에 도착할 때를 보여 드려요.</p>
+      <div class="bars-box">
+        <svg id="bars" viewBox="0 0 358 150" role="img"></svg>
+        <div class="bar-hits" id="bar-hits" role="group" aria-label="도착 시각 골라 보기"></div>
+      </div>
       <div class="legend" aria-hidden="true">
         <span><i style="background: var(--lv-normal); border: 1px solid var(--line)"></i>보통</span>
         <span><i style="background: var(--lv-busy)"></i>붐빔 (평소의 1.3배↑)</span>
         <span><i style="background: var(--lv-very)"></i>매우 붐빔 (2배↑)</span>
       </div>
+      <div class="bar-detail" id="bar-detail" aria-live="polite" hidden></div>
       <p class="small" id="chart-src"></p>
     </section>
 
@@ -555,9 +568,39 @@ function renderBars(c) {
         sv('text', { x: x + (bw - 4) / 2, y: y(v) - 6, 'text-anchor': 'middle', 'font-size': 11, 'font-weight': 700, fill: 'var(--ink)' }, tag));
     }
   }
+  if (selHour !== null) {   // 고른 막대: 세로 띠로 표시
+    const x = X0 + (selHour - H0) * bw;
+    g.insertBefore(sv('rect', { x, y: 4, width: bw, height: Y0 - 2, rx: 4, fill: 'var(--ink)', 'fill-opacity': 0.08 }), g.firstChild);
+  }
+  renderBarHits(c, H0, H1);
   g.setAttribute('aria-label', `${c.kind === 'weekend' ? '주말·공휴일' : '평일'} 공연 날 10시부터 23시까지 주차장 혼잡. ` +
     (c.advice.arriveHour !== null ? `권장 도착 ${c.advice.arriveHour}시, ` : '') + `${state.startHour}시 시작.`);
   $('chart-src').textContent = `2025년 공연 날 ${DATA.show.공연일수}일 평균. 평소 = 같은 달·같은 요일 유형·같은 시각에 공연이 없던 날.` + (state.rain ? ` 비 온 시간 기록(약 ${Math.round((1 - DATA.show.rain_factor) * 100)}% 적음)을 반영했어요.` : '');
+}
+// 막대 위에 겹친 투명 버튼: 누르면 "그 시각에 도착하면?"
+function renderBarHits(c, H0, H1) {
+  const hits = [];
+  for (let h = H0; h <= H1; h++) hits.push(el('button', { type: 'button', 'data-hour': String(h), 'aria-pressed': String(h === selHour), 'aria-label': `${h}시에 도착하면`,
+    onclick: () => { selHour = selHour === h ? null : h; renderBars(compute()); } }));
+  $('bar-hits').replaceChildren(...hits);
+  renderBarDetail(c);
+}
+function renderBarDetail(c) {
+  const box = $('bar-detail');
+  if (selHour === null) { box.hidden = true; return; }
+  const F = DATA.facts || {};
+  const w = Logic.whatIf({ profile: DATA.show.profile[c.kind], rain: state.rain, rainFactor: DATA.show.rain_factor, hour: selHour,
+    startHour: state.startHour, advice: c.advice, exit: c.exit, feePer10: F.fee_per_10min });
+  const word = { normal: '보통', busy: '붐빔', very: '매우 붐빔' }[w.level];
+  const rel = w.afterStart ? '공연 시작 뒤예요.'
+    : w.lateHours === null ? '' : w.lateHours === 0 ? '권장 도착 시각이에요.'
+    : w.lateHours > 0 ? `권장 도착(${pad2(c.advice.arriveHour)}:00)보다 ${w.lateHours}시간 늦어요.` : `권장 도착(${pad2(c.advice.arriveHour)}:00)보다 ${-w.lateHours}시간 일러요.`;
+  const e = c.exit, out = e.endHour * 60 + e.endMinute + (e.showRatios ? e.wait.minutes : 0);
+  box.hidden = false;
+  box.replaceChildren(el('strong', { text: `${pad2(selHour)}:00에 도착하면` }),
+    el('span', { class: 'lv' }, el('i', { style: `background: var(--lv-${w.level})` }), `주차장 평소의 ${times(w.index)}, ${word}`),
+    rel ? el('span', { text: rel }) : '',
+    w.fee && !w.afterStart ? el('span', { text: `주차비 약 ${fmt(w.fee)}원 (출차 ${pad2(Math.floor(out / 60) % 24)}:${pad2(out % 60)}까지)` }) : '');
 }
 function renderHome() {
   const c = compute();
@@ -568,7 +611,8 @@ function renderHome() {
   if (state.date === today()) Live.start(onLive); 
   renderLive();
 }
-function update() { save(); renderHome(); }
+let selHour = null;   // 막대를 눌러 고른 도착 시각 (조건을 바꾸면 지움)
+function update() { selHour = null; save(); renderHome(); }
 $('rain').addEventListener('change', e => { state.rain = e.target.checked; update(); });
 
 /* ── 실시간 줄 ── */
