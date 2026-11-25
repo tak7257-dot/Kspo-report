@@ -137,3 +137,27 @@ test('parkingFee: 10분 미만도 10분으로, 자정 넘김도 계산', () => {
   assert.equal(L.parkingFee({ inMinute: 600, outMinute: 601, feePer10: 600 }), 600);
   assert.equal(L.parkingFee({ inMinute: 21 * 60, outMinute: 24 * 60 + 20, feePer10: 600 }), 12000);
 });
+
+// ── 오늘 예보 (실시간 보정) ──
+const BASE = { show_day: { all: { weekend: Array.from({ length: 24 }, (_, h) => 1000 + h * 100), weekday: Array(24).fill(1500) } } };
+test('nowcast: 지금 2,300대, 2025년 같은 시각 공연 날 2,000대(가정) → +15%', () => {
+  const t = { show_day: { all: { weekend: Array(24).fill(2000), weekday: Array(24).fill(2000) } } };
+  const n = L.nowcast({ live: 2300, nowHour: 14, month: 11, dayKind: 'weekend', base: t, profile: P.weekend, startHour: 18, rainFactor: 0.907, rain: false });
+  assert.equal(n.deviationPct, 15);
+});
+test('nowcast: 오늘이 평소보다 10% 한산하면 주말 18시 공연도 차 가능(16시 도착)으로 바뀜', () => {
+  const t = { show_day: { all: { weekend: Array(24).fill(2000), weekday: Array(24).fill(2000) } } };
+  const n = L.nowcast({ live: 1800, nowHour: 14, month: 11, dayKind: 'weekend', base: t, profile: P.weekend, startHour: 18, rainFactor: 0.907, rain: false });
+  assert.deepEqual([n.advice.mode, n.advice.arriveHour], ['car', 16]);
+});
+test('nowcast: 시작 1시간 전 예상 대수 = 지금 × (기준 17시 / 기준 14시)', () => {
+  const n = L.nowcast({ live: 2600, nowHour: 14, month: 11, dayKind: 'weekend', base: BASE, profile: P.weekend, startHour: 18, rainFactor: 0.907, rain: false });
+  assert.deepEqual([n.targetHour, n.predicted], [17, Math.round(2600 * 2700 / 2400)]);
+});
+test('nowcast: 13시 전, 4시간보다 먼 예보, 시작 이후, 기준 없음이면 null', () => {
+  const o = { live: 2000, month: 11, dayKind: 'weekend', base: BASE, profile: P.weekend, rainFactor: 0.907, rain: false };
+  assert.equal(L.nowcast({ ...o, nowHour: 12, startHour: 16 }), null);
+  assert.equal(L.nowcast({ ...o, nowHour: 13, startHour: 19 }), null);   // 목표 18시까지 5시간
+  assert.equal(L.nowcast({ ...o, nowHour: 18, startHour: 18 }), null);
+  assert.equal(L.nowcast({ ...o, nowHour: 14, startHour: 18, base: { show_day: {} } }), null);
+});

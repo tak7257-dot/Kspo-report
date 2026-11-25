@@ -164,7 +164,28 @@
     return Math.round(units * o.feePer10 * (1 - (o.discountPct || 0) / 100));
   }
 
+  // 오늘 예보 (실시간 보정): 지금 주차 대수가 2025년 공연 날 같은 시각보다 몇 % 많은지(편차)를 보고,
+  // 그 편차가 앞으로 4시간 이어진다고 보고 혼잡 지수와 권장 도착을 다시 계산한다.
+  // 2025년 공연 날로 되짚어 보니 13시 이후, 4시간 안쪽 예보에서 오차가 줄었다 (src/nowcast_check.py).
+  var NOW_MIN_HOUR = 13, NOW_MAX_LEAD = 4;
+  function nowcast(o) {
+    var target = o.startHour - 1;
+    if (o.nowHour < NOW_MIN_HOUR || o.nowHour >= o.startHour || target - o.nowHour > NOW_MAX_LEAD) return null;
+    var bNow = baseline(o.base, o.month, o.dayKind, o.nowHour), bT = baseline(o.base, o.month, o.dayKind, target);
+    if (bNow === null || bT === null) { bNow = baseline(o.base, 'all', o.dayKind, o.nowHour); bT = baseline(o.base, 'all', o.dayKind, target); }
+    if (!bNow || bT === null) return null;
+    var dev = o.live / bNow;
+    var prof = o.profile.map(function (v, h) { return (h >= o.nowHour && h <= o.nowHour + NOW_MAX_LEAD) ? v * dev : v; });
+    return {
+      deviationPct: Math.round((dev - 1) * 100),
+      targetHour: target,
+      predicted: Math.round(o.live * bT / bNow),
+      advice: arrivalAdvice({ profile: prof, startHour: o.startHour, rain: o.rain, rainFactor: o.rainFactor })
+    };
+  }
+
   return {
+    nowcast: nowcast,
     parkingFee: parkingFee,
     buildIcs: buildIcs, shareText: shareText,
     baseline: baseline,

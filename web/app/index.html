@@ -82,6 +82,8 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .t-icon { flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--field); color: var(--field-ink); }
 .t-answer h3 { font-size: clamp(24px, 7vw, 30px); }
 .ticket .sub { font-size: 14.5px; line-height: 1.5; }
+.today { margin-top: 6px; padding: 8px 10px; border-radius: var(--r); background: var(--field); color: var(--field-ink); font-size: 13.5px; line-height: 1.5; }
+.today b { font-size: 14.5px; }
 .fee { margin-top: 2px; font-size: 13.5px; color: var(--muted); }
 .fee b { color: var(--ink); font-size: 15px; }
 .live { font-size: 13px; color: var(--muted); margin-top: 4px; }
@@ -244,6 +246,7 @@ dialog.help::backdrop { background: rgba(10, 30, 24, .55); }
           <a href="https://map.kakao.com/?q=%EC%98%AC%EB%A6%BC%ED%94%BD%EA%B3%B5%EC%9B%90%EC%97%AD" target="_blank" rel="noopener">카카오맵 ↗</a>
         </div>
         <p class="live" id="live-line" aria-live="polite" hidden></p>
+        <p class="today" id="today" aria-live="polite" hidden></p>
       </div>
       <div class="t-stub" id="stub">
         <span class="s-k" id="stub-k"></span>
@@ -375,6 +378,7 @@ dialog.help::backdrop { background: rgba(10, 30, 24, .55); }
         <li>그 시각이 시작보다 2시간 넘게 이르면 지하철을 권해요.</li>
         <li>비가 오면 비 온 시간대의 기록만큼 줄여서 계산해요.</li>
         <li>평소: 같은 달, 같은 요일 유형(평일 또는 주말·공휴일), 같은 시각에 공연이 없던 날.</li>
+        <li id="help-nowcast">공연 당일 13시부터는 지금 주차 대수로 남은 4시간을 다시 계산한 "오늘 예보"를 보여 드려요.</li>
       </ul>
     </section>
     <section id="facts-sec" hidden>
@@ -556,6 +560,7 @@ function renderHome() {
   renderPickers(); renderAnswer(c); renderBars(c);
   $('to-seat').hidden = state.venue !== 'kspo-dome';
   renderBand(c);
+  renderToday();
   if (state.date === today()) Live.start(onLive); 
   renderLive();
 }
@@ -582,7 +587,23 @@ function renderLive() {
   ex.hidden = false; ex.innerHTML = '';
   ex.append('지금 주차장 ', el('b', { text: fmt(liveN) + '대' }), k !== null ? ` · 최근 10분 동안 ${fmt(k)}대 줄었어요` : '');
 }
-function onLive(n, samples) { liveN = n; liveSamples = samples; renderLive(); renderBand(); }
+// 오늘 예보: 공연 당일 13시 이후, 지금 대수로 남은 4시간 흐름을 보정해 권장 도착을 다시 계산
+function renderToday() {
+  const box = $('today');
+  if (liveN === null || state.date !== today() || !DATA.show) { box.hidden = true; return; }
+  const now = new Date(), c = compute();
+  const n = Logic.nowcast({ live: liveN, nowHour: now.getHours(), month: now.getMonth() + 1, dayKind: c.kind, base: DATA.base,
+    profile: DATA.show.profile[c.kind], startHour: state.startHour, rain: state.rain, rainFactor: DATA.show.rain_factor });
+  if (!n) { box.hidden = true; return; }
+  const a = n.advice, more = n.deviationPct >= 0;
+  const verdict = a.mode === 'car'
+    ? (a.arriveHour > now.getHours() ? `오늘 흐름이면 ${pad2(a.arriveHour)}:00 전에 들어오면 돼요.` : `오늘 흐름으로는 권장 도착(${pad2(a.arriveHour)}:00)이 이미 지났어요. 지금 오신다면 서두르세요.`)
+    : '오늘 흐름으로는 지하철을 권해요.';
+  box.hidden = false;
+  box.replaceChildren(el('b', { text: '오늘 예보 ' }),
+    `지금 2025년 공연 날 이 시각보다 ${Math.abs(n.deviationPct)}% ${more ? '많아요' : '적어요'}. 이 흐름이면 ${n.targetHour}시 약 ${fmt(n.predicted)}대. ${verdict}`);
+}
+function onLive(n, samples) { liveN = n; liveSamples = samples; renderLive(); renderToday(); renderBand(); }
 
 /* ── 나가기 안내 ── */
 // 첫 화면의 '공연 끝났나요?' 띠: 화면을 열어 둔 채 기다려도 때가 되면 뜨도록 1분마다·돌아올 때마다 다시 본다
@@ -862,9 +883,11 @@ function route() {
 }
 
 const load = f => fetch('data/' + f).then(r => { if (!r.ok) throw new Error(f); return r.json(); });
-Promise.all([load('show_profile.json'), load('exit_profile.json'), load('live_baseline.json'), load('seat_views.json'), load('park_facts.json').catch(() => ({}))])
-  .then(([show, exit, base, seats, facts]) => {
+Promise.all([load('show_profile.json'), load('exit_profile.json'), load('live_baseline.json'), load('seat_views.json'), load('park_facts.json').catch(() => ({})), load('nowcast_check.json').catch(() => ({}))])
+  .then(([show, exit, base, seats, facts, check]) => {
     Object.assign(DATA, { show, exit, base, seats, facts });
+    const bt = (check.weekend || []).find(r => r.now === 15 && r.target === 18);
+    if (bt) $('help-nowcast').textContent += ` 2025년 주말 공연 날 ${bt.days}일로 되짚어 보니, 15시에 18시를 예보할 때 오차가 ${Math.round(bt.err_past * 100)}%에서 ${Math.round(bt.err_corrected * 100)}%로 줄었어요.`;
     renderFacts(facts);
     $('help-days').textContent = `2025년 공연 날 ${show.공연일수}일 기록의 평균으로 본 예상이라 실제와 다를 수 있어요.`;
     $('change').open = firstVisit;   // 처음 온 사람은 고르기부터, 다시 온 사람은 답부터
