@@ -566,13 +566,19 @@ function renderBars(c) {
     const v = c.idx[h], x = X0 + (h - H0) * bw + 2;
     g.append(sv('rect', { x, y: y(v), width: bw - 4, height: Math.max(2, Y0 - y(v)), rx: 2, fill: col[Logic.levelOf(v)] }));
     if (h % 2 === 0) g.append(sv('text', { x: x + (bw - 4) / 2, y: 140, 'text-anchor': 'middle', 'font-size': 11, fill: 'var(--muted)' }, h + '시'));
-    const tag = h === c.advice.arriveHour ? '도착' : h === state.startHour ? '시작' : '';
-    if (tag) {
-      g.append(sv('rect', { x: x - 2, y: y(v) - 2, width: bw, height: Y0 - y(v) + 4, rx: 3, fill: 'none', stroke: 'var(--ink)', 'stroke-width': 2, 'stroke-dasharray': tag === '시작' ? '4 3' : 'none' }),
-        sv('text', { x: x + (bw - 4) / 2, y: y(v) - 6, 'text-anchor': 'middle', 'font-size': 11, 'font-weight': 700, fill: 'var(--ink)' }, tag));
+    // 도착 표시: 막대로 고른 시각이 있으면 그 시각, 없으면 추천 시각. 고른 경우 원래 추천은 옅게 '추천'
+    const picked = selHour !== null && selHour < state.startHour;
+    const arriveAt = picked ? selHour : c.advice.arriveHour;
+    const mark = h === arriveAt ? 'arrive' : h === state.startHour ? 'start' : (picked && h === c.advice.arriveHour) ? 'recommend' : '';
+    if (mark) {
+      const faint = mark === 'recommend';
+      g.append(sv('rect', { 'data-mark': mark, 'data-hour': String(h), x: x - 2, y: y(v) - 2, width: bw, height: Y0 - y(v) + 4, rx: 3, fill: 'none',
+        stroke: faint ? 'var(--muted)' : 'var(--ink)', 'stroke-width': faint ? 1.5 : 2, 'stroke-dasharray': mark === 'arrive' ? 'none' : '4 3' }),
+        sv('text', { x: x + (bw - 4) / 2, y: y(v) - 6, 'text-anchor': 'middle', 'font-size': 11, 'font-weight': faint ? 500 : 700, fill: faint ? 'var(--muted)' : 'var(--ink)' },
+          { arrive: '도착', start: '시작', recommend: '추천' }[mark]));
     }
   }
-  if (selHour !== null) {   // 고른 막대: 세로 띠로 표시
+  if (selHour !== null && selHour >= state.startHour) {   // 공연 시작 뒤 시각을 고르면 세로 띠로만 표시
     const x = X0 + (selHour - H0) * bw;
     g.insertBefore(sv('rect', { x, y: 4, width: bw, height: Y0 - 2, rx: 4, fill: 'var(--ink)', 'fill-opacity': 0.08 }), g.firstChild);
   }

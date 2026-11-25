@@ -226,12 +226,17 @@ const noSideScroll = page => page.evaluate(() => document.documentElement.scroll
       check('막대: 권장보다 1시간 늦음', t.includes('1시간 늦'), t);
       check('막대: 주차비 15,600원', t.includes('15,600원'), t);
       check('막대: 고른 막대 표시', (await page.locator('#bar-hits button[data-hour="16"]').getAttribute('aria-pressed')) === 'true');
+      const mark = (m) => page.evaluate(m => { const e = document.querySelector('#bars [data-mark="' + m + '"]'); return e ? e.getAttribute('data-hour') : null; }, m);
+      check('그래프: 도착 표시가 16시로 옮겨 감', (await mark('arrive')) === '16', await mark('arrive'));
+      check('그래프: 원래 추천(15시)은 따로 표시', (await mark('recommend')) === '15', await mark('recommend'));
+      check('그래프: 시작 표시는 18시 그대로', (await mark('start')) === '18');
       check('안내표: 꼬리표가 고른 도착 16:00', (await text(page, '#stub')).includes('16:00'));
       check('안내표: 답이 고른 시각 기준(매우 붐벼요)', (await text(page, '#answer-title')).includes('매우 붐벼요'));
       check('안내표: 주차비 15,600원', (await text(page, '#fee')).includes('15,600원'));
       check('안내표: 추천으로 돌아가기 버튼', await page.locator('#ticket-reset').isVisible());
       await page.click('#ticket-reset');
       check('안내표: 돌아가면 다시 지하철 권장', (await text(page, '#answer-title')).includes('지하철') && await page.locator('#ticket-reset').isHidden());
+      check('그래프: 돌아가면 도착 표시가 15시로, 추천 표시 없음', (await mark('arrive')) === '15' && (await mark('recommend')) === null);
       check('안내표: 돌아가면 막대 선택도 해제', (await page.locator('#bar-hits button[data-hour="16"]').getAttribute('aria-pressed')) === 'false');
       check('막대: 가로 스크롤 없음', await noSideScroll(page));
       check('막대: 페이지 오류 없음', page.errors.length === 0, page.errors.join(' | '));
