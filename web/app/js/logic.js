@@ -158,7 +158,14 @@
     return head + body + ' — 덜붐빌때 ' + o.url;
   }
 
+  // 주차비: 「자주 묻는 질문정보」의 후불 요금(10분당 feePer10원). 10분 미만은 10분으로 올림
+  function parkingFee(o) {
+    var units = Math.ceil(Math.max(0, o.outMinute - o.inMinute) / 10);
+    return Math.round(units * o.feePer10 * (1 - (o.discountPct || 0) / 100));
+  }
+
   return {
+    parkingFee: parkingFee,
     buildIcs: buildIcs, shareText: shareText,
     baseline: baseline,
     HOLIDAYS: HOLIDAYS, dayType: dayType, levelOf: levelOf, arrivalAdvice: arrivalAdvice,

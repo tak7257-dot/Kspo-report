@@ -10,7 +10,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-FILE_DATA = ["15138735", "15164156", "15131671"]  # 입출차(2024-07), 주차장 혼잡도, 월별주차현황
+FILE_DATA = ["15138735", "15164156", "15131671", "15089962", "15149169"]  # 입출차(2024-07), 주차장 혼잡도, 월별주차현황, 자주 묻는 질문, 영문 공연정보
 KCISA_PAGES = ["1", "17"]                         # 500건 x 17페이지 ≒ 시간대별 요약 전체(7,803건)
 
 steps = []
@@ -24,7 +24,7 @@ if "--fetch" in sys.argv:
         steps.append(["src/fetch_kscperf.py"])
 steps += [["src/clean.py"], ["src/metrics.py"]]
 if any(Path("data/raw/kcisa").glob("kcisa_p*.xml")):
-    steps += [["src/clean_kcisa.py"], ["src/metrics_2025.py"], ["src/export_web_data.py"], ["src/seat_views.py"], ["src/exit_profile.py"], ["src/live_baseline.py"]]
+    steps += [["src/clean_kcisa.py"], ["src/metrics_2025.py"], ["src/export_web_data.py"], ["src/seat_views.py"], ["src/exit_profile.py"], ["src/live_baseline.py"], ["src/park_facts.py"]]
 steps.append(["src/report.py"])
 
 for step in steps:

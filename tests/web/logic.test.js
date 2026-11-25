@@ -127,3 +127,13 @@ test('buildIcs: 낮 공연(비율 없음)엔 20분 출차 안내를 넣지 않�
   assert.ok(!s.includes('20분'));
   assert.ok(L.buildIcs({ ...ICS_BASE, arriveHour: 15, mode: 'car', showRatios: true }).includes('20분'));
 });
+
+// ── 주차비 (FAQ: 10분당 600원) ──
+test('parkingFee: 15:00 도착 → 20:20 출차 = 320분 = 19,200원, 할인 50%면 9,600원', () => {
+  assert.equal(L.parkingFee({ inMinute: 15 * 60, outMinute: 20 * 60 + 20, feePer10: 600 }), 19200);
+  assert.equal(L.parkingFee({ inMinute: 15 * 60, outMinute: 20 * 60 + 20, feePer10: 600, discountPct: 50 }), 9600);
+});
+test('parkingFee: 10분 미만도 10분으로, 자정 넘김도 계산', () => {
+  assert.equal(L.parkingFee({ inMinute: 600, outMinute: 601, feePer10: 600 }), 600);
+  assert.equal(L.parkingFee({ inMinute: 21 * 60, outMinute: 24 * 60 + 20, feePer10: 600 }), 12000);
+});
