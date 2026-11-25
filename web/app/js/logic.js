@@ -60,7 +60,7 @@
 
   var pad2 = function (n) { return (n < 10 ? '0' : '') + n; };
   var WAIT_MINUTES = 20;     // 끝나고 기다렸다 나가기를 권하는 시간
-  var EVENING_MIN = 20 * 60; // 출차 몰림 모양은 20:30 이후 저녁 기록 → 20시 이후 끝나는 공연에만 비율을 보여 준다
+  var EVENING_MIN = 20 * 60, EVENING_MAX = 23 * 60; // 출차 몰림 모양은 20:30~24시 저녁 기록 → 20~23시에 끝나는 공연에만 비율을 보여 준다 (끝 + 20분 뒤까지 기록 안에 들도록)
 
   // 공연이 언제 끝나고, 20분 기다리면 출차가 얼마로 줄어드는지
   function exitPlan(o) {
@@ -71,7 +71,7 @@
     return {
       endHour: Math.floor(m / 60), endMinute: m % 60, nextDay: nextDay,
       endLabel: pad2(Math.floor(m / 60)) + ':' + pad2(m % 60) + (nextDay ? ' (다음 날)' : ''),
-      showRatios: end >= EVENING_MIN,
+      showRatios: end >= EVENING_MIN && end <= EVENING_MAX,
       wait: { minutes: WAIT_MINUTES, ratio: o.decay.ratio[i] }
     };
   }

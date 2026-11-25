@@ -48,9 +48,12 @@ test('18시+120분 → 20:00, 비율 표시, 20분 뒤 0.42', () => {
 test('14시 공연 → 16:00, 비율 숨김', () => {
   assert.equal(L.exitPlan({ startHour: 14, startMinute: 0, showMinutes: 120, decay: D }).showRatios, false);
 });
-test('22시 공연 → 00:00 (다음 날)', () => {
+test('22시 공연 → 00:00 (다음 날), 출차 기록(20:30~24시) 밖이라 비율 숨김', () => {
   const e = L.exitPlan({ startHour: 22, startMinute: 0, showMinutes: 120, decay: D });
-  assert.deepEqual([e.endLabel, e.nextDay, e.showRatios], ['00:00 (다음 날)', true, true]);
+  assert.deepEqual([e.endLabel, e.nextDay, e.showRatios], ['00:00 (다음 날)', true, false]);
+});
+test('21시 공연 → 23:00 끝, 비율 표시 (20~23시 끝나는 공연만)', () => {
+  assert.equal(L.exitPlan({ startHour: 21, startMinute: 0, showMinutes: 120, decay: D }).showRatios, true);
 });
 test('나가기 모드 창: 19:45 true, 19:44 false, 21:30 true, 21:31 false', () => {
   const a = h => L.exitModeActive({ now: new Date('2026-11-28T' + h + ':00'), showDateISO: '2026-11-28', startHour: 18, startMinute: 0, showMinutes: 120 });
