@@ -46,12 +46,12 @@ const noSideScroll = page => page.evaluate(() => document.documentElement.scroll
       check(`${name}: 차라면 15:00`, (await text(page, '#answer-sub')).includes('15:00'));
       check(`${name}: 꼬리표에 도착 15:00`, (await text(page, '#stub')).includes('15:00'));
       check(`${name}: 차라면 주차비 19,200원 (15:00~20:20)`, (await text(page, '#fee')).includes('19,200원'));
-      check(`${name}: 표 번호는 날짜·시각`, (await text(page, '#ticket-no')).includes('1128-1800'));
+      check(`${name}: 예상임을 밝힘 (실제 공연 정보 아님)`, (await text(page, '#ticket-kind')).includes('예상'));
       await page.click('button[data-start="16"]');
       check(`${name}: 주말 16시 → 차`, (await text(page, '#answer-title')).includes('차'));
       check(`${name}: 16시 공연 주차비 10,800원 (15:00~18:00)`, (await text(page, '#fee')).includes('10,800원'));
       check(`${name}: 가로 스크롤 없음`, await noSideScroll(page));
-      check(`${name}: 차 답이면 지도 링크 숨김`, await page.locator('#maplinks').isHidden());
+      check(`${name}: 차 답이면 주차장 길찾기`, (await text(page, '#maplinks').catch(() => '')).includes('주차장'));
       check(`${name}: 공연 날이 아니면 나가기 띠 숨김`, await page.locator('#exit-band').isHidden());
       await page.click('button[data-venue="handball"]');
       check(`${name}: 다른 공연장이면 내 자리 링크 숨김`, await page.locator('#to-seat').isHidden());
@@ -240,6 +240,28 @@ const noSideScroll = page => page.evaluate(() => document.documentElement.scroll
       check('안내표: 돌아가면 막대 선택도 해제', (await page.locator('#bar-hits button[data-hour="16"]').getAttribute('aria-pressed')) === 'false');
       check('막대: 가로 스크롤 없음', await noSideScroll(page));
       check('막대: 페이지 오류 없음', page.errors.length === 0, page.errors.join(' | '));
+      await page.context().close();
+    }
+    // ── 평가 보완 ──
+    {
+      const page = await open(browser, devices['iPhone 13']);
+      await page.click('button[data-date="2026-11-28"]');
+      await page.click('button[data-start="18"]');
+      const basis = await page.evaluate(() => document.getElementById('basis').textContent);
+      check('근거: 판단 기준(2배·2시간)과 표본(공연 날 일수)', basis.includes('2배') && basis.includes('2시간') && basis.includes('120일'), basis.slice(0, 120));
+      check('근거: 비 보정 표본(비 온 168시간)', basis.includes('168시간'), basis.slice(0, 200));
+      check('지하철 답이면 역 길찾기', (await text(page, '#maplinks')).includes('역'));
+      await page.click('#rain');
+      const sub = await text(page, '#answer-sub');
+      check('비 체크로 답이 바뀌면 경계선이라고 알림', sub.includes('맑은 날') && sub.includes('15:00'), sub);
+      await page.click('#rain');
+      await page.click('button[data-start="16"]');
+      check('차 답이면 주차장 길찾기와 주차 안내', (await page.locator('#maplinks').isVisible()) && (await text(page, '#maplinks')).includes('주차장'));
+      check('구역별 시야 이름', (await text(page, '#to-seat')).includes('구역별 시야'));
+      await page.goto(page.url().replace('#home', '#exit'));
+      await page.waitForSelector('#s-exit:not([hidden])');
+      check('나가기: 출차 흐름이지 대기시간이 아님을 밝힘', (await text(page, '#s-exit')).includes('빠져나오는 데 걸리는 시간'));
+      check('평가 보완: 페이지 오류 없음', page.errors.length === 0, page.errors.join(' | '));
       await page.context().close();
     }
     // (다음 작업의 확인은 이 줄 위에 이어 붙인다)

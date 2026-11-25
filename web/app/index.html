@@ -110,6 +110,13 @@ button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visibl
 .chart h2 { font-size: 18px; font-weight: 700; }
 .chart svg { width: 100%; height: auto; display: block; }
 .bars-box { position: relative; }
+.basis-box { margin-top: 6px; }
+.basis-box summary { min-height: 44px; display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--sub); list-style: none; }
+.basis-box summary::-webkit-details-marker { display: none; }
+.basis-box summary::after { content: ""; width: 6px; height: 6px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); }
+.basis-box[open] summary::after { transform: rotate(-135deg); }
+.basis { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 12px; background: var(--fill); font-size: 13px; color: var(--sub); line-height: 1.55; }
+.basis b { color: var(--ink); }
 .ticket-reset { align-self: flex-start; min-height: 44px; margin-top: 4px; padding: 0 16px; border: 0; border-radius: 12px; background: var(--fill); color: var(--ink); font-size: 15px; font-weight: 600; }
 .bar-hits { position: absolute; top: 0; bottom: 12%; left: 9.5%; right: 1.7%; display: grid; grid-template-columns: repeat(14, minmax(0, 1fr)); }
 .bar-hits button { border: 0; background: transparent; padding: 0; min-height: 44px; border-radius: 6px; }
@@ -245,7 +252,7 @@ dialog.help::backdrop { background: rgba(0, 0, 0, .45); }
     <a class="exit-band" id="exit-band" href="#exit" hidden>공연 끝났나요? 나가기 안내 보기</a>
     <section class="ticket" aria-label="이날의 안내표">
       <div class="t-main">
-        <div class="t-top"><span class="t-kind">공연 날 안내표</span><span class="t-no num" id="ticket-no"></span></div>
+        <div class="t-top"><span class="t-kind" id="ticket-kind">고른 조건으로 본 예상</span></div>
         <p class="t-venue big" id="t-venue"></p>
         <p class="what num" id="what"></p>
         <div class="t-answer" aria-live="polite">
@@ -254,10 +261,8 @@ dialog.help::backdrop { background: rgba(0, 0, 0, .45); }
         </div>
         <p class="sub" id="answer-sub"></p>
         <p class="fee num" id="fee" hidden></p>
-        <div class="maplinks" id="maplinks" hidden>
-          <a href="https://map.naver.com/p/search/%EC%98%AC%EB%A6%BC%ED%94%BD%EA%B3%B5%EC%9B%90%EC%97%AD" target="_blank" rel="noopener">네이버 지도 ↗</a>
-          <a href="https://map.kakao.com/?q=%EC%98%AC%EB%A6%BC%ED%94%BD%EA%B3%B5%EC%9B%90%EC%97%AD" target="_blank" rel="noopener">카카오맵 ↗</a>
-        </div>
+        <div class="maplinks" id="maplinks" hidden></div>
+        <details class="basis-box"><summary>이 답의 근거</summary><div class="basis" id="basis"></div></details>
         <button type="button" class="ticket-reset" id="ticket-reset" hidden>추천 도착으로 돌아가기</button>
         <p class="live" id="live-line" aria-live="polite" hidden></p>
         <p class="today" id="today" aria-live="polite" hidden></p>
@@ -290,7 +295,7 @@ dialog.help::backdrop { background: rgba(0, 0, 0, .45); }
 
     <nav class="more" aria-label="더 보기">
       <a id="to-day" href="#day"><span><strong>처음이라면: 공연 날 하루 미리 보기</strong><br><span>도착부터 출차까지 3D로</span></span></a>
-      <a id="to-seat" href="#seat"><span><strong>내 자리에서 보기</strong><br><span>KSPO DOME 객석 눈높이 3D</span></span></a>
+      <a id="to-seat" href="#seat"><span><strong>구역별 시야 미리보기</strong><br><span>KSPO DOME 대표 시점 8곳, 3D</span></span></a>
       <a id="to-exit" href="#exit"><span><strong>끝나고 언제 나갈까</strong><br><span>출차가 몰리는 때 피하기</span></span></a>
       <a id="to-plan" href="#plan"><span><strong>하루 일정표와 캘린더</strong><br><span>같이 갈 사람에게 보내기</span></span></a>
     </nav>
@@ -317,12 +322,13 @@ dialog.help::backdrop { background: rgba(0, 0, 0, .45); }
       <output id="timer-left" class="num big" aria-live="polite" hidden></output>
       <p class="small">화면을 열어 둔 동안만 알려 드려요. 화면이 꺼지면 소리가 안 날 수 있어요. 기다리는 동안 공원 밤길을 잠깐 걸어 보세요.</p>
     </div>
-    <p class="small" id="exit-src" style="margin-top: 14px"></p>
+    <p class="small" style="margin-top: 14px">비율은 10분 동안 주차장을 빠져나간 차의 수를 견준 거예요. 내가 주차장에서 빠져나오는 데 걸리는 시간(출구 정체)은 기록이 없어 알 수 없어요. 출차 기록이 공원 전체 기준이라 공연장마다 다를 수 있어요.</p>
+    <p class="small" id="exit-src" style="margin-top: 8px"></p>
     <p class="small" style="margin-top: 6px">지금 주차장 대수: 「올림픽공원 실시간 주차현황」(동2·남2·북2문 주차장 합계). 장기 주차 차량은 출차가 안 찍혀 실제보다 많을 수 있어요.</p>
   </div>
 </section>
 
-<!-- 공연 날 하루 미리 보기 (#day) / 내 자리에서 보기 (#seat) — 같은 3D 화면을 함께 쓴다 -->
+<!-- 공연 날 하루 미리 보기 (#day) / 구역별 시야 미리보기 (#seat) — 같은 3D 화면을 함께 쓴다 -->
 <section class="screen" id="s-day" hidden>
   <div class="wrap">
     <header class="bar">
@@ -342,7 +348,8 @@ dialog.help::backdrop { background: rgba(0, 0, 0, .45); }
     <div class="stops" id="day-stops" role="group" aria-label="하루 단계"></div>
     <div id="day-card" aria-live="polite"></div>
     <section class="seat-pick" id="seat-pick" aria-labelledby="seat-h" hidden>
-      <h2 id="seat-h" style="font-size: 17px">내 자리에서 보기</h2>
+      <h2 id="seat-h" style="font-size: 17px">구역별 시야 미리보기</h2>
+      <p class="small">플로어 앞·뒤, 1·2층 왼쪽·정면·오른쪽의 대표 시점 8곳이에요. 내 좌석 번호의 정확한 시야는 아니에요.</p>
       <svg class="seat-map" id="seat-map" viewBox="0 0 340 290" role="img" aria-label="KSPO DOME 객석 위치 그림. 위쪽이 무대."></svg>
       <div class="tier"><span>플로어</span><div class="row two" id="t-floor"></div></div>
       <div class="tier"><span>1층</span><div class="row" id="t-1"></div></div>
@@ -515,7 +522,6 @@ const ICONS = {   // 차·지하철 그림 (선 아이콘)
 };
 function renderAnswer(c) {
   const a = c.advice, e = c.exit, d = new Date(state.date + 'T00:00:00');
-  $('ticket-no').textContent = `No. ${pad2(d.getMonth() + 1)}${pad2(d.getDate())}-${pad2(state.startHour)}${pad2(state.startMinute)}`;
   $('t-venue').textContent = venue().name;
   $('what').textContent = `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()} (${WK[d.getDay()]}) ${pad2(state.startHour)}:00 공연`;
   $('t-icon').innerHTML = ICONS[a.mode];
@@ -540,7 +546,38 @@ function renderAnswer(c) {
   renderFee(c);
   applySelection(c);
   $('stub').setAttribute('aria-label', `${$('stub-k').textContent} ${$('stub-v').textContent}, ${$('stub-k2').textContent}`);
-  $('maplinks').hidden = a.mode !== 'subway';
+  renderMapLinks(a.mode);
+  renderBasis(c);
+  rainEdge(c);
+}
+// 길찾기: 지하철을 권하면 역, 차로 오면 공원 주차장으로
+const MAPQ = { subway: ['올림픽공원역', '올림픽공원역 길찾기'], car: ['올림픽공원 주차장', '주차장 길찾기'] };
+function renderMapLinks(mode) {
+  const [q, label] = MAPQ[mode], F = DATA.facts || {}, enc = encodeURIComponent(q);
+  const kids = [el('a', { href: 'https://map.naver.com/p/search/' + enc, target: '_blank', rel: 'noopener', text: label + ' (네이버)' }),
+    el('a', { href: 'https://map.kakao.com/?q=' + enc, target: '_blank', rel: 'noopener', text: '카카오맵' })];
+  if (mode === 'car' && F.booths && F.booths.length) kids.push(el('span', { class: 'small', style: 'flex-basis: 100%', text: `주차 매표소: ${F.booths.join(', ')}. 공연장과 가까운 주차장은 올림픽공원 홈페이지 교통·주차 안내에서 확인하세요.` }));
+  $('maplinks').replaceChildren(...kids); $('maplinks').hidden = false;
+}
+// 이 답의 근거: 판단 기준, 쓴 자료와 표본, 못 하는 것
+function renderBasis(c) {
+  const S = DATA.show, rainPct = Math.round((1 - S.rain_factor) * 100);
+  const line = (k, v) => el('span', {}, el('b', { text: k + ' ' }), v);
+  $('basis').replaceChildren(
+    line('판단 기준', '공연 날 주차장이 평소의 2배를 넘기 전에 도착하도록 권해요. 그 시각이 시작보다 2시간 넘게 이르면 지하철을 권해요.'),
+    line('자료', `2025년 공연 날 ${S.공연일수}일의 시간대별 주차 대수. 평소 = 같은 달·같은 요일 유형·같은 시각에 공연이 없던 날.`),
+    line('비 보정', `2025년 공연 날 중 비 온 ${S.rain_hours}시간은 비 안 온 시간보다 주차 대수가 평균 ${rainPct}% 적었어요.`),
+    line('가정', '고른 날 고른 시각에 공연이 있다고 보고 계산해요. 큰 공연 하나인 날과 여러 공연이 겹치는 날은 아직 구분하지 못해요.'),
+    line('모르는 것', '주차장에 자리가 남는지(만차 여부)는 공공데이터에 없어 알려 드리지 못해요.'));
+}
+// 비 체크 하나로 답이 바뀌면 경계선이라고 알리고 맑은 날 기준도 보여 준다
+function rainEdge(c) {
+  if (!state.rain) return;
+  const dry = Logic.arrivalAdvice({ profile: DATA.show.profile[c.kind], startHour: state.startHour, rain: false, rainFactor: DATA.show.rain_factor });
+  const a = c.advice;
+  if (dry.mode === a.mode && dry.arriveHour === a.arriveHour) return;
+  const was = dry.mode === 'subway' ? '지하철을 권하고' : '차로 와도 되고';
+  $('answer-sub').textContent += ` 맑은 날 기준으로는 ${was}${dry.arriveHour !== null ? ' ' + pad2(dry.arriveHour) + ':00 전 도착이에요' : ''}. 비 효과(약 ${Math.round((1 - DATA.show.rain_factor) * 100)}%)로 경계선을 넘은 거라 여유 있게 오세요.`;
 }
 // 주차비 예상: 「자주 묻는 질문정보」의 요금(10분당 600원)으로 도착~출차 시간을 계산
 function renderFee(c, inHour) {
@@ -603,7 +640,7 @@ function applySelection(c) {
   $('stub-k').textContent = '고른 도착';
   $('stub-v').textContent = pad2(selHour) + ':00';
   $('stub-k2').textContent = `출차 ${pad2(Math.floor(out / 60) % 24)}:${pad2(out % 60)}`;
-  $('maplinks').hidden = w.level !== 'very';
+  renderMapLinks(w.level === 'very' ? 'subway' : 'car');
   renderFee(c, selHour);
   btn.hidden = false;
 }
@@ -715,7 +752,7 @@ function renderExit() {
     $('exit-src').textContent = `끝나는 시각: 「공연정보」의 ${venue().name} 공연 ${sm.n || ''}편 공연 시간 중앙값 ${c.showMinutes}분으로 계산. ` +
       `출차 몰림: 「올림픽공원 입출차 정보」 2024년 7월, 저녁에 출차가 몰린 ${D.저녁수}일을 모아 가장 몰린 10분 기준으로 본 모양이에요.`;
   } else {
-    box.append(el('p', { class: 'note', text: '출차 몰림 기록은 저녁(20시 이후) 공연 것이라, 이 공연엔 비율을 보여 드리지 않아요. 아래 지금 주차장 상황을 참고하세요.' }));
+    box.append(el('p', { class: 'note', text: '출차 몰림 기록은 20~23시에 끝나는 공연 것이라, 이 공연엔 비율을 보여 드리지 않아요. 아래 지금 주차장 상황을 참고하세요.' }));
     $('exit-src').textContent = `끝나는 시각: 「공연정보」 공연 시간 중앙값 ${c.showMinutes}분으로 계산.`;
   }
   renderLive();
@@ -829,14 +866,14 @@ function dayCard(c, i) {
   } else if (i === 1) {
     const s = DATA.seats.views.find(v => v.id === seatId);
     box.push(state.venue === 'kspo-dome'
-      ? el('div', { class: 'card' }, el('span', { class: 'k', text: '내 자리 ' + s.label }), el('span', { class: 'v big', text: `무대 쪽 끝까지 약 ${s.to_stage_m}m` }),
+      ? el('div', { class: 'card' }, el('span', { class: 'k', text: '고른 구역 ' + s.label }), el('span', { class: 'v big', text: `무대 쪽 끝까지 약 ${s.to_stage_m}m` }),
           el('span', { text: '아래에서 자리를 바꾸면 3D가 그 자리 눈높이로 바뀌어요.' }))
       : el('div', { class: 'card' }, el('span', { class: 'k', text: '공연 시작' }), el('span', { class: 'v big', text: `${pad2(state.startHour)}:00` }),
           el('span', { text: `${venue().name} 3D를 끌어서 둘러보세요.` })));
   } else if (i === 2) {
     box.push(el('div', { class: 'card' }, el('span', { class: 'k', text: `${e.endLabel}쯤 끝나요 (공연 시간 중앙값 ${c.showMinutes}분)` }),
       el('span', { class: 'v big', text: e.showRatios ? '끝나자마자 나가면 가장 몰리는 때' : '공연이 끝나요' }),
-      el('span', { text: e.showRatios ? `${e.wait.minutes}분 쉬었다 나가면 같이 나가는 차가 ${Math.round(e.wait.ratio * 100)}%로 줄어요.` : '저녁 공연 기록만 있어 줄어드는 비율은 보여 드리지 않아요.' })));
+      el('span', { text: e.showRatios ? `${e.wait.minutes}분 쉬었다 나가면 같이 나가는 차가 ${Math.round(e.wait.ratio * 100)}%로 줄어요.` : '출차 몰림 기록은 20~23시에 끝나는 공연 것이라 비율은 보여 드리지 않아요.' })));
   } else {
     box.push(el('div', { class: 'card ans' }, el('span', { class: 'k', text: e.showRatios ? `${e.wait.minutes}분만 쉬었다 나가면` : '나갈 때' }),
       el('span', { class: 'v big', text: e.showRatios ? `같이 나가는 차 ${Math.round(e.wait.ratio * 100)}%` : '지금 주차장 상황 보기' }),
@@ -956,7 +993,7 @@ function route() {
   if (name === 'exit') { renderExit(); Live.start(onLive); }
   if (name === 'day') {
     if (h === 'seat') dayStage = 1;
-    $('day-title').textContent = h === 'seat' ? '내 자리에서 보기' : '공연 날 하루';
+    $('day-title').textContent = h === 'seat' ? '구역별 시야 미리보기' : '공연 날 하루';
     showViewer(); renderDay();
   }
   if (name === 'plan') renderPlan();
