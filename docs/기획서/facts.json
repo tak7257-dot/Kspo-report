@@ -1,0 +1,283 @@
+{
+ "m25_기간": {
+  "value": "2025-01-01 ~ 2025-12-31",
+  "source": "data/clean/m25_kpi.json 기간"
+ },
+ "m25_시간대수": {
+  "value": 7803,
+  "source": "data/clean/m25_kpi.json 시간대수"
+ },
+ "m25_일수": {
+  "value": 307,
+  "source": "data/clean/m25_kpi.json 일수 (결함일 제외)"
+ },
+ "m25_공연일수": {
+  "value": 120,
+  "source": "data/clean/m25_kpi.json 공연일수"
+ },
+ "주말_저녁최고시": {
+  "value": 18,
+  "source": "data/clean/m25_kpi.json 저녁최고시_주말"
+ },
+ "주말_저녁최고배": {
+  "value": 2.5,
+  "source": "data/clean/m25_kpi.json 저녁최고지수_주말 ÷ 100"
+ },
+ "평일_저녁최고시": {
+  "value": 21,
+  "source": "data/clean/m25_kpi.json 저녁최고시_평일"
+ },
+ "평일_저녁최고배": {
+  "value": 1.9,
+  "source": "data/clean/m25_kpi.json 저녁최고지수_평일 ÷ 100"
+ },
+ "피크증가_주말": {
+  "value": 67,
+  "source": "data/clean/m25_kpi.json 공연일피크증가율_주말 (%)"
+ },
+ "피크증가_평일": {
+  "value": 0,
+  "source": "data/clean/m25_kpi.json 공연일피크증가율_평일 (%)"
+ },
+ "관객_피크_상관": {
+  "value": 0.27,
+  "source": "data/clean/m25_kpi.json 관객_피크_상관"
+ },
+ "결함일수": {
+  "value": 51,
+  "source": "data/clean/m25_notes.json [0]"
+ },
+ "8월_급변": {
+  "value": "2,362대 → 577대",
+  "source": "data/clean/m25_notes.json [1]"
+ },
+ "화면_공연일수": {
+  "value": 120,
+  "source": "web/app/data/show_profile.json 공연일수"
+ },
+ "비_보정률": {
+  "value": 9,
+  "source": "show_profile.json rain_factor (1 − 값, %)"
+ },
+ "비_시간수": {
+  "value": 168,
+  "source": "show_profile.json rain_hours"
+ },
+ "붐빔_기준": {
+  "value": 1.3,
+  "source": "show_profile.json levels.busy ÷ 100 (배)"
+ },
+ "매우붐빔_기준": {
+  "value": 2.0,
+  "source": "show_profile.json levels.very_busy ÷ 100 (배)"
+ },
+ "출차_기간": {
+  "value": "2024-07-01 ~ 2024-08-18",
+  "source": "exit_profile.json exit_decay.기간"
+ },
+ "출차_저녁수": {
+  "value": 27,
+  "source": "exit_profile.json exit_decay.저녁수"
+ },
+ "출차_최대10분": {
+  "value": 113,
+  "source": "exit_profile.json exit_decay.최대출차_10분_중앙값"
+ },
+ "출차_0분": {
+  "value": 100,
+  "source": "exit_profile.json exit_decay.ratio[0분] (%)"
+ },
+ "출차_10분": {
+  "value": 68,
+  "source": "exit_profile.json exit_decay.ratio[10분] (%)"
+ },
+ "출차_20분": {
+  "value": 42,
+  "source": "exit_profile.json exit_decay.ratio[20분] (%)"
+ },
+ "출차_30분": {
+  "value": 41,
+  "source": "exit_profile.json exit_decay.ratio[30분] (%)"
+ },
+ "출차_40분": {
+  "value": 44,
+  "source": "exit_profile.json exit_decay.ratio[40분] (%)"
+ },
+ "출차_50분": {
+  "value": 57,
+  "source": "exit_profile.json exit_decay.ratio[50분] (%)"
+ },
+ "출차_60분": {
+  "value": 54,
+  "source": "exit_profile.json exit_decay.ratio[60분] (%)"
+ },
+ "공연시간_중앙값": {
+  "value": [
+   120
+  ],
+  "source": "exit_profile.json show_minutes.*.median (분)"
+ },
+ "공연시간_표본": {
+  "value": 536,
+  "source": "exit_profile.json show_minutes.*.n 합"
+ },
+ "예보검증": {
+  "value": {
+   "weekday": [
+    {
+     "now": 13,
+     "target": 17,
+     "days": 24,
+     "err_past": 0.085,
+     "err_corrected": 0.06
+    },
+    {
+     "now": 14,
+     "target": 18,
+     "days": 24,
+     "err_past": 0.156,
+     "err_corrected": 0.106
+    },
+    {
+     "now": 15,
+     "target": 18,
+     "days": 24,
+     "err_past": 0.156,
+     "err_corrected": 0.078
+    },
+    {
+     "now": 16,
+     "target": 19,
+     "days": 24,
+     "err_past": 0.198,
+     "err_corrected": 0.064
+    },
+    {
+     "now": 17,
+     "target": 20,
+     "days": 24,
+     "err_past": 0.207,
+     "err_corrected": 0.053
+    },
+    {
+     "now": 12,
+     "target": 18,
+     "days": 24,
+     "err_past": 0.156,
+     "err_corrected": 0.123
+    }
+   ],
+   "weekend": [
+    {
+     "now": 13,
+     "target": 17,
+     "days": 74,
+     "err_past": 0.172,
+     "err_corrected": 0.159
+    },
+    {
+     "now": 14,
+     "target": 18,
+     "days": 74,
+     "err_past": 0.193,
+     "err_corrected": 0.174
+    },
+    {
+     "now": 15,
+     "target": 18,
+     "days": 74,
+     "err_past": 0.193,
+     "err_corrected": 0.134
+    },
+    {
+     "now": 16,
+     "target": 19,
+     "days": 74,
+     "err_past": 0.256,
+     "err_corrected": 0.156
+    },
+    {
+     "now": 17,
+     "target": 20,
+     "days": 74,
+     "err_past": 0.38,
+     "err_corrected": 0.214
+    },
+    {
+     "now": 12,
+     "target": 18,
+     "days": 74,
+     "err_past": 0.193,
+     "err_corrected": 0.209
+    }
+   ]
+  },
+  "source": "web/app/data/nowcast_check.json"
+ },
+ "FAQ_capacity": {
+  "value": 2800,
+  "source": "park_facts.json capacity (자주 묻는 질문정보: 올림픽공원 내 주차시설은 어떻게 되나요)"
+ },
+ "FAQ_fee_per_10min": {
+  "value": 600,
+  "source": "park_facts.json fee_per_10min (자주 묻는 질문정보: 주차장 이용 및 요금은 어떻게 되나요)"
+ },
+ "FAQ_discount_pct": {
+  "value": 50,
+  "source": "park_facts.json discount_pct (자주 묻는 질문정보: 주차장 이용 및 요금은 어떻게 되나요)"
+ },
+ "FAQ_car_open": {
+  "value": 6,
+  "source": "park_facts.json car_open (자주 묻는 질문정보: 올림픽공원 이용시간이 어떻게 되나요)"
+ },
+ "FAQ_car_close": {
+  "value": 22,
+  "source": "park_facts.json car_close (자주 묻는 질문정보: )"
+ },
+ "FAQ_spare_minutes": {
+  "value": 60,
+  "source": "park_facts.json spare_minutes (자주 묻는 질문정보: 주차 예상 소요 시간은 어느 정도인가요)"
+ },
+ "FAQ_walk_minutes": {
+  "value": 5,
+  "source": "park_facts.json walk_minutes (자주 묻는 질문정보: 주차 후 공연장까지 오는 방법은 어떻게 되나요)"
+ },
+ "FAQ_booths": {
+  "value": [
+   "북2문",
+   "동2문",
+   "남2문",
+   "남3문",
+   "남4문"
+  ],
+  "source": "park_facts.json booths"
+ },
+ "시야_시점수": {
+  "value": 8,
+  "source": "seat_views.json views 개수"
+ },
+ "3D_공연장수": {
+  "value": 5,
+  "source": "web/app/models 파일 수"
+ },
+ "입출차2024_건수": {
+  "value": 215528,
+  "source": "data/raw/15138735_*.csv 행 수"
+ },
+ "공연정보_건수": {
+  "value": 2502,
+  "source": "data/raw/kscperf/*.json item 수"
+ },
+ "실시간기록_건수": {
+  "value": 13,
+  "source": "data/live/*.csv 행 수"
+ },
+ "실시간기록_시작": {
+  "value": "2026-11-25",
+  "source": "data/live/*.csv 첫 기록"
+ },
+ "계산테스트_수": {
+  "value": 33,
+  "source": "tests/web/logic.test.js test( 개수"
+ }
+}
