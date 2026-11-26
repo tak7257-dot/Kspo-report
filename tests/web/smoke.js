@@ -16,7 +16,8 @@ function serveDir() {   // GitHub Pages에 올라갈 결과물 그대로 (tools/
 }
 
 async function open(browser, opts, live = 'abort', hash = '#home', blockStorage = false, now = NOW) {
-  const ctx = await browser.newContext({ timezoneId: 'Asia/Seoul', ...opts });
+  // 서비스 워커는 기본으로 막는다(가짜 실시간 응답이 워커를 거치지 않게). 앱 설치 확인만 serviceWorkers: 'allow'.
+  const ctx = await browser.newContext({ timezoneId: 'Asia/Seoul', serviceWorkers: 'block', ...opts });
   if (blockStorage) await ctx.addInitScript(() => { Object.defineProperty(window, 'localStorage', { get() { throw new Error('blocked'); } }); });
   const page = await ctx.newPage();
   await page.clock.setFixedTime(now);
@@ -262,6 +263,38 @@ const noSideScroll = page => page.evaluate(() => document.documentElement.scroll
       await page.waitForSelector('#s-exit:not([hidden])');
       check('나가기: 출차 흐름이지 대기시간이 아님을 밝힘', (await text(page, '#s-exit')).includes('빠져나오는 데 걸리는 시간'));
       check('평가 보완: 페이지 오류 없음', page.errors.length === 0, page.errors.join(' | '));
+      await page.context().close();
+    }
+    // ── 앱처럼 설치 (PWA): 설치 정보·아이콘, 한 번 연 뒤 인터넷 없이 열기, 설치 안내 ──
+    {
+      const page = await open(browser, { ...devices['iPhone 13'], serviceWorkers: 'allow' });
+      const base = `http://localhost:${PORT}/`;
+      const mHref = await page.locator('link[rel="manifest"]').getAttribute('href', { timeout: 2000 }).catch(() => null);
+      const man = mHref ? await (await page.request.get(base + mHref)).json() : {};
+      check('설치: 이름·홈 화면 시작·단독 화면', man.short_name === '덜붐빌때' && man.display === 'standalone' && /#home/.test(man.start_url || ''), JSON.stringify(man).slice(0, 160));
+      const sizes = (man.icons || []).map(i => i.sizes + (i.purpose ? ':' + i.purpose : ''));
+      check('설치: 아이콘 192·512·마스크', sizes.includes('192x192') && sizes.includes('512x512') && sizes.some(x => x.includes('maskable')), sizes.join(','));
+      let iconsOk = true;
+      for (const i of man.icons || []) { const r = await page.request.get(base + i.src); iconsOk = iconsOk && r.ok() && r.headers()['content-type'].includes('png'); }
+      const apple = await page.locator('link[rel="apple-touch-icon"]').getAttribute('href', { timeout: 2000 }).catch(() => null);
+      iconsOk = iconsOk && !!apple && (await page.request.get(base + apple)).ok();
+      check('설치: 아이콘 파일이 모두 열림 (아이폰 아이콘 포함)', iconsOk);
+      check('설치: 테마 색', !!(await page.locator('meta[name="theme-color"]').first().getAttribute('content', { timeout: 2000 }).catch(() => null)));
+      await page.evaluate(() => navigator.serviceWorker.ready);
+      await page.reload(); await page.waitForSelector('#answer-title:not(:empty)');
+      check('설치: 서비스 워커가 화면을 맡음', await page.evaluate(() => !!navigator.serviceWorker.controller));
+      check('설치: 연결돼 있으면 오프라인 알림 숨김', await page.locator('#offline').isHidden());
+      await page.context().setOffline(true);
+      await page.reload(); await page.waitForSelector('#answer-title:not(:empty)', { timeout: 15000 });
+      check('설치: 인터넷 없이도 답이 나옴', (await text(page, '#answer-title')).length > 2);
+      check('설치: 인터넷 없음 알림', (await page.locator('#offline').isVisible()) && (await text(page, '#offline')).includes('인터넷'));
+      await page.context().setOffline(false);
+      await page.evaluate(() => dispatchEvent(new Event('online')));
+      check('설치: 다시 연결되면 알림 숨김', await page.locator('#offline').isHidden());
+      check('설치: 더 보기에 홈 화면에 두기', await page.locator('#to-install').isVisible());
+      await page.click('#to-install');
+      check('설치: 누르면 홈 화면 추가 방법 안내', (await page.locator('#help').evaluate(d => d.open)) && (await text(page, '#install-sec')).includes('홈 화면에 추가'));
+      check('설치: 페이지 오류 없음', page.errors.length === 0, page.errors.join(' | '));
       await page.context().close();
     }
     // (다음 작업의 확인은 이 줄 위에 이어 붙인다)
