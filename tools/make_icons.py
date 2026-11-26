@@ -1,4 +1,4 @@
-"""앱 아이콘: 초록 바탕 + 흰 글씨(DBT Sans, OFL). 큰 아이콘은 '덜붐/빌때' 두 줄, 탭 아이콘은 '덜' 한 글자.
+"""앱 아이콘: 초록 바탕 + 흰 글씨(DBT Sans, OFL). 큰 아이콘은 '덜붐빌때' 한 줄 가운데, 탭 아이콘은 '덜' 한 글자.
 사용법: python tools/make_icons.py   → web/app/icons/*.png 를 다시 그린다 (Pillow, fontTools, brotli 필요)
 """
 import io
@@ -42,9 +42,9 @@ def draw(size, lines, safe, rounded, weight=800):
         y += lh + gap
     return im.resize((size, size), Image.LANCZOS)
 
-two = ['덜붐', '빌때']
-draw(192, two, 0.60, True).save(OUT + 'icon-192.png')
-draw(512, two, 0.60, True).save(OUT + 'icon-512.png')
-draw(512, two, 0.52, False).save(OUT + 'icon-maskable-512.png')
-draw(180, two, 0.60, False).convert('RGB').save(OUT + 'apple-touch-icon.png')
+one = ['덜붐빌때']
+draw(192, one, 0.70, True).save(OUT + 'icon-192.png')
+draw(512, one, 0.70, True).save(OUT + 'icon-512.png')
+draw(512, one, 0.62, False).save(OUT + 'icon-maskable-512.png')   # 안드로이드가 원으로 잘라도 남는 폭
+draw(180, one, 0.70, False).convert('RGB').save(OUT + 'apple-touch-icon.png')
 draw(32, ['덜'], 0.74, True, 860).save(OUT + 'favicon-32.png')
