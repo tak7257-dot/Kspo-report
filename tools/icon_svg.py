@@ -2,7 +2,8 @@
 
 디자인 규칙 (design/아이콘/README.md 에 설명)
   - 바탕: 브랜드 초록(#00A86B)을 가운데 둔 위→아래 옅은 명암 + 위쪽 은은한 빛. 평면 단색보다 깊이가 생긴다.
-  - 글자: DBT Sans(Pretendard 기반, OFL) 윤곽선을 그대로 벡터로 옮긴다. 글꼴 칸이 아니라 '잉크' 기준으로
+  - 글자: Jua(SIL OFL 1.1, design/아이콘/fonts/) 윤곽선을 그대로 벡터로 옮긴다. 아이콘에 글꼴 파일은 넣지 않는다.
+    (앱 본문 글꼴은 DBT Sans 그대로) 글꼴 칸이 아니라 '잉크' 기준으로
     글자 사이를 같은 간격으로 좁힌다(로고타입 자간). 한글은 무게중심이 위에 있어 정중앙보다 살짝 위에 둔다.
   - 원본은 1024 정사각형, 모서리 없음(아이폰·안드로이드가 자기 모양으로 자른다).
     모서리가 필요한 곳(브라우저·데스크톱 설치 아이콘)은 앱 아이콘 비율(22.37%)의 부드러운 모서리로 자른다.
@@ -20,6 +21,7 @@ from fontTools.varLib import instancer
 
 ROOT = Path(__file__).resolve().parent.parent
 FONT = ROOT / "web" / "app" / "fonts" / "DBTSans-Variable.woff2"
+ICON_FONT = ROOT / "design" / "아이콘" / "fonts" / "Jua-Regular.ttf"   # 아이콘 글씨 (원본 그대로, OFL)
 DESIGN = ROOT / "design" / "아이콘"
 WEB = ROOT / "web" / "app" / "icons"
 N = 1024
@@ -116,10 +118,9 @@ def svg(path_d, palette="brand", shape="full", shadow=True):
 
 
 VARIANTS = {
-    # 이름: (줄, 굵기, 폭 비율, 자간(em), 줄 간격(em), 높이 비율, 색)
-    "A_한줄": (["덜붐빌때"], 680, 0.64, 0.06, 0, None, "brand"),
-    "B_두줄": (["덜붐", "빌때"], 760, 0.50, 0.05, 0.08, 0.52, "brand"),
-    "C_한줄_깊은초록": (["덜붐빌때"], 680, 0.64, 0.06, 0, None, "deep"),
+    # 이름: (줄, 폭 비율, 자간(em), 줄 간격(em), 높이 비율, 색)
+    "A_한줄": (["덜붐빌때"], 0.66, 0.05, 0, None, "brand"),
+    "B_두줄": (["덜붐", "빌때"], 0.56, 0.05, 0.07, 0.56, "brand"),
 }
 CHOSEN = "A_한줄"
 
@@ -127,14 +128,17 @@ CHOSEN = "A_한줄"
 if __name__ == "__main__":
     DESIGN.mkdir(parents=True, exist_ok=True)
     WEB.mkdir(parents=True, exist_ok=True)
-    for name, (lines, w, wf, gap, lgap, hf, pal) in VARIANTS.items():
-        d = wordmark(lines, w, wf, gap, lgap, height_frac=hf)
+    for old in DESIGN.glob("icon_*.svg"):
+        old.unlink()
+    font = load_font(ICON_FONT)
+    for name, (lines, wf, gap, lgap, hf, pal) in VARIANTS.items():
+        d = wordmark(lines, None, wf, gap, lgap, height_frac=hf, font=font)
         (DESIGN / f"icon_{name}.svg").write_text(svg(d, pal), encoding="utf-8")
         (DESIGN / f"icon_{name}_squircle.svg").write_text(svg(d, pal, "squircle"), encoding="utf-8")
-    lines, w, wf, gap, lgap, hf, pal = VARIANTS[CHOSEN]
-    d = wordmark(lines, w, wf, gap, lgap, height_frac=hf)
+    lines, wf, gap, lgap, hf, pal = VARIANTS[CHOSEN]
+    d = wordmark(lines, None, wf, gap, lgap, height_frac=hf, font=font)
     (WEB / "icon-full.svg").write_text(svg(d, pal), encoding="utf-8")                     # 아이폰·안드로이드 마스크용
     (WEB / "icon.svg").write_text(svg(d, pal, "squircle"), encoding="utf-8")               # 브라우저·설치 아이콘
-    small = wordmark(["덜"], 820, 0.62, 0, 0, center_y=0.5, height_frac=0.62)
+    small = wordmark(["덜"], None, 0.64, 0, 0, center_y=0.5, height_frac=0.64, font=font)
     (WEB / "favicon.svg").write_text(svg(small, pal, "squircle", shadow=False), encoding="utf-8")
     print("SVG:", sorted(p.name for p in DESIGN.glob("*.svg")), sorted(p.name for p in WEB.glob("*.svg")))

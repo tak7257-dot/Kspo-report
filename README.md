@@ -47,4 +47,4 @@ python run_all.py --fetch
 
 ## 외부 프로그램 라이선스
 pandas·numpy(BSD), requests(Apache-2.0), plotly(MIT), jinja2(BSD), trimesh(MIT), shapely(BSD), opencv(Apache-2.0),
-@google/model-viewer·three.js Draco 해독기(Apache-2.0), 글꼴 DBT Sans(Pretendard 기반 하위집합, SIL OFL 1.1, web/app/fonts/OFL.txt), glTF-Transform(MIT), assimp(BSD)
+@google/model-viewer·three.js Draco 해독기(Apache-2.0), 글꼴 DBT Sans(Pretendard 기반 하위집합, SIL OFL 1.1, web/app/fonts/OFL.txt), 앱 아이콘 글씨 Jua(SIL OFL 1.1, design/아이콘/fonts/Jua-OFL.txt — 아이콘 그림에만 사용), glTF-Transform(MIT), assimp(BSD)
