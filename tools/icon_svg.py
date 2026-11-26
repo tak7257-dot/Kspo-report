@@ -27,15 +27,22 @@ N = 1024
 _cache = {}
 
 
-def font_at(weight):
-    if weight not in _cache:
-        f = TTFont(FONT)
+def load_font(path=FONT, weight=None):
+    """글꼴 파일(ttf/otf/woff2)을 읽는다. 가변 글꼴이면 weight 굵기로 고정한다."""
+    key = (str(path), weight)
+    if key not in _cache:
+        f = TTFont(path)
         f.flavor = None
+        if "fvar" in f and weight is not None:
+            instancer.instantiateVariableFont(f, {"wght": weight}, inplace=True)
         buf = io.BytesIO()
-        instancer.instantiateVariableFont(f, {"wght": weight}, inplace=True)
         f.save(buf)
-        _cache[weight] = TTFont(io.BytesIO(buf.getvalue()))
-    return _cache[weight]
+        _cache[key] = TTFont(io.BytesIO(buf.getvalue()))
+    return _cache[key]
+
+
+def font_at(weight):
+    return load_font(FONT, weight)
 
 
 def glyph(font, ch):
@@ -46,9 +53,9 @@ def glyph(font, ch):
     return gs[name], bp.bounds  # (xMin, yMin, xMax, yMax), 글꼴 단위(위가 +)
 
 
-def wordmark(lines, weight, width_frac, gap_em, line_gap_em, center_y=0.485, height_frac=None):
+def wordmark(lines, weight, width_frac, gap_em, line_gap_em, center_y=0.485, height_frac=None, font=None):
     """글자 윤곽을 잉크 기준 자간으로 배치해 SVG path 문자열 하나로 돌려준다."""
-    font = font_at(weight)
+    font = font or font_at(weight)
     em = font["head"].unitsPerEm
     rows = []
     for text in lines:
