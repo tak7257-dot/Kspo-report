@@ -9,7 +9,7 @@ const SHELL = [
   './', 'index.html', 'manifest.webmanifest', 'js/logic.js', 'js/live.js', 'fonts/DBTSans-Variable.woff2',
   'data/show_profile.json', 'data/exit_profile.json', 'data/live_baseline.json', 'data/seat_views.json',
   'data/park_facts.json', 'data/nowcast_check.json',
-  'icons/icon-192.png', 'icons/apple-touch-icon.png', 'icons/favicon-32.png'
+  'icons/icon-192.png', 'icons/apple-touch-icon.png', 'icons/favicon-32.png', 'icons/favicon.svg'
 ];
 const CDN = 'https://cdn.jsdelivr.net/npm/@google/model-viewer@';
 

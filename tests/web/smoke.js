@@ -275,7 +275,7 @@ const noSideScroll = page => page.evaluate(() => document.documentElement.scroll
       const sizes = (man.icons || []).map(i => i.sizes + (i.purpose ? ':' + i.purpose : ''));
       check('설치: 아이콘 192·512·마스크', sizes.includes('192x192') && sizes.includes('512x512') && sizes.some(x => x.includes('maskable')), sizes.join(','));
       let iconsOk = true;
-      for (const i of man.icons || []) { const r = await page.request.get(base + i.src); iconsOk = iconsOk && r.ok() && r.headers()['content-type'].includes('png'); }
+      for (const i of man.icons || []) { const r = await page.request.get(base + i.src); iconsOk = iconsOk && r.ok() && /png|svg/.test(r.headers()['content-type']); }
       const apple = await page.locator('link[rel="apple-touch-icon"]').getAttribute('href', { timeout: 2000 }).catch(() => null);
       iconsOk = iconsOk && !!apple && (await page.request.get(base + apple)).ok();
       check('설치: 아이콘 파일이 모두 열림 (아이폰 아이콘 포함)', iconsOk);
