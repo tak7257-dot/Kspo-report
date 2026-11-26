@@ -11,3 +11,7 @@ cp -R "$ROOT/web/app/." "$OUT/"
   printf '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
   cat "$ROOT/web/app/index.html"
 } > "$OUT/index.html"
+# 서비스 워커 저장본 이름에 커밋 번호를 넣는다 → 새로 배포하면 휴대폰에 남은 옛 화면·데이터를 바꾼다
+BUILD=$(git -C "$ROOT" rev-parse --short HEAD 2>/dev/null || date +%s)
+[ -n "$(git -C "$ROOT" status --porcelain web/app 2>/dev/null)" ] && BUILD="$BUILD-$(date +%s)"
+sed "s/__BUILD__/$BUILD/" "$ROOT/web/app/sw.js" > "$OUT/sw.js"

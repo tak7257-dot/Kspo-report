@@ -5,3 +5,4 @@ __pycache__/
 kspo-report_backup_*.zip
 output/3d/*.raw.glb
 _site/
+data/raw/zone/

@@ -18,7 +18,8 @@ python run_all.py --fetch
 
 ## 관람객 웹 「덜붐빌때」 (`web/app/`)
 공연 날 "차를 가져가도 될까?"부터 답하는 주차 비서. 첫 화면 답 카드(차/지하철, 권장 도착), 공연 끝날 무렵 나가기 안내(20분 타이머),
-실시간 주차 줄, 공연 날 하루 미리 보기(3D)·내 자리에서 보기, 하루 일정표·캘린더(.ics)·공유 문구.
+실시간 주차 줄, 공연 날 하루 미리 보기(3D)·구역별 시야 미리보기, 하루 일정표·캘린더(.ics)·공유 문구,
+홈 화면에 두기(앱처럼 설치, 한 번 연 화면은 인터넷 없이도 열림 — 실시간 숫자는 제외).
 - 공개 주소: https://tak7257-dot.github.io/Kspo-report/ (저장소 공개 + Settings → Pages → Source "GitHub Actions" 후 자동 배포)
 - 테스트: `node --test tests/web/*.test.js` (판단 로직), `python -m unittest discover tests` (파이프라인), `node tests/web/smoke.js` (화면, Playwright)
 
@@ -46,4 +47,4 @@ python run_all.py --fetch
 
 ## 외부 프로그램 라이선스
 pandas·numpy(BSD), requests(Apache-2.0), plotly(MIT), jinja2(BSD), trimesh(MIT), shapely(BSD), opencv(Apache-2.0),
-@google/model-viewer·three.js Draco 해독기(Apache-2.0), 글꼴 DBT Sans(Pretendard 기반 하위집합, SIL OFL 1.1, web/app/fonts/OFL.txt), glTF-Transform(MIT), assimp(BSD)
+@google/model-viewer·three.js Draco 해독기(Apache-2.0), 글꼴 DBT Sans(Pretendard 기반 하위집합, SIL OFL 1.1, web/app/fonts/OFL.txt), 앱 아이콘 글씨 Jua(SIL OFL 1.1, design/아이콘/fonts/Jua-OFL.txt — 아이콘 그림에만 사용), glTF-Transform(MIT), assimp(BSD)
